@@ -1,0 +1,9 @@
+<form method="POST">
+  <label>Select customer:</label>
+  <select name="customer">
+    {% for c in customers %}
+      <option value="{{ c }}">{{ c }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Next</button>
+</form>

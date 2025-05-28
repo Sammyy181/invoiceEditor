@@ -1,0 +1,9 @@
+<form method="POST">
+  <label>Select your service:</label>
+  <select name="service">
+    {% for s in services %}
+      <option value="{{ s }}">{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Next</button>
+</form>
