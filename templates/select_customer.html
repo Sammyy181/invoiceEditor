@@ -15,14 +15,15 @@
         
         .container {
             position: fixed;
-            right: 20px;
-            top: 20px;
-            width: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; /* increased width */
             height: 60vh;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 30px;
             box-sizing: border-box;
@@ -448,30 +449,9 @@
             }
         }
         
-        .left-placeholder {
-            position: fixed;
-            left: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 300px;
-            height: 400px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
-            font-weight: 500;
-        }
-        
     </style>
 </head>
 <body>
-    <div class="left-placeholder">
-        Your content goes here
-    </div>
     
     <div class="container">
         <form method="POST" id="customerForm">
