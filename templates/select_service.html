@@ -38,7 +38,8 @@
     margin-top: 20px;
   }
 
-  .service-buttons button {
+  .service-buttons button,
+  .popup .popup-button {
     padding: 18px 25px;
     border: none;
     background: linear-gradient(145deg, #4f46e5, #7c3aed);
@@ -56,7 +57,8 @@
     text-align: left;
   }
 
-  .service-buttons button::before {
+  .service-buttons button::before,
+  .popup .popup-button::before {
     content: '';
     position: absolute;
     top: 0;
@@ -67,52 +69,42 @@
     transition: left 0.6s;
   }
 
-  .service-buttons button:hover {
+  .service-buttons button:hover,
+  .popup .popup-button:hover {
     transform: translateY(-5px) scale(1.02);
     box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
     background: linear-gradient(145deg, #5b21b6, #6366f1);
   }
 
-  .service-buttons button:hover::before {
+  .service-buttons button:hover::before,
+  .popup .popup-button:hover::before {
     left: 100%;
   }
 
   .popup {
     display: none;
     position: fixed;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -30%);
-    background: white;
+    top: 23%;
+    right: 400px; /* moved to right */
+    transform: translateY(-30%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     border-radius: 20px;
-    padding: 30px;
+    padding: 40px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
     z-index: 1000;
-    width: 90%;
-    max-width: 400px;
+    width: 420px; /* made it bigger */
     text-align: center;
   }
 
   .popup h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
+    font-size: 22px;
+    margin-bottom: 30px;
+    color: #2d3748;
   }
 
-  .popup button {
+  .popup .popup-button {
     margin: 10px 0;
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background-color: #4f46e5;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  .popup button:hover {
-    background-color: #5b21b6;
   }
 
   .popup .close {
@@ -134,6 +126,13 @@
     label {
       font-size: 20px;
     }
+
+    .popup {
+      right: 10px;
+      left: 10px;
+      width: auto;
+      transform: translateY(-30%);
+    }
   }
 </style>
 
@@ -150,9 +149,9 @@
 
 <div class="popup" id="popupMenu">
   <h2 id="selectedService">Selected Service</h2>
-  <button onclick="handleAction('view')">View Last Generated Invoice</button>
-  <button onclick="handleAction('generate')">Generate New Invoice</button>
-  <button onclick="handleAction('update')">Update Preferences</button>
+  <button class="popup-button" onclick="handleAction('view')">View Last Generated Invoice</button>
+  <button class="popup-button" onclick="handleAction('generate')">Generate New Invoice</button>
+  <button class="popup-button" onclick="handleAction('update')">Update Preferences</button>
   <div class="close" onclick="closePopup()">Cancel</div>
 </div>
 
@@ -164,7 +163,6 @@
     document.getElementById('selectedService').innerText = `Service: ${service}`;
     document.getElementById('popupMenu').style.display = 'block';
 
-    // Save selected service to the server via POST so Flask session can capture it
     fetch('/select_service', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -178,15 +176,11 @@
 
   function handleAction(action) {
     if (action === 'update') {
-      // Redirect to /select_customer
       window.location.href = '/select_customer';
-    } else if (action === 'view') {
-      window.location.href = '/select_feature'; // Your Flask logic handles the view feature
-    } else if (action === 'generate') {
-      window.location.href = '/select_feature'; // Your Flask logic handles generate feature
+    } else if (action === 'view' || action === 'generate') {
+      window.location.href = '/select_feature';
     }
 
     closePopup();
   }
 </script>
-
