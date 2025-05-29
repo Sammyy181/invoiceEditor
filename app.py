@@ -1,8 +1,31 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info
+import os
+import shutil
+from datetime import datetime
+from openpyxl import load_workbook
+from dateutil.relativedelta import relativedelta
+
+
+# Get current month as full name (e.g., "May")
+month_name = datetime.now().strftime("%B")
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
+
+TEMPLATE_FILE = 'template.xlsx'
+SERVICE_FOLDER = 'data'  # Folder where new service Excel files go
+
+now = datetime.now()
+previous_month_date = now - relativedelta(months=1)
+previous_month_name = previous_month_date.strftime('%B')
+
+wb = load_workbook(TEMPLATE_FILE)
+first_sheet = wb.worksheets[0]  # or wb.active
+second_sheet = wb.worksheets[1]
+first_sheet.title = previous_month_name
+second_sheet.title = month_name
+wb.save(TEMPLATE_FILE)
 
 @app.route('/')
 def home():
@@ -15,6 +38,28 @@ def select_service():
         session['service'] = request.form['service']
         return redirect(url_for('select_customer'))
     return render_template('select_service.html', services=services)
+
+@app.route('/add_service', methods=['POST'])
+def add_service():
+    service_name = request.form.get('service_name', '').strip()
+    
+    if not service_name:
+        return "No service name provided", 400
+
+    # Sanitize and construct the path
+    filename = f"{service_name}.xlsx"
+    dest_path = os.path.join(SERVICE_FOLDER, filename)
+
+    # Check if file already exists
+    if os.path.exists(dest_path):
+        return "Service already exists", 409
+
+    try:
+        shutil.copyfile(TEMPLATE_FILE, dest_path)
+        print(f"Created new service file: {dest_path}")
+        return redirect(url_for('select_service'))
+    except Exception as e:
+        return f"Failed to create new service: {str(e)}", 500
 
 @app.route('/select_feature', methods=['GET', 'POST'])
 def select_feature():
