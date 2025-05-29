@@ -1,6 +1,8 @@
 import pandas as pd
 from openpyxl import load_workbook
 from datetime import datetime
+import os
+from dateutil.relativedelta import relativedelta
 
 n_days = {
     "January" : 31,
@@ -18,14 +20,16 @@ n_days = {
 }
 
 def get_services():
-    wb = pd.ExcelFile('data/services.xlsx')
-    return wb.sheet_names
+    service_files = os.listdir('data')
+    services = [f[:-5] for f in service_files if f.endswith('.xlsx')]
+    return services
 
 def get_customers(service):
-    df = pd.read_excel('data/services.xlsx', sheet_name=service)
+    filepath = f'data/{service}.xlsx'
+    now = datetime.now()
+    previous_month_date = now - relativedelta(months=1) 
+    df = pd.read_excel(filepath, sheet_name=previous_month_date.strftime('%B'))
     return df['Customer Name'].tolist()
-
-EXCEL_PATH = 'data/services.xlsx'
 
 FIELD_MAP = {
     'usage': 'Usage (%)',
@@ -36,7 +40,10 @@ FIELD_MAP = {
 }
 
 def get_customer_info(service, customer_name):
-    df = pd.read_excel(EXCEL_PATH, sheet_name=service)
+    path = f'data/{service}.xlsx'
+    now = datetime.now()
+    previous_month_date = now - relativedelta(months=1) 
+    df = pd.read_excel(path, sheet_name=previous_month_date.strftime('%B'))
     customer_row = df[df['Customer Name'].str.strip() == customer_name.strip()]
     
     current_values = {}
@@ -52,34 +59,62 @@ def get_customer_info(service, customer_name):
 
 def update_customer_info(service, customer_name, updates):
     print(f"Updating {customer_name} in {service} with: {updates}")
+    path = f'data/{service}.xlsx'
     
-    # Load the sheet to update
-    df = pd.read_excel(EXCEL_PATH, sheet_name=service)
-    
+    now = datetime.now()
+    current_month = now.strftime('%B')
+    previous_month_date = now - relativedelta(months=1)
+    previous_month = previous_month_date.strftime('%B')
+
+    # Read all sheets from the file
+    all_sheets = pd.read_excel(path, sheet_name=None)
+
+    if current_month in all_sheets:
+        # Current month sheet exists, edit it directly
+        df = all_sheets[current_month].copy()
+        print(f"Editing existing sheet for {current_month}.")
+    elif previous_month in all_sheets:
+        # Current month sheet missing, copy previous month sheet as base
+        df = all_sheets[previous_month].copy()
+        df['Month'] = current_month  # Update Month column for all rows just in case
+        print(f"Creating new sheet for {current_month} from {previous_month}.")
+    else:
+        print(f"Neither current month ({current_month}) nor previous month ({previous_month}) sheets found in {service} file.")
+        return
+
     try:
         idx = df[df['Customer Name'].str.strip() == customer_name.strip()].index[0]
-        df.at[idx, 'Month'] = datetime.now().strftime('%B')
     except IndexError:
-        print(f"Customer '{customer_name}' not found in {service} sheet.")
+        print(f"Customer '{customer_name}' not found in {service} sheet '{current_month}'.")
         return
-    
+
+    # Update the 'Month' column for this customer row (just to be sure)
+    df.at[idx, 'Month'] = current_month
+
+    # Apply updates only if values are non-empty after stripping
     for field, value in updates.items():
         if value.strip():
-            excel_field = FIELD_MAP.get(field, field)  # fallback to original field if not in map
-            print(f"Updating '{excel_field}' to '{value}'")
-            df.at[idx, excel_field] = value.strip()      
-    
-    df.at[idx, 'Consumption Duration'] = round(float(df.at[idx, 'Consumption Period']) / n_days[datetime.now().strftime('%B')], 2)
-    df.at[idx, 'Net Price'] = float(df.at[idx, 'Consumption Duration']) * float(df.at[idx, 'Usage (%)']) * float(df.at[idx, 'Unit Price']) / 100
-    
-    # Read all sheets before writing
-    all_sheets = pd.read_excel(EXCEL_PATH, sheet_name=None)
-    all_sheets[service] = df  # Replace updated sheet
+            excel_field = FIELD_MAP.get(field, field)  # Use FIELD_MAP or fallback
+            print(f"Updating '{excel_field}' to '{value.strip()}'")
+            df.at[idx, excel_field] = value.strip()
 
-    # Now safely write back all sheets
-    with pd.ExcelWriter(EXCEL_PATH, engine='openpyxl', mode='w') as writer:
+    df.at[idx, 'Consumption Duration'] = round(
+        float(df.at[idx, 'Consumption Period']) / n_days[current_month], 2
+    )
+    df.at[idx, 'Net Price'] = (
+        float(df.at[idx, 'Consumption Duration']) *
+        float(df.at[idx, 'Usage (%)']) *
+        float(df.at[idx, 'Unit Price']) / 100
+    )
+
+    # Update the dictionary with modified or new sheet
+    all_sheets[current_month] = df
+
+    # Write back all sheets, including new/updated current month sheet
+    with pd.ExcelWriter(path, engine='openpyxl', mode='w') as writer:
         for sheet_name, sheet_df in all_sheets.items():
             sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
-    
-    print("Excel update completed.")
+
+    print(f"Excel update for {current_month} completed successfully.")
+
 

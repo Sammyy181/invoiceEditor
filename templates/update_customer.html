@@ -1,14 +1,14 @@
 <form method="POST">
   <p>Leave fields empty if no update is needed.</p>
 
-  <label>Usage % (current: {{ current.usage }}):</label>
-  <input type="text" name="usage"><br>
+  <label>Usage %:</label>
+  <input type="text" name="usage" value="{{ current.usage }}"><br>
 
-  <label>Unit Price (current: {{ current.cost }}):</label>
-  <input type="text" name="cost"><br>
+  <label>Unit Price:</label>
+  <input type="text" name="cost" value="{{ current.cost }}"><br>
 
-  <label>Consumption Period (current: {{ current.period }}):</label>
-  <input type="text" name="period"><br>
+  <label>Consumption Period:</label>
+  <input type="text" name="period" value="{{ current.period }}"><br>
 
   <button type="submit">Save Changes</button>
 </form>
