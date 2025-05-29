@@ -1,186 +1,595 @@
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service Selection</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-  .form-container {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 100%;
-    margin: 40px;
-  }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start; /* Changed from center to flex-start */
+      padding-left: 40px; /* Added left padding to move container further left */
+    }
 
-  label {
-    font-size: 24px;
-    font-weight: 600;
-    color: #2d3748;
-    text-align: left;
-    display: block;
-    margin-bottom: 30px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .service-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-  }
-
-  .service-buttons button,
-  .popup .popup-button {
-    padding: 18px 25px;
-    border: none;
-    background: linear-gradient(145deg, #4f46e5, #7c3aed);
-    color: white;
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    text-transform: capitalize;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
-    width: 100%;
-    text-align: left;
-  }
-
-  .service-buttons button::before,
-  .popup .popup-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.6s;
-  }
-
-  .service-buttons button:hover,
-  .popup .popup-button:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
-    background: linear-gradient(145deg, #5b21b6, #6366f1);
-  }
-
-  .service-buttons button:hover::before,
-  .popup .popup-button:hover::before {
-    left: 100%;
-  }
-
-  .popup {
-    display: none;
-    position: fixed;
-    top: 23%;
-    right: 400px; /* moved to right */
-    transform: translateY(-30%);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-    z-index: 1000;
-    width: 420px; /* made it bigger */
-    text-align: center;
-  }
-
-  .popup h2 {
-    font-size: 22px;
-    margin-bottom: 30px;
-    color: #2d3748;
-  }
-
-  .popup .popup-button {
-    margin: 10px 0;
-  }
-
-  .popup .close {
-    background: none;
-    color: #666;
-    font-size: 14px;
-    margin-top: 10px;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
-  @media (max-width: 768px) {
     .form-container {
-      padding: 30px 20px;
-      margin: 20px 10px;
-      max-width: none;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 24px;
+      padding: 45px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 450px;
+      height: 650px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border-radius: 24px;
+      pointer-events: none;
     }
 
     label {
-      font-size: 20px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d3748;
+      text-align: left; /* Changed from center to left */
+      margin-bottom: 35px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 1;
     }
 
+    .services-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .service-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      overflow-y: auto; /* This makes it scrollable */
+      overflow-x: hidden; /* Hide horizontal scroll */
+      padding-right: 8px;
+      margin-bottom: 20px;
+      max-height: 400px; /* Set explicit max height for better scroll control */
+    }
+
+    /* Enhanced Custom Scrollbar */
+    .service-buttons::-webkit-scrollbar {
+      width: 8px; /* Made scrollbar slightly wider */
+    }
+
+    .service-buttons::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      margin: 4px 0; /* Add margin to track */
+    }
+
+    .service-buttons::-webkit-scrollbar-thumb {
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .service-buttons::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(145deg, #5b21b6, #6366f1);
+    }
+
+    /* Firefox scrollbar styling */
+    .service-buttons {
+      scrollbar-width: thin;
+      scrollbar-color: #4f46e5 rgba(0, 0, 0, 0.1);
+    }
+
+    .service-buttons button {
+      padding: 16px 24px;
+      border: none;
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      color: white;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      text-transform: capitalize;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+      width: 100%;
+      text-align: left;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .service-buttons button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .service-buttons button:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+      background: linear-gradient(145deg, #5b21b6, #6366f1);
+    }
+
+    .service-buttons button:hover::before {
+      left: 100%;
+    }
+
+    .service-buttons button:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .add-service-container {
+      margin-top: auto;
+      text-align: left; /* Changed from center to left */
+      position: relative;
+      z-index: 1;
+    }
+
+    .add-service-button {
+      padding: 16px 32px;
+      background: linear-gradient(145deg, #10b981, #059669);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .add-service-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .add-service-button:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
+      background: linear-gradient(145deg, #059669, #047857);
+    }
+
+    .add-service-button:hover::before {
+      left: 100%;
+    }
+
+    .add-service-button:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    /* Main Service Popup */
     .popup {
-      right: 10px;
-      left: 10px;
-      width: auto;
-      transform: translateY(-30%);
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 24px;
+      padding: 45px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      z-index: 1001;
+      width: 90%;
+      max-width: 480px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: popupSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-  }
-</style>
 
-<div class="form-container">
-  <form method="POST" onsubmit="return false;">
-    <label>Select your service:</label>
-    <div class="service-buttons">
-      {% for s in services %}
-        <button type="button" onclick="openPopup('{{ s }}')">{{ s }}</button>
-      {% endfor %}
+    @keyframes popupSlideIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .popup h2 {
+      font-size: 24px;
+      margin-bottom: 35px;
+      color: #2d3748;
+      font-weight: 700;
+    }
+
+    .popup .popup-button {
+      padding: 16px 28px;
+      border: none;
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      color: white;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
+      width: 100%;
+      margin: 8px 0;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .popup .popup-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .popup .popup-button:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+      background: linear-gradient(145deg, #5b21b6, #6366f1);
+    }
+
+    .popup .popup-button:hover::before {
+      left: 100%;
+    }
+
+    .popup .close {
+      background: none;
+      color: #666;
+      font-size: 16px;
+      margin-top: 20px;
+      text-decoration: underline;
+      cursor: pointer;
+      border: none;
+      padding: 10px;
+      transition: color 0.3s ease;
+      font-weight: 500;
+    }
+
+    .popup .close:hover {
+      color: #333;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Overlay */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      display: none;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Add Service Popup */
+    .add-service-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 45px;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      z-index: 1001;
+      width: 90%;
+      max-width: 420px;
+      display: none;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: popupSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .add-service-popup h2 {
+      margin-bottom: 30px;
+      color: #2d3748;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .add-service-popup input {
+      width: 100%;
+      padding: 16px 20px;
+      margin-bottom: 30px;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .add-service-popup input:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    .popup-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .popup-buttons button {
+      padding: 16px 24px;
+      border: none;
+      border-radius: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      flex: 1;
+      min-height: 56px;
+      font-size: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .popup-buttons button:first-child {
+      background: linear-gradient(145deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .popup-buttons button:first-child:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      background: linear-gradient(145deg, #059669, #047857);
+    }
+
+    .popup-buttons .cancel-btn {
+      background: linear-gradient(145deg, #ef4444, #dc2626);
+      color: white;
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+    }
+
+    .popup-buttons .cancel-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+      background: linear-gradient(145deg, #dc2626, #b91c1c);
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+        justify-content: center; /* Center on mobile for better UX */
+        padding-left: 15px;
+      }
+
+      .form-container {
+        padding: 35px 25px;
+        height: 600px;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+      }
+
+      label {
+        font-size: 24px;
+        margin-bottom: 25px;
+        text-align: center; /* Center on mobile */
+      }
+
+      .add-service-container {
+        text-align: center; /* Center on mobile */
+      }
+
+      .service-buttons button,
+      .add-service-button,
+      .popup .popup-button,
+      .popup-buttons button {
+        min-height: 50px;
+        font-size: 15px;
+      }
+
+      .popup,
+      .add-service-popup {
+        padding: 35px 25px;
+        width: 95%;
+        max-width: none;
+      }
+
+      .popup h2,
+      .add-service-popup h2 {
+        font-size: 22px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 25px 20px;
+        height: 550px;
+      }
+
+      label {
+        font-size: 22px;
+      }
+
+      .service-buttons {
+        gap: 10px;
+      }
+
+      .popup-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <form method="POST" onsubmit="return false;">
+      <label>Select your service:</label>
+      <div class="service-buttons">
+        {% for s in services %}
+          <button type="button" onclick="openPopup('{{ s }}')">{{ s }}</button>
+        {% endfor %}
+      </div>
+    </form>
+
+    <!-- Add New Service Button -->
+    <div class="add-service-container">
+      <button class="add-service-button" onclick="openAddServicePopup()">+ Add New Service</button>
     </div>
-  </form>
-</div>
+  </div>
 
-<div class="popup" id="popupMenu">
-  <h2 id="selectedService">Selected Service</h2>
-  <button class="popup-button" onclick="handleAction('view')">View Last Generated Invoice</button>
-  <button class="popup-button" onclick="handleAction('generate')">Generate New Invoice</button>
-  <button class="popup-button" onclick="handleAction('update')">Update Preferences</button>
-  <div class="close" onclick="closePopup()">Cancel</div>
-</div>
+  <!-- Main Popup -->
+  <div class="popup" id="popupMenu">
+    <h2 id="selectedService">Selected Service</h2>
+    <button class="popup-button" onclick="handleAction('view')">View Last Generated Invoice</button>
+    <button class="popup-button" onclick="handleAction('generate')">Generate New Invoice</button>
+    <button class="popup-button" onclick="handleAction('update')">Update Preferences</button>
+    <div class="close" onclick="closePopup()">Cancel</div>
+  </div>
 
-<script>
-  let selectedService = '';
+  <!-- Add New Service Popup -->
+  <div class="overlay" id="overlay"></div>
+  <div class="add-service-popup" id="addServicePopup">
+    <h2>Add New Service</h2>
+    <input type="text" id="newServiceInput" placeholder="Enter service name" />
+    <div class="popup-buttons">
+      <button onclick="submitNewService()">Add</button>
+      <button class="cancel-btn" onclick="closeAddServicePopup()">Cancel</button>
+    </div>
+  </div>
 
-  function openPopup(service) {
-    selectedService = service;
-    document.getElementById('selectedService').innerText = `Service: ${service}`;
-    document.getElementById('popupMenu').style.display = 'block';
+  <script>
+    let selectedService = '';
 
-    fetch('/select_service', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `service=${encodeURIComponent(service)}`
-    });
-  }
+    function openPopup(service) {
+      selectedService = service;
+      document.getElementById('selectedService').innerText = `Service: ${service}`;
+      document.getElementById('popupMenu').style.display = 'block';
 
-  function closePopup() {
-    document.getElementById('popupMenu').style.display = 'none';
-  }
-
-  function handleAction(action) {
-    if (action === 'update') {
-      window.location.href = '/select_customer';
-    } else if (action === 'view' || action === 'generate') {
-      window.location.href = '/select_feature';
+      fetch('/select_service', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `service=${encodeURIComponent(service)}`
+      });
     }
 
-    closePopup();
-  }
-</script>
+    function closePopup() {
+      document.getElementById('popupMenu').style.display = 'none';
+    }
+
+    function handleAction(action) {
+      if (action === 'update') {
+        window.location.href = '/select_customer';
+      } else if (action === 'view' || action === 'generate') {
+        window.location.href = '/select_feature';
+      }
+      closePopup();
+    }
+
+    function openAddServicePopup() {
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("addServicePopup").style.display = "block";
+    }
+
+    function closeAddServicePopup() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("addServicePopup").style.display = "none";
+      document.getElementById("newServiceInput").value = "";
+    }
+
+    function submitNewService() {
+      const input = document.getElementById("newServiceInput");
+      const serviceName = input.value.trim();
+      if (serviceName === "") return;
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = serviceName;
+      button.onclick = function () {
+        openPopup(serviceName);
+fetch("/add_service", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "service_name=" + encodeURIComponent(serviceName)
+    })
+    .then(response => {
+      if (response.ok) {
+        // Optionally update the UI
+        location.reload(); // or update DOM to add the button without reload
+      } else {
+        alert("Error adding service: " + response.statusText);
+      }
+    });
+      };
+
+      document.querySelector(".service-buttons").appendChild(button);
+      closeAddServicePopup();
+    }
+  </script>
+</body>
+</html>
