@@ -1,32 +1,192 @@
 <style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .form-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    margin: 40px;
+  }
+
+  label {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2d3748;
+    text-align: left;
+    display: block;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
   .service-buttons {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
   }
-  
+
   .service-buttons button {
-    padding: 10px 20px;
-    border: 2px solid #007bff;
-    background-color: white;
-    color: #007bff;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .service-buttons button:hover {
-    background-color: #007bff;
+    padding: 18px 25px;
+    border: none;
+    background: linear-gradient(145deg, #4f46e5, #7c3aed);
     color: white;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: capitalize;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+    width: 100%;
+    text-align: left;
+  }
+
+  .service-buttons button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+  }
+
+  .service-buttons button:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+    background: linear-gradient(145deg, #5b21b6, #6366f1);
+  }
+
+  .service-buttons button:hover::before {
+    left: 100%;
+  }
+
+  .popup {
+    display: none;
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .popup h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .popup button {
+    margin: 10px 0;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background-color: #4f46e5;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .popup button:hover {
+    background-color: #5b21b6;
+  }
+
+  .popup .close {
+    background: none;
+    color: #666;
+    font-size: 14px;
+    margin-top: 10px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 30px 20px;
+      margin: 20px 10px;
+      max-width: none;
+    }
+
+    label {
+      font-size: 20px;
+    }
   }
 </style>
 
-<form method="POST">
-  <label>Select your service:</label>
-  <div class="service-buttons">
-    {% for s in services %}
-      <button type="submit" name="service" value="{{ s }}">{{ s }}</button>
-    {% endfor %}
-  </div>
-</form>
+<div class="form-container">
+  <form method="POST" onsubmit="return false;">
+    <label>Select your service:</label>
+    <div class="service-buttons">
+      {% for s in services %}
+        <button type="button" onclick="openPopup('{{ s }}')">{{ s }}</button>
+      {% endfor %}
+    </div>
+  </form>
+</div>
+
+<div class="popup" id="popupMenu">
+  <h2 id="selectedService">Selected Service</h2>
+  <button onclick="handleAction('view')">View Last Generated Invoice</button>
+  <button onclick="handleAction('generate')">Generate New Invoice</button>
+  <button onclick="handleAction('update')">Update Preferences</button>
+  <div class="close" onclick="closePopup()">Cancel</div>
+</div>
+
+<script>
+  let selectedService = '';
+
+  function openPopup(service) {
+    selectedService = service;
+    document.getElementById('selectedService').innerText = `Service: ${service}`;
+    document.getElementById('popupMenu').style.display = 'block';
+
+    // Save selected service to the server via POST so Flask session can capture it
+    fetch('/select_service', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `service=${encodeURIComponent(service)}`
+    });
+  }
+
+  function closePopup() {
+    document.getElementById('popupMenu').style.display = 'none';
+  }
+
+  function handleAction(action) {
+    if (action === 'update') {
+      // Redirect to /select_customer
+      window.location.href = '/select_customer';
+    } else if (action === 'view') {
+      window.location.href = '/select_feature'; // Your Flask logic handles the view feature
+    } else if (action === 'generate') {
+      window.location.href = '/select_feature'; // Your Flask logic handles generate feature
+    }
+
+    closePopup();
+  }
+</script>
+
