@@ -16,6 +16,29 @@ def select_service():
         return redirect(url_for('select_customer'))
     return render_template('select_service.html', services=services)
 
+@app.route('/select_feature', methods=['GET', 'POST'])
+def select_feature():
+    service = session.get('service')
+    if not service:
+        return redirect(url_for('select_service'))
+    
+    if request.method == 'POST':
+        feature = request.form['feature']
+        
+        if feature == 'update_preferences':
+            return redirect(url_for('select_customer'))
+        elif feature == 'view_invoice':
+            # Add your invoice viewing logic here
+            return render_template('coming_soon.html', feature='View Last Generated Invoice')
+        elif feature == 'generate_invoice':
+            # Add your invoice generation logic here
+            return render_template('coming_soon.html', feature='Generate New Invoice')
+        elif feature == 'manage_customer':
+            # Add your customer management logic here
+            return render_template('coming_soon.html', feature='Add or Delete Customer')
+    
+    return render_template('select_feature.html', service=service)
+
 @app.route('/select_customer', methods=['GET', 'POST'])
 def select_customer():
     service = session.get('service')
