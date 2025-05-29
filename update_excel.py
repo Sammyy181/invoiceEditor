@@ -73,6 +73,8 @@ def add_customer_info(service, name, price, period, usage):
     
     now = datetime.now()
     current_month = now.strftime('%B')
+    previous_month = now - relativedelta(months=1)
+    previous_month = previous_month.strftime('%B')
 
     # Read all sheets from the file
     all_sheets = pd.read_excel(path, sheet_name=None)
@@ -83,7 +85,7 @@ def add_customer_info(service, name, price, period, usage):
         print(f"Editing existing sheet for {current_month}.")
     
     else:
-        df = {}
+        df = all_sheets[previous_month].copy()
         
     idx = len(df)
     
@@ -107,8 +109,8 @@ def update_customer_info(service, customer_name, updates):
     
     now = datetime.now()
     current_month = now.strftime('%B')
-    previous_month_date = now - relativedelta(months=1)
-    previous_month = previous_month_date.strftime('%B')
+    previous_month = now - relativedelta(months=1)
+    previous_month = previous_month.strftime('%B')
 
     # Read all sheets from the file
     all_sheets = pd.read_excel(path, sheet_name=None)

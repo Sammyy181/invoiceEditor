@@ -473,18 +473,11 @@
             </div>
 
             <div class="back-button-container" style="margin-top: 40px; margin-bottom: 20px; display: flex; justify-content: center;">
-                <button type="button" onclick="window.history.back()" style="
-                    background: none;
-                    border: none;
-                    color: blue;
-                    text-decoration: underline;
-                    cursor: pointer;
-                    font-size: 1rem;
-                    padding: 0;
-                    font-family: inherit;
-                ">
-                    Go Back
-                </button>
+                <a href="{{ url_for('select_service') }}"
+                  style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; font-size: 1rem; padding: 0; font-family: inherit;">
+                  Go Back
+                </a>
+
             </div>
         </form>
         
@@ -496,7 +489,7 @@
         <div class="popup-form">
             <h2>Add New Customer</h2>
             
-            <form id="addCustomerForm">
+            <form id="addCustomerForm" method="POST" action="{{ url_for('add_customer') }}">
                 <div class="form-group">
                     <label for="customerName">Customer Name</label>
                     <input type="text" id="customerName" name="customer_name" placeholder="Enter customer name" required>
@@ -519,7 +512,7 @@
                 
                 <div class="form-buttons">
                     <button type="button" class="form-btn cancel" onclick="hideAddCustomerPopup()">Cancel</button>
-                    <button type="button" class="form-btn save" onclick="handleFormSubmit()">Save Customer</button>
+                    <button type="submit" class="form-btn save">Save Customer</button>
                 </div>
             </form>
         </div>
@@ -563,27 +556,11 @@
             }
         });
 
-        async function handleFormSubmit() {
-            const formData = new FormData(document.getElementById('addCustomerForm'));
-
-            const response = await fetch('/add_customer', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.redirected) {
-                // If Flask redirects (like with redirect(url_for(...))), follow it
-                window.location.href = response.url;
-            } else {
-                // Handle any other response here
-                console.log("Customer saved without redirect");
-            }
-        }
     </script>
 
         {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="flash-message" style="position: fixed; bottom: 10px; left: 0; right: 0; text-align: center; color: green;">
+        <div class="flash-message" style="position: fixed; bottom: 10px; left: 0; right: 0; text-align: center; color: green; bold;">
           {% for message in messages %}
             <p>{{ message }}</p>
           {% endfor %}
