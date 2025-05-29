@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info
 
 app = Flask(__name__)
@@ -56,16 +56,16 @@ def select_customer():
 
 @app.route('/add_customer', methods=['POST'])
 def add_customer():
-    service = session.get(service)
+    service = session.get('service')
     
     name = request.form['customer_name']
     price = float(request.form['unit_price'])
     period = request.form['consumption_period']
     usage = float(request.form['usage_percent'])
 
-    # Call helper function
     add_customer_info(service, name, price, period, usage)
-
+    
+    flash("Added Customer Information Successfully!")
     return redirect(url_for('select_customer'))
 
 

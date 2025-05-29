@@ -455,7 +455,7 @@
     
     <div class="container">
         <form method="POST" id="customerForm">
-            <label>Select customer:</label>
+            <h2>Select customer:</h2>
             
             <div class="customer-list">
                 
@@ -481,7 +481,7 @@
         <div class="popup-form">
             <h2>Add New Customer</h2>
             
-            <form method="POST" action="/add_customer" id="addCustomerForm">
+            <form id="addCustomerForm">
                 <div class="form-group">
                     <label for="customerName">Customer Name</label>
                     <input type="text" id="customerName" name="customer_name" placeholder="Enter customer name" required>
@@ -504,7 +504,7 @@
                 
                 <div class="form-buttons">
                     <button type="button" class="form-btn cancel" onclick="hideAddCustomerPopup()">Cancel</button>
-                    <button type="submit" class="form-btn save">Save Customer</button>
+                    <button type="button" class="form-btn save" onclick="handleFormSubmit()">Save Customer</button>
                 </div>
             </form>
         </div>
@@ -547,6 +547,34 @@
                 hideAddCustomerPopup();
             }
         });
+
+        async function handleFormSubmit() {
+            const formData = new FormData(document.getElementById('addCustomerForm'));
+
+            const response = await fetch('/add_customer', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.redirected) {
+                // If Flask redirects (like with redirect(url_for(...))), follow it
+                window.location.href = response.url;
+            } else {
+                // Handle any other response here
+                console.log("Customer saved without redirect");
+            }
+        }
     </script>
+
+        {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-message" style="position: fixed; bottom: 10px; left: 0; right: 0; text-align: center; color: green;">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
 </body>
 </html>
