@@ -57,6 +57,9 @@ def get_customer_info(service, customer_name):
     
     return current_values
 
+def add_customer_info():
+    return None
+
 def update_customer_info(service, customer_name, updates):
     print(f"Updating {customer_name} in {service} with: {updates}")
     path = f'data/{service}.xlsx'

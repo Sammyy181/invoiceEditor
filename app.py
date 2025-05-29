@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from update_excel import get_services, get_customers, update_customer_info, get_customer_info
+from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -20,10 +20,31 @@ def select_service():
 def select_customer():
     service = session.get('service')
     customers = get_customers(service)
+
     if request.method == 'POST':
-        session['customer'] = request.form['customer']
-        return redirect(url_for('update_customer'))
-    return render_template('select_customer.html', customers=customers, service=service)
+        if request.form.get('action') == 'add_new':
+            # This just re-renders the page with the popup showing
+            return render_template('select_customer.html', customers=customers, service=service, show_popup=True)
+        else:
+            session['customer'] = request.form['customer']
+            return redirect(url_for('update_customer'))
+
+    return render_template('select_customer.html', customers=customers, service=service, show_popup=False)
+
+@app.route('/add_customer', methods=['POST'])
+def add_customer():
+    service = session.get(service)
+    
+    name = request.form['customer_name']
+    price = float(request.form['unit_price'])
+    period = request.form['consumption_period']
+    usage = float(request.form['usage_percent'])
+
+    # Call helper function
+    add_customer_info(service, name, price, period, usage)
+
+    return redirect(url_for('select_customer'))
+
 
 @app.route('/update_customer', methods=['GET', 'POST'])
 def update_customer():
