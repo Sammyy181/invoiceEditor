@@ -42,15 +42,25 @@ def select_feature():
 @app.route('/select_customer', methods=['GET', 'POST'])
 def select_customer():
     service = session.get('service')
+    action = request.form.get('action')
+    selected_customer = request.form.get('customer')
     customers = get_customers(service)
 
     if request.method == 'POST':
-        if request.form.get('action') == 'add_new':
+        if action == 'add_new':
             # This just re-renders the page with the popup showing
             return render_template('select_customer.html', customers=customers, service=service, show_popup=True)
-        else:
-            session['customer'] = request.form['customer']
-            return redirect(url_for('update_customer'))
+        elif selected_customer:
+            session['customer'] = selected_customer
+            current = get_customer_info(service, selected_customer)
+            
+            return render_template(
+                'select_customer.html',
+                customers=customers,
+                service=service,
+                show_edit_popup=True,
+                current=current
+            )
 
     return render_template('select_customer.html', customers=customers, service=service, show_popup=False)
 
@@ -69,17 +79,26 @@ def add_customer():
     return redirect(url_for('select_customer'))
 
 
-@app.route('/update_customer', methods=['GET', 'POST'])
+@app.route('/update_customer', methods=['POST'])
 def update_customer():
-    if request.method == 'POST':
-        updates = {k: v for k, v in request.form.items() if v.strip() != ''}
-        update_customer_info(session['service'], session['customer'], updates)
-        return redirect(url_for('thank_you'))
+    # Make sure these session keys exist
+    service = session.get('service')
+    customer = session.get('customer')
 
-    # Use helper function from backend tools
-    current_values = get_customer_info(session['service'], session['customer'])
+    if not service or not customer:
+        flash("Session expired or invalid. Please select a customer again.", "error")
+        return redirect(url_for('select_customer'))
 
-    return render_template('update_customer.html', current=current_values)
+    # Filter out empty values, so only updated fields are sent
+    updates = {k: v for k, v in request.form.items() if v.strip() != ''}
+
+    try:
+        update_customer_info(service, customer, updates)
+        flash("Customer Updated Successfully!", "success")
+    except Exception as e:
+        flash(f"Failed to update customer: {str(e)}", "error")
+
+    return redirect(url_for('select_customer'))
 
 
 @app.route('/thank_you')
