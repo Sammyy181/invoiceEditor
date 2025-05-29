@@ -31,6 +31,29 @@
             flex-direction: column;
         }
 
+        .back-button-container {
+            /* No need for margin-top here if placed directly after the container */
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            justify-content: center;
+        }
+        .back-button-container a {
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+            display: inline-block;
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+        }
+        .back-button-container a:hover {
+            background-color: #0056b3; /* Darken on hover */
+        }
+
         .customer-list {
             flex: 1;
             overflow-y: auto;
@@ -453,7 +476,6 @@
     </style>
 </head>
 <body>
-
     <div class="container">
         <form method="POST" id="customerForm">
             <h2>Select customer:</h2>
@@ -473,16 +495,16 @@
                 </button>
             </div>
 
-            <div class="back-button-container" style="margin-top: 40px; margin-bottom: 20px; display: flex; justify-content: center;">
-                <a href="{{ url_for('select_service') }}"
-                  style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; font-size: 1rem; padding: 0; font-family: inherit;">
-                    Go Back
-                </a>
-
-            </div>
+            
         </form>
 
         <div id="result" class="result"></div>
+    </div>
+
+    <div class="back-button-container" style="position: fixed; bottom: 100px;">
+        <a href="{{ url_for('select_service') }}">
+            Go Back
+        </a>
     </div>
 
     <div id="popupOverlay" class="popup-overlay">
