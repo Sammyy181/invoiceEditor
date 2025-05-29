@@ -3,6 +3,7 @@ from openpyxl import load_workbook
 from datetime import datetime
 import os
 from dateutil.relativedelta import relativedelta
+import json
 
 n_days = {
     "January" : 31,
@@ -162,4 +163,28 @@ def update_customer_info(service, customer_name, updates):
 
     print(f"Excel update for {current_month} completed successfully.")
 
-
+def your_invoice_function(action, service):
+    """
+    Replace this with your actual function that returns a pandas DataFrame
+    """
+    if action == 'view':
+        # Return last generated invoice data
+        data = {
+            'Item': ['Service A', 'Service B', 'Consulting'],
+            'Description': ['Basic service', 'Premium service', 'Expert consultation'],
+            'Quantity': [2, 1, 3],
+            'Rate': [100.00, 250.00, 150.00],
+            'Amount': [200.00, 250.00, 450.00]
+        }
+    else:  # action == 'generate'
+        # Generate new invoice data
+        data = {
+            'Item': ['New Service', 'Updated Service'],
+            'Description': ['Newly added service', 'Recently updated service'],
+            'Quantity': [1, 2],
+            'Rate': [300.00, 200.00],
+            'Amount': [300.00, 400.00]
+        }
+    
+    df = pd.DataFrame(data)
+    return df

@@ -481,6 +481,259 @@
         gap: 10px;
       }
     }
+
+    .invoice-popup {
+      position: fixed;
+      top: 50%;
+      right: -450px; /* Start off-screen */
+      transform: translateY(-50%);
+      width: 420px;
+      max-height: 80vh;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      z-index: 1002; /* Higher than main popup */
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .invoice-popup.show {
+      right: 20px; /* Slide in position */
+    }
+
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 25px 30px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+    }
+
+    .invoice-header h2 {
+      color: #2d3748;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .invoice-close-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #666;
+      cursor: pointer;
+      padding: 5px;
+      line-height: 1;
+      transition: all 0.3s ease;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .invoice-close-btn:hover {
+      color: #333;
+      background: rgba(0, 0, 0, 0.05);
+      transform: rotate(90deg);
+    }
+
+    .invoice-content {
+      padding: 30px;
+      max-height: calc(80vh - 100px);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Custom scrollbar for invoice content */
+    .invoice-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .invoice-content::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+
+    .invoice-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      border-radius: 10px;
+    }
+
+    .invoice-content::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(145deg, #5b21b6, #6366f1);
+    }
+
+    .invoice-placeholder {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 40px 20px;
+    }
+
+    /* Loading and Error States */
+    .loading-state, .error-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4f46e5;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-detail {
+      color: #ef4444;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+
+    .retry-btn {
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .retry-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Invoice Table Styles */
+    .invoice-table-container {
+      overflow-x: auto;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .invoice-table th {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      padding: 15px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .invoice-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+      color: #2d3748;
+    }
+
+    .invoice-table tbody tr:hover {
+      background: rgba(79, 70, 229, 0.05);
+    }
+
+    .invoice-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Invoice Summary Styles */
+    .invoice-summary {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(124, 58, 237, 0.05));
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(79, 70, 229, 0.1);
+    }
+
+    .invoice-summary h3 {
+      margin: 0 0 15px 0;
+      color: #2d3748;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(79, 70, 229, 0.1);
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+      font-weight: 700;
+      font-size: 16px;
+      color: #4f46e5;
+    }
+
+    .summary-label {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .summary-value {
+      color: #2d3748;
+      font-weight: 600;
+    }
+
+    /* Mobile responsiveness for invoice popup */
+    @media (max-width: 768px) {
+      .invoice-popup {
+        width: 100%;
+        right: -100%;
+        top: 0;
+        transform: none;
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+      }
+      
+      .invoice-popup.show {
+        right: 0;
+      }
+      
+      .invoice-content {
+        max-height: calc(100vh - 100px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .invoice-header {
+        padding: 20px 20px 15px;
+      }
+      
+      .invoice-content {
+        padding: 20px;
+      }
+      
+      .invoice-header h2 {
+        font-size: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -518,6 +771,19 @@
     <div class="popup-buttons">
       <button onclick="submitNewService()">Add</button>
       <button class="cancel-btn" onclick="closeAddServicePopup()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="invoice-popup" id="invoicePopup">
+    <div class="invoice-header">
+      <h2 id="invoiceTitle">Invoice</h2>
+      <button class="invoice-close-btn" onclick="closeInvoicePopup()">×</button>
+    </div>
+    <div class="invoice-content" id="invoiceContent">
+      <!-- Invoice content will be populated here -->
+      <div class="invoice-placeholder">
+        <p>Invoice content will be displayed here...</p>
+      </div>
     </div>
   </div>
 
@@ -590,6 +856,183 @@ fetch("/add_service", {
       document.querySelector(".service-buttons").appendChild(button);
       closeAddServicePopup();
     }
+  
+  function showInvoicePopup(type) {
+      const popup = document.getElementById('invoicePopup');
+      const title = document.getElementById('invoiceTitle');
+      
+      // Set title based on action type
+      if (type === 'view') {
+        title.textContent = 'Last Generated Invoice';
+      } else if (type === 'generate') {
+        title.textContent = 'New Invoice';
+      }
+      
+      // Show the popup with slide-in animation
+      popup.classList.add('show');
+      
+      // Load invoice content
+      loadInvoiceContent(type);
+    }
+
+    async function loadInvoiceContent(type) {
+      const contentDiv = document.getElementById('invoiceContent');
+      
+      // Show loading state
+      contentDiv.innerHTML = `
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading invoice data...</p>
+        </div>
+      `;
+      
+      try {
+        // Make API call to get dataframe data
+        const response = await fetch('/get_invoice_data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: type,
+            service: selectedService
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Display the dataframe data
+        displayInvoiceData(data);
+        
+      } catch (error) {
+        console.error('Error loading invoice data:', error);
+        contentDiv.innerHTML = `
+          <div class="error-state">
+            <p>❌ Error loading invoice data</p>
+            <p class="error-detail">${error.message}</p>
+            <button onclick="loadInvoiceContent('${type}')" class="retry-btn">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function displayInvoiceData(data) {
+      const contentDiv = document.getElementById('invoiceContent');
+      
+      if (!data || !data.columns || !data.data) {
+        contentDiv.innerHTML = '<div class="error-state"><p>No invoice data available</p></div>';
+        return;
+      }
+      
+      // Create table HTML from dataframe data
+      let tableHtml = `
+        <div class="invoice-table-container">
+          <table class="invoice-table">
+            <thead>
+              <tr>
+                ${data.columns.map(col => `<th>${col}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      // Add data rows
+      data.data.forEach(row => {
+        tableHtml += '<tr>';
+        row.forEach(cell => {
+          // Format cell data (handle numbers, dates, etc.)
+          const formattedCell = formatCellData(cell);
+          tableHtml += `<td>${formattedCell}</td>`;
+        });
+        tableHtml += '</tr>';
+      });
+      
+      tableHtml += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      // Add summary if provided
+      if (data.summary) {
+        tableHtml += `
+          <div class="invoice-summary">
+            <h3>Summary</h3>
+            ${Object.entries(data.summary).map(([key, value]) => 
+              `<div class="summary-row">
+                <span class="summary-label">${key}:</span>
+                <span class="summary-value">${formatCellData(value)}</span>
+              </div>`
+            ).join('')}
+          </div>
+        `;
+      }
+      
+      contentDiv.innerHTML = tableHtml;
+    }
+
+    function formatCellData(cell) {
+      if (cell === null || cell === undefined) {
+        return '-';
+      }
+      
+      // Format numbers
+      if (typeof cell === 'number') {
+        // If it looks like currency (has decimals), format as currency
+        if (cell % 1 !== 0) {
+          return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+          }).format(cell);
+        }
+        // Otherwise format as regular number
+        return new Intl.NumberFormat('en-US').format(cell);
+      }
+      
+      // Format dates (if string looks like date)
+      if (typeof cell === 'string' && /^\d{4}-\d{2}-\d{2}/.test(cell)) {
+        try {
+          const date = new Date(cell);
+          return date.toLocaleDateString('en-US');
+        } catch (e) {
+          return cell;
+        }
+      }
+      
+      return String(cell);
+    }
+
+    function closeInvoicePopup() {
+      const popup = document.getElementById('invoicePopup');
+      popup.classList.remove('show');
+    }
+
+    // Update your existing handleAction function to call showInvoicePopup
+    function handleAction(action) {
+      if (action === 'update') {
+        window.location.href = '/select_customer';
+      } else if (action === 'view' || action === 'generate') {
+        // Show invoice popup instead of redirecting
+        showInvoicePopup(action);
+        closePopup(); // Close the main popup
+      }
+    }
+
+    // Optional: Close invoice popup when clicking outside (if you want this behavior)
+    document.addEventListener('click', function(event) {
+      const invoicePopup = document.getElementById('invoicePopup');
+      const mainPopup = document.getElementById('popupMenu');
+      
+      if (invoicePopup.classList.contains('show') && 
+          !invoicePopup.contains(event.target) && 
+          !mainPopup.contains(event.target)) {
+        closeInvoicePopup();
+      }
+    });
   </script>
 </body>
 </html>

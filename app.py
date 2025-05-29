@@ -1,11 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info, your_invoice_function
 import os
 import shutil
 from datetime import datetime
 from openpyxl import load_workbook
 from dateutil.relativedelta import relativedelta
-
 
 # Get current month as full name (e.g., "May")
 month_name = datetime.now().strftime("%B")
@@ -172,3 +171,35 @@ def submit():
 
     update_customer_info(service, customer, updates)
     return render_template('thank_you.html')
+
+@app.route('/get_invoice_data', methods=['POST'])
+def get_invoice_data():
+    try:
+        data = request.get_json()
+        action = data.get('action')  # 'view' or 'generate'
+        service = data.get('service')
+        
+        # Call your function that returns a pandas DataFrame
+        df = your_invoice_function(action, service)  # Replace with your actual function
+        
+        # Convert DataFrame to JSON-serializable format
+        response_data = {
+            'columns': df.columns.tolist(),
+            'data': df.values.tolist(),
+            'summary': None  # Optional: add summary data
+        }
+        
+        # Optional: Add summary calculations
+        if 'Amount' in df.columns or 'Total' in df.columns:
+            # Example summary calculations
+            amount_col = 'Amount' if 'Amount' in df.columns else 'Total'
+            response_data['summary'] = {
+                'Subtotal': df[amount_col].sum(),
+                'Tax (10%)': df[amount_col].sum() * 0.1,
+                'Total': df[amount_col].sum() * 1.1
+            }
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
