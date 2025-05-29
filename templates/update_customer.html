@@ -1,7 +1,15 @@
 <form method="POST">
   <p>Leave fields empty if no update is needed.</p>
-  <label>Usage %:</label><input type="text" name="usage"><br>
-  <label>Unit Price:</label><input type="text" name="cost"><br>
-  <Label>Consumtion Period:</label><input type="text" name='period'><br>
+
+  <label>Usage % (current: {{ current.usage }}):</label>
+  <input type="text" name="usage"><br>
+
+  <label>Unit Price (current: {{ current.cost }}):</label>
+  <input type="text" name="cost"><br>
+
+  <label>Consumption Period (current: {{ current.period }}):</label>
+  <input type="text" name="period"><br>
+
   <button type="submit">Save Changes</button>
 </form>
+

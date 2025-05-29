@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from update_excel import get_services, get_customers, update_customer_info
+from update_excel import get_services, get_customers, update_customer_info, get_customer_info
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -39,7 +39,12 @@ def update_customer():
         updates = {k: v for k, v in request.form.items() if v.strip() != ''}
         update_customer_info(session['service'], session['customer'], updates)
         return redirect(url_for('thank_you'))
-    return render_template('update_customer.html')
+
+    # Use helper function from backend tools
+    current_values = get_customer_info(session['service'], session['customer'])
+
+    return render_template('update_customer.html', current=current_values)
+
 
 @app.route('/thank_you')
 def thank_you():
