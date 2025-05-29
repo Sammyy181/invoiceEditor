@@ -5,16 +5,8 @@ app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
 @app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/decision', methods=['POST'])
-def decision():
-    choice = request.form['choice']
-    if choice == 'no':
-        return redirect(url_for('thank_you'))
-    else:
-        return redirect(url_for('select_service'))
+def home():
+    return redirect(url_for('select_service'))
 
 @app.route('/select_service', methods=['GET', 'POST'])
 def select_service():
