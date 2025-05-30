@@ -810,7 +810,7 @@
       if (action === 'update') {
         window.location.href = '/select_customer';
       } else if (action === 'view' || action === 'generate') {
-        window.location.href = '/select_feature';
+        //window.location.href = '/select_feature';
       }
       closePopup();
     }
@@ -857,7 +857,7 @@ fetch("/add_service", {
       closeAddServicePopup();
     }
   
-  function showInvoicePopup(type) {
+    function showInvoicePopup(type) {
       const popup = document.getElementById('invoicePopup');
       const title = document.getElementById('invoiceTitle');
       

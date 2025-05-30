@@ -149,9 +149,6 @@ def update_customer():
 def thank_you():
     return render_template('thank_you.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
 @app.route('/submit', methods=['POST'])
 def submit():
     service = request.form['service']
@@ -203,3 +200,6 @@ def get_invoice_data():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+if __name__ == '__main__':
+    app.run(debug=True)
