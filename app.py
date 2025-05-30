@@ -173,27 +173,23 @@ def submit():
 def get_invoice_data():
     try:
         data = request.get_json()
-        action = data.get('action')  # 'view' or 'generate'
+        action = data.get('action')  
         service = data.get('service')
         
-        # Call your function that returns a pandas DataFrame
-        df = your_invoice_function(action, service)  # Replace with your actual function
+        df = your_invoice_function(action, service) 
+        df.drop(['Remarks', 'Month'], axis=1, inplace=True, errors='ignore')
         
-        # Convert DataFrame to JSON-serializable format
+        total = df['Net Price'].sum()
+        
         response_data = {
             'columns': df.columns.tolist(),
             'data': df.values.tolist(),
-            'summary': None  # Optional: add summary data
+            'summary': None 
         }
         
-        # Optional: Add summary calculations
-        if 'Amount' in df.columns or 'Total' in df.columns:
-            # Example summary calculations
-            amount_col = 'Amount' if 'Amount' in df.columns else 'Total'
+        if len(df):
             response_data['summary'] = {
-                'Subtotal': df[amount_col].sum(),
-                'Tax (10%)': df[amount_col].sum() * 0.1,
-                'Total': df[amount_col].sum() * 1.1
+                'Grand Total' : total
             }
         
         return jsonify(response_data)

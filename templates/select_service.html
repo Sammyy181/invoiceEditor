@@ -860,12 +860,21 @@ fetch("/add_service", {
     function showInvoicePopup(type) {
       const popup = document.getElementById('invoicePopup');
       const title = document.getElementById('invoiceTitle');
-      
-      // Set title based on action type
+
+      const now = new Date();
+      const currentMonth = now.toLocaleString('default', { month: 'long' });
+      const currentYear = now.getFullYear();
+
+      // Previous month logic
+      const prevMonthIndex = now.getMonth() - 1;
+      const prevMonthDate = new Date(now.getFullYear(), prevMonthIndex, 1);
+      const previousMonth = prevMonthDate.toLocaleString('default', { month: 'long' });
+      const previousMonthYear = prevMonthIndex < 0 ? currentYear - 1 : currentYear;
+
       if (type === 'view') {
-        title.textContent = 'Last Generated Invoice';
+        title.textContent = `Last Generated Invoice : ${previousMonth} ${previousMonthYear}`;
       } else if (type === 'generate') {
-        title.textContent = 'New Invoice';
+        title.textContent = `New Invoice : ${currentMonth} ${currentYear}`;
       }
       
       // Show the popup with slide-in animation
@@ -945,8 +954,8 @@ fetch("/add_service", {
         tableHtml += '<tr>';
         row.forEach(cell => {
           // Format cell data (handle numbers, dates, etc.)
-          const formattedCell = formatCellData(cell);
-          tableHtml += `<td>${formattedCell}</td>`;
+          //const formattedCell = formatCellData(cell);
+          tableHtml += `<td>${cell}</td>`;
         });
         tableHtml += '</tr>';
       });
@@ -986,7 +995,7 @@ fetch("/add_service", {
         if (cell % 1 !== 0) {
           return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'USD'
+            currency: 'INR'
           }).format(cell);
         }
         // Otherwise format as regular number
