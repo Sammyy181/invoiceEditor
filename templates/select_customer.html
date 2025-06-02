@@ -542,15 +542,18 @@
         </form>
         
         <div class="warning-message" style="color: red; margin: 10px 0; padding: 0 10px; box-sizing: border-box;">
-        ⚠️ Clicking on Copy Previous Data Multiple times will result in repeated copies.
+        ⚠️ Clicking on Copy Previous Data multiple times will result in repeated copies.
         </div>
 
         <div id="result" class="result"></div>
     </div>
 
-    <div class="back-button-container" style="position: fixed; bottom: 100px;">
+    <div class="back-button-container" style="position: fixed; bottom: 100px; display: flex; gap: 20px;">
         <a href="{{ url_for('select_service') }}">
             Go Back
+        </a>
+        <a href="{{ url_for('admin') }}">
+            Access Admin Options
         </a>
     </div>
 

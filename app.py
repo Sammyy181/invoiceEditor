@@ -147,31 +147,6 @@ def update_customer():
 
     return redirect(url_for('select_customer'))
 
-
-@app.route('/thank_you')
-def thank_you():
-    return render_template('thank_you.html')
-
-@app.route('/submit', methods=['POST'])
-def submit():
-    service = request.form['service']
-    customer = request.form['customer']
-    usage = request.form.get('Usage (%)', '').strip()
-    total_cost = request.form.get('Total Cost', '').strip()
-    remarks = request.form.get('Remarks', '').strip()
-
-    updates = {
-        'Usage (%)': usage,
-        'Total Cost': total_cost,
-        'Remarks': remarks
-    }
-
-    print(f"\nForm received for {customer} under {service}:")
-    print(updates)
-
-    update_customer_info(service, customer, updates)
-    return render_template('thank_you.html')
-
 @app.route('/get_invoice_data', methods=['POST'])
 def get_invoice_data():
     try:
@@ -199,6 +174,10 @@ def get_invoice_data():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+        
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

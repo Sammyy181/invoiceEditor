@@ -50,19 +50,36 @@ FIELD_MAP = {
 
 def get_customer_info(service, customer_name):
     path = f'data/{service}.xlsx'
-    now = datetime.now()
-    previous_month_date = now - relativedelta(months=1) 
-    df = pd.read_excel(path, sheet_name=previous_month_date.strftime('%B'))
-    customer_row = df[df['Customer Name'].str.strip() == customer_name.strip()]
-    
+    xls = pd.read_excel(path, sheet_name=None)
     current_values = {}
-    if not customer_row.empty:
-        row = customer_row.iloc[0]
-        current_values = {
-            'usage': row.get('Usage (%)', ''),
-            'cost': row.get('Unit Price', ''),
-            'period': row.get('Consumption Period', '')
-        }
+    
+    now = datetime.now()
+    current_month = now.strftime('%B')
+    previous_month_date = now - relativedelta(months=1) 
+    previous_month = previous_month_date.strftime('%B')
+    
+    if current_month in xls:
+        df = xls[current_month]
+        customer_row = df[df['Customer Name'].str.strip() == customer_name.strip()]
+        if not customer_row.empty:
+            row = customer_row.iloc[0]
+            current_values = {
+                'usage': row.get('Usage (%)', ''),
+                'cost': row.get('Unit Price', ''),
+                'period': row.get('Consumption Period', '')
+            }
+            return current_values
+    
+    if previous_month in xls:
+        df_prev = xls[previous_month]
+        customer_row_prev = df_prev[df_prev['Customer Name'].str.strip() == customer_name.strip()]
+        if not customer_row_prev.empty:
+            row = customer_row_prev.iloc[0]
+            current_values = {
+                'usage': row.get('Usage (%)', ''),
+                'cost': row.get('Unit Price', ''),
+                'period': row.get('Consumption Period', '')
+            }
     
     return current_values
 
