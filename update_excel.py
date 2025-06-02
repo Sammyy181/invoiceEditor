@@ -40,14 +40,6 @@ def get_customers(service):
         df = df[0:0]
     return df['Customer Name'].tolist()
 
-FIELD_MAP = {
-    'usage': 'Usage (%)',
-    'cost': 'Unit Price',
-    'period' : 'Consumption Period',
-    
-    # Add more if needed
-}
-
 def get_customer_info(service, customer_name):
     path = f'data/{service}.xlsx'
     xls = pd.read_excel(path, sheet_name=None)
@@ -83,7 +75,7 @@ def get_customer_info(service, customer_name):
     
     return current_values
 
-def add_customer_info(service, name, price, period, usage):
+def add_customer_info(service, name, price, period, usage, others=None):
     path = f'data/{service}.xlsx'
     
     price = float(price)
@@ -116,6 +108,15 @@ def add_customer_info(service, name, price, period, usage):
     df.at[idx, 'Net Price'] = float(df.at[idx, 'Consumption Duration']) * price * usage/100
     df.at[idx, 'Month'] = current_month
     
+    if others:
+        for key, value in others.items():
+            # Capitalize column name to match Excel? Adjust as needed
+            col_name = key
+            if col_name not in df.columns:
+                print(f"Adding new column '{col_name}' for dynamic field.")
+                df[col_name] = '' 
+            df.at[idx, col_name] = value
+    
     all_sheets[current_month] = df
     
     with pd.ExcelWriter(path, engine='openpyxl', mode='w') as writer:
@@ -130,6 +131,23 @@ def update_customer_info(service, customer_name, updates):
     current_month = now.strftime('%B')
     previous_month = now - relativedelta(months=1)
     previous_month = previous_month.strftime('%B')
+    
+    try:
+        with open('columns_config.json') as f:
+            config = json.load(f)
+        FIELD_MAP = {col['title'].lower(): col['title'] for col in config}
+        FIELD_MAP.update({
+            'usage': 'Usage (%)',
+            'cost': 'Unit Price',
+            'period': 'Consumption Period'
+        })
+    except Exception as e:
+        print(f"Error reading columns_config.json: {e}")
+        FIELD_MAP = {
+            'usage': 'Usage (%)',
+            'cost': 'Unit Price',
+            'period': 'Consumption Period'
+        }
 
     # Read all sheets from the file
     all_sheets = pd.read_excel(path, sheet_name=None)
@@ -156,10 +174,12 @@ def update_customer_info(service, customer_name, updates):
 
     df.at[idx, 'Month'] = current_month
 
-    # Apply updates only if values are non-empty after stripping
     for field, value in updates.items():
         if value.strip():
-            excel_field = FIELD_MAP.get(field, field)  # Use FIELD_MAP or fallback
+            excel_field = FIELD_MAP.get(field, field)  
+            if excel_field not in df.columns:
+                print(f"Column '{excel_field}' not found in sheet, creating it.")
+                df[excel_field] = ''
             print(f"Updating '{excel_field}' to '{value.strip()}'")
             df.at[idx, excel_field] = value.strip()
 

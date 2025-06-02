@@ -414,7 +414,7 @@
             color: #2d3748;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .customer-btn::before {
@@ -455,7 +455,7 @@
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .add-new-btn::before {
@@ -607,6 +607,18 @@
                     <input type="number" id="usagePercent" name="usage_percent" min="0" max="100" step="1" placeholder="0.0" required>
                 </div>
 
+                {% for field in dynamic_fields %}
+                    <div class="form-group">
+                        <label for="{{ field.name }}">{{ field.label }}</label>
+                        <input 
+                            type="{{ field.type }}" 
+                            id="{{ field.name }}" 
+                            name="{{ field.name }}" 
+                            placeholder="Enter your {{ field.type }} here"
+                        >
+                    </div>
+                {% endfor %}
+
                 <div class="form-buttons">
                     <button type="button" class="form-btn cancel" onclick="hideAddCustomerPopup()">Cancel</button>
                     <button type="submit" class="form-btn save">Save Customer</button>
@@ -633,6 +645,18 @@
                     <label for="period">Consumption Period</label>
                     <input type="text" id="period" name="period" placeholder="Currently {{ current['period'] if current else 'N/A' }}" required>
                 </div>
+
+                {% for field in dynamic_fields %}
+                    <div class="form-group">
+                        <label for="{{ field.name }}">{{ field.label }}</label>
+                        <input 
+                            type="{{ field.type }}" 
+                            id="{{ field.name }}" 
+                            name="{{ field.name }}" 
+                            placeholder="Enter your {{ field.type }} here"
+                        >
+                    </div>
+                {% endfor %}
 
                 <div class="form-buttons">
                     <button type="button" class="form-btn cancel" onclick="hideEditCustomerPopup()">Cancel</button>

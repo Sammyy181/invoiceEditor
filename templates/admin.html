@@ -41,8 +41,350 @@
             padding: 20px;
             display: flex;
             align-items: center;
-            justify-content: flex-start; /* Changed from center to flex-start */
-            padding-left: 40px; /* Added left padding to move container further left */
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            max-height: 60vh;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        .form-title {
+            text-align: center;
+            color: #2e3192;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2e3192;
+            box-shadow: 0 0 0 3px rgba(46, 49, 146, 0.1);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #2e3192;
+            box-shadow: 0 0 0 3px rgba(46, 49, 146, 0.1);
+        }
+
+        .title-field {
+            flex: 2;
+        }
+
+        .type-field {
+            flex: 1;
+        }
+
+        .add-button {
+            background: linear-gradient(45deg, #2e3192, #1bffff);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .add-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(46, 49, 146, 0.3);
+        }
+
+        .columns-list {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e1e5e9;
+        }
+
+        .column-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(46, 49, 146, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .column-info {
+            flex: 1;
+        }
+
+        .column-title {
+            font-weight: 600;
+            color: #2e3192;
+        }
+
+        .column-type {
+            font-size: 14px;
+            color: #666;
+            text-transform: capitalize;
+        }
+
+        .remove-button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-button:hover {
+            background: #ff3742;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px 0;
+        }
+
+        .back-button-container {
+            /* No need for margin-top here if placed directly after the container */
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            justify-content: center;
+        }
+        .back-button-container a {
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+            display: inline-block;
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+        }
+        .back-button-container a:hover {
+            background-color: #0056b3; /* Darken on hover */
         }
     </style>
 </head>
+<body>
+    <div class="container">
+        <h1 class="form-title">Excel Column Configuration</h1>
+        
+        <form id="columnForm">
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="title-field">
+                        <label for="columnTitle">Column Title</label>
+                        <input type="text" id="columnTitle" name="columnTitle" placeholder="Enter column title" required>
+                    </div>
+                    <div class="type-field">
+                        <label for="dataType">Data Type</label>
+                        <select id="dataType" name="dataType" required>
+                            <option value="">Select type</option>
+                            <option value="text">Text</option>
+                            <option value="integer">Integer</option>
+                            <option value="decimal">Decimal</option>
+                            <option value="date">Date</option>
+                            <option value="boolean">Boolean</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="add-button">Add Column</button>
+        </form>
+
+        <div class="columns-list">
+            <h3 style="color: #2e3192; margin-bottom: 15px;">Configured Columns</h3>
+            <div id="columnsList">
+                <div class="empty-state">No columns configured yet</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="back-button-container" style="position: fixed; bottom: 100px; display: flex; gap: 20px;">
+        <a href="#" onclick="fadeAndNavigate('{{ url_for('select_customer') }}'); return false;">
+            Go Back
+        </a>
+    </div>
+
+    <script>
+        let columns = [];
+
+        document.getElementById('columnForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('columnTitle').value;
+            const type = document.getElementById('dataType').value;
+            
+            if (title && type) {
+                // Check if column title already exists
+                if (columns.some(col => col.title.toLowerCase() === title.toLowerCase())) {
+                    alert('Column title already exists!');
+                    return;
+                }
+                
+                // Save to backend
+                const savedColumn = await saveColumn(title, type);
+                if (savedColumn) {
+                    columns.push(savedColumn);
+                    renderColumns();
+                    
+                    // Clear form
+                    document.getElementById('columnTitle').value = '';
+                    document.getElementById('dataType').value = '';
+                    document.getElementById('columnTitle').focus();
+                }
+            }
+        });
+
+        function fadeAndNavigate(url) {
+            // Fade out current page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            document.body.style.opacity = '0';
+            
+            // Navigate after fade completes
+            setTimeout(() => {
+                window.location.href = url;
+            }, 300);
+        }
+
+        async function loadColumns() {
+            try {
+                const response = await fetch('/api/columns');
+                if (response.ok) {
+                    columns = await response.json();
+                    renderColumns();
+                }
+            } catch (error) {
+                console.error('Error loading columns:', error);
+            }
+        }
+
+        async function saveColumn(title, type) {
+            try {
+                const response = await fetch('/api/columns', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, type })
+                });
+                
+                if (response.ok) {
+                    const newColumn = await response.json();
+                    return newColumn;
+                } else {
+                    throw new Error('Failed to save column');
+                }
+            } catch (error) {
+                console.error('Error saving column:', error);
+                alert('Error saving column. Please try again.');
+                return null;
+            }
+        }
+
+        async function removeColumnFromBackend(columnId) {
+            try {
+                const response = await fetch(`/api/columns/${columnId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to remove column');
+                }
+            } catch (error) {
+                console.error('Error removing column:', error);
+                alert('Error removing column. Please try again.');
+                return false;
+            }
+            return true;
+        }
+        
+        function renderColumns() {
+            const columnsList = document.getElementById('columnsList');
+            
+            if (columns.length === 0) {
+                columnsList.innerHTML = '<div class="empty-state">No columns configured yet</div>';
+                return;
+            }
+            
+            columnsList.innerHTML = columns.map((column, index) => `
+                <div class="column-item">
+                    <div class="column-info">
+                        <div class="column-title">${column.title}</div>
+                        <div class="column-type">${column.type}</div>
+                    </div>
+                    <button class="remove-button" onclick="removeColumn(${index}, '${column.id || index}')">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        async function removeColumn(index, columnId) {
+            const success = await removeColumnFromBackend(columnId);
+            if (success) {
+                columns.splice(index, 1);
+                renderColumns();
+            }
+        }
+
+        // Focus on title field when page loads
+        window.addEventListener('load', function() {
+            loadColumns();
+            document.getElementById('columnTitle').focus();
+        });
+    </script>
+</body>
+</html>
