@@ -5,11 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Selection Demo</title>
     <style>
+
+        body {
+            transition: opacity 0.3s ease-in;
+        }
+
+        /* Fade in on page load */
+        body {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Style your buttons to look like links if needed */
+        .back-button-container button {
+            background: none;
+            border: none;
+            color: inherit;
+            text-decoration: underline;
+            cursor: pointer;
+            font: inherit;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(45deg, #2e3192 0%, #1bffff 100%);
             min-height: 100vh;
         }
 
@@ -548,11 +573,11 @@
         <div id="result" class="result"></div>
     </div>
 
-    <div class="back-button-container" style="position: fixed; bottom: 100px; display: flex; gap: 20px;">
-        <a href="{{ url_for('select_service') }}">
+   <div class="back-button-container" style="position: fixed; bottom: 100px; display: flex; gap: 20px;">
+        <a href="#" onclick="fadeAndNavigate('{{ url_for('select_service') }}'); return false;">
             Go Back
         </a>
-        <a href="{{ url_for('admin') }}">
+        <a href="#" onclick="fadeAndNavigate('{{ url_for('admin') }}'); return false;">
             Access Admin Options
         </a>
     </div>
@@ -618,7 +643,18 @@
     </div>
 
     <script>
-        // Shows the Add Customer popup (triggered by Flask if show_popup is true)
+
+        function fadeAndNavigate(url) {
+            // Fade out current page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            document.body.style.opacity = '0';
+            
+            // Navigate after fade completes
+            setTimeout(() => {
+                window.location.href = url;
+            }, 300);
+        }
+
         {% if show_popup %}
             document.addEventListener("DOMContentLoaded", function() {
                 showAddCustomerPopup();

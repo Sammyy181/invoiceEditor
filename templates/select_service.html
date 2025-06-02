@@ -10,15 +10,29 @@
     }
 
     body {
+        transition: opacity 0.3s ease-in;
+    }
+
+    /* Fade in on page load */
+    body {
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(45deg, #2e3192 0%, #1bffff 100%);
       min-height: 100vh;
       margin: 0;
       padding: 20px;
       display: flex;
       align-items: center;
-      justify-content: flex-start; /* Changed from center to flex-start */
-      padding-left: 40px; /* Added left padding to move container further left */
+      justify-content: flex-start; 
+      padding-left: 40px; 
     }
 
     .form-container {
@@ -808,11 +822,25 @@
 
     function handleAction(action) {
       if (action === 'update') {
-        window.location.href = '/select_customer';
+        navigateWithTransition('/select_customer');
       } else if (action === 'view' || action === 'generate') {
         //window.location.href = '/select_feature';
       }
       closePopup();
+    }
+
+    function navigateWithTransition(url) {
+        // Check if View Transitions API is supported
+        if (!document.startViewTransition) {
+            // Fallback to normal navigation
+            window.location.href = url;
+            return;
+        }
+
+        // Start the view transition
+        document.startViewTransition(() => {
+            window.location.href = url;
+        });
     }
 
     function openAddServicePopup() {
@@ -1023,12 +1051,23 @@ fetch("/add_service", {
     // Update your existing handleAction function to call showInvoicePopup
     function handleAction(action) {
       if (action === 'update') {
-        window.location.href = '/select_customer';
+        fadeAndNavigate('/select_customer');
       } else if (action === 'view' || action === 'generate') {
         // Show invoice popup instead of redirecting
         showInvoicePopup(action);
         closePopup(); // Close the main popup
       }
+    }
+
+    function fadeAndNavigate(url) {
+        // Fade out current page
+        document.body.style.transition = 'opacity 0.3s ease-out';
+        document.body.style.opacity = '0';
+        
+        // Navigate after fade completes
+        setTimeout(() => {
+            window.location.href = url;
+        }, 300);
     }
 
     // Optional: Close invoice popup when clicking outside (if you want this behavior)
