@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info, your_invoice_function
+from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info, your_invoice_function, copy_previous_data
 import os
 import shutil
 from datetime import datetime
@@ -94,6 +94,9 @@ def select_customer():
         if action == 'add_new':
             # This just re-renders the page with the popup showing
             return render_template('select_customer.html', customers=customers, service=service, show_popup=True)
+        elif action == 'copy_previous':
+            copy_previous_data(service=service)
+            return redirect(url_for('select_customer'))
         elif selected_customer:
             session['customer'] = selected_customer
             current = get_customer_info(service, selected_customer)

@@ -18,17 +18,18 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 600px; /* increased width */
+            width: 720px; 
             height: 60vh;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 30px;
+            padding: 32px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
 
         .back-button-container {
@@ -84,6 +85,9 @@
         .add-new-container {
             margin-top: 20px;
             flex-shrink: 0;
+            display: flex;
+            gap: 15px;
+            align-items: stretch;
         }
 
         .popup-overlay {
@@ -413,8 +417,8 @@
 
         .add-new-btn {
             display: block;
-            width: 100%;
-            margin-top: 25px;
+            flex: 1;
+            margin-top: 0;
             padding: 16px;
             text-align: center;
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
@@ -434,7 +438,7 @@
             position: absolute;
             top: 0;
             left: -100%;
-            width: 100%;
+            width: 50%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             transition: left 0.5s;
@@ -448,6 +452,44 @@
             background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .copy-prev-btn {
+            display: block;
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .copy-prev-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .copy-prev-btn:hover::before {
+            left: 100%;
+        }
+
+        .copy-prev-btn:hover {
+            background: linear-gradient(135deg, #545b62 0%, #495057 100%);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(108, 117, 125, 0.4);
         }
 
         .result {
@@ -493,10 +535,15 @@
                 <button type="submit" name="action" value="add_new" class="add-new-btn">
                     + Add New Customer
                 </button>
-            </div>
-
-            
+                <button type="submit" name="action" value="copy_previous" class="copy-prev-btn">
+                    📋 Copy Previous Data
+                </button>
+            </div>           
         </form>
+        
+        <div class="warning-message" style="color: red; margin: 10px 0; padding: 0 10px; box-sizing: border-box;">
+        ⚠️ Clicking on Copy Previous Data Multiple times will result in repeated copies.
+        </div>
 
         <div id="result" class="result"></div>
     </div>

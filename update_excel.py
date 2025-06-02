@@ -37,6 +37,7 @@ def get_customers(service):
     except Exception:
         # If current month not found, fall back to previous
         df = pd.read_excel(filepath, sheet_name=previous_month)
+        df = df[0:0]
     return df['Customer Name'].tolist()
 
 FIELD_MAP = {
@@ -123,6 +124,7 @@ def update_customer_info(service, customer_name, updates):
     elif previous_month in all_sheets:
         # Current month sheet missing, copy previous month sheet as base
         df = all_sheets[previous_month].copy()
+        df = df[0:0]
         df['Month'] = current_month  # Update Month column for all rows just in case
         print(f"Creating new sheet for {current_month} from {previous_month}.")
     else:
@@ -153,10 +155,8 @@ def update_customer_info(service, customer_name, updates):
         float(df.at[idx, 'Unit Price']) / 100
     )
 
-    # Update the dictionary with modified or new sheet
     all_sheets[current_month] = df
 
-    # Write back all sheets, including new/updated current month sheet
     with pd.ExcelWriter(path, engine='openpyxl', mode='w') as writer:
         for sheet_name, sheet_df in all_sheets.items():
             sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
@@ -177,3 +177,41 @@ def your_invoice_function(action, service):
     else:  
         df = pd.read_excel(path, sheet_name=current_month)    
     return df
+
+def copy_previous_data(service):
+    
+    path = f'data/{service}.xlsx'
+    now = datetime.now()
+    current_month = now.strftime('%B')
+    previous_month = now - relativedelta(months=1)
+    previous_month = previous_month.strftime('%B')
+    
+    all_sheets = pd.read_excel(path, sheet_name=None)
+    
+    if current_month in all_sheets:
+        df = all_sheets[current_month].copy()
+        copied = all_sheets[previous_month].copy()
+        copied['Month'] = current_month
+        copied['Consumption Period'] = pd.to_numeric(copied['Consumption Period'], errors='coerce')
+        copied['Usage (%)'] = pd.to_numeric(copied['Usage (%)'], errors='coerce')
+        copied['Unit Price'] = pd.to_numeric(copied['Unit Price'], errors='coerce')
+        copied['Consumption Duration'] = (copied['Consumption Period'] / n_days[current_month]).round(2)
+        copied['Net Price'] = (copied['Consumption Duration'] * copied['Usage (%)'] * copied['Unit Price']/ 100).round(2)
+        
+        
+        df = pd.concat([df, copied], ignore_index=True)
+    elif previous_month in all_sheets:
+        df = all_sheets[previous_month].copy()
+        df['Month'] = current_month
+        df['Consumption Period'] = pd.to_numeric(df['Consumption Period'], errors='coerce')
+        df['Usage (%)'] = pd.to_numeric(df['Usage (%)'], errors='coerce')
+        df['Unit Price'] = pd.to_numeric(df['Unit Price'], errors='coerce')
+        df['Consumption Duration'] = (df['Consumption Period'] / n_days[current_month]).round(2)
+        df['Net Price'] = (df['Consumption Duration'] * df['Usage (%)'] * df['Unit Price']/ 100).round(2)
+    
+    all_sheets[current_month] = df
+    
+    with pd.ExcelWriter(path, engine='openpyxl', mode='w') as writer:
+        for sheet_name, sheet_df in all_sheets.items():
+            sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
+        
