@@ -20,8 +20,8 @@ n_days = {
     "December" : 31
 }
 
-def load_column_map():
-    with open('titles_config.json') as f:
+def load_column_map(service):
+    with open(f'titles/{service}.json') as f:
         titles_config = json.load(f)
 
     COLUMN_MAP = {
@@ -55,7 +55,7 @@ def get_customers(service):
         # If current month not found, fall back to previous
         df = pd.read_excel(filepath, sheet_name=previous_month)
         df = df[0:0]
-    COLUMN_MAP = load_column_map()
+    COLUMN_MAP = load_column_map(service)
     return df[COLUMN_MAP['customer_name']].tolist()
 
 def get_customer_info(service, customer_name):
@@ -67,7 +67,7 @@ def get_customer_info(service, customer_name):
     current_month = now.strftime('%B')
     previous_month_date = now - relativedelta(months=1) 
     previous_month = previous_month_date.strftime('%B')
-    COLUMN_MAP = load_column_map()
+    COLUMN_MAP = load_column_map(service)
     
     if current_month in xls:
         df = xls[current_month]
@@ -96,7 +96,7 @@ def get_customer_info(service, customer_name):
 
 def add_customer_info(service, name, price, period, usage, others=None):
     path = f'data/{service}.xlsx'
-    COLUMN_MAP = load_column_map()
+    COLUMN_MAP = load_column_map(service)
     
     price = float(price)
     period = float(period)
@@ -146,7 +146,7 @@ def add_customer_info(service, name, price, period, usage, others=None):
 def update_customer_info(service, customer_name, updates):
     print(f"Updating {customer_name} in {service} with: {updates}")
     path = f'data/{service}.xlsx'
-    COLUMN_MAP = load_column_map()
+    COLUMN_MAP = load_column_map(service)
     
     now = datetime.now()
     current_month = now.strftime('%B')
@@ -154,7 +154,7 @@ def update_customer_info(service, customer_name, updates):
     previous_month = previous_month.strftime('%B')
     
     try:
-        with open('columns_config.json') as f:
+        with open(f'columns/{service}.json') as f:
             config = json.load(f)
         FIELD_MAP = {col['title'].lower(): col['title'] for col in config}
         FIELD_MAP.update({
@@ -239,7 +239,7 @@ def your_invoice_function(action, service):
 def copy_previous_data(service):
     
     path = f'data/{service}.xlsx'
-    COLUMN_MAP = load_column_map()
+    COLUMN_MAP = load_column_map(service)
     
     now = datetime.now()
     current_month = now.strftime('%B')

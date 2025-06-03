@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <title>Service Selection</title>
   <style>
     * {
@@ -749,6 +750,36 @@
         font-size: 20px;
       }
     }
+
+    .admin-link-container {
+        position: fixed;
+        bottom: 20px;         /* 20px from bottom of the screen */
+        left: 50%;            /* Center horizontally */
+        transform: translateX(-50%); /* Offset 50% of its width to truly center it */
+        text-align: center;
+        z-index: 1000; 
+    }
+
+    .admin-link{
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .admin-link:hover{
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(46, 49, 146, 0.3);
+    }
+
   </style>
 </head>
 <body>
@@ -767,6 +798,12 @@
     <div class="add-service-container">
       <button class="add-service-button" onclick="openAddServicePopup()">+ Add New Service</button>
     </div>
+  </div>
+
+  <div class="admin-link-container">
+      <a href="#" onclick="fadeAndNavigate('{{ url_for('admin') }}'); return false;" class="admin-link">
+          <i class="fas fa-cog"></i> Admin Panel
+      </a>
   </div>
 
   <!-- Main Popup -->
