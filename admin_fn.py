@@ -17,7 +17,6 @@ FIXED_COLUMNS = [
 ]
 
 def load_columns_from_excel():
-    """Load column configurations from Excel file metadata or a separate JSON file"""
     config_file = 'columns_config.json'
     
     if os.path.exists(config_file):
@@ -26,13 +25,11 @@ def load_columns_from_excel():
     return []
 
 def save_columns_to_config(columns):
-    """Save column configurations to JSON file"""
     config_file = 'columns_config.json'
     with open(config_file, 'w') as f:
         json.dump(columns, f, indent=2)
         
 def update_excel_template(columns):
-    """Update the Excel template with fixed + dynamic column headers using pandas"""
     try:
         all_sheets = pd.read_excel(TEMPLATE_FILE, sheet_name=None)
         now = datetime.now()
@@ -53,3 +50,17 @@ def update_excel_template(columns):
         
     except Exception as e:
         print(f"Error updating Excel template: {e}")
+        
+def load_titles():
+    config_file = 'titles_config.json'
+    
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            return json.load(f)
+    return []
+
+def save_titles(titles):
+    config_file = 'titles_config.json'
+    with open(config_file, 'w') as f:
+        json.dump(titles, f, indent=4)
+        

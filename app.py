@@ -15,16 +15,7 @@ app.secret_key = 'your-secret-key'
 
 TEMPLATE_FILE = 'template.xlsx'
 SERVICE_FOLDER = 'data'  
-FIXED_COLUMNS = [
-    {'id': 'fixed_1', 'title': 'Customer Name', 'type': 'text'},
-    {'id': 'fixed_2', 'title': 'Unit Price', 'type': 'integer'},
-    {'id': 'fixed_3', 'title': 'Consumption Percentage', 'type': 'integer'},
-    {'id': 'fixed_4', 'title': 'Usage (%)', 'type': 'integer'},
-    {'id': 'fixed_5', 'title': 'Consumption Duration', 'type': 'decimal'},
-    {'id': 'fixed_6', 'title': 'Net Price', 'type': 'decimal'},
-    {'id': 'fixed_7', 'title': 'Remarks', 'type': 'text'},
-    {'id': 'fixed_8', 'title': 'Month', 'type': 'text'}
-]
+FIXED_COLUMNS = load_titles()
 
 now = datetime.now()
 previous_month_date = now - relativedelta(months=1)
@@ -119,8 +110,18 @@ def select_customer():
                     'label': col['title'],
                     'type': col.get('type', 'text')  # fallback to text input
                 })
+                
+            all_titles = load_titles()
+            wanted_ids = {"fixed_1", "fixed_2", "fixed_3", "fixed_4"}
+            titles = [item for item in all_titles if item["id"] in wanted_ids]
             
-            return render_template('select_customer.html', customers=customers, service=service, show_popup=True, dynamic_fields=dynamic_fields)
+            return render_template('select_customer.html', 
+                                   customers=customers, 
+                                   service=service, 
+                                   show_popup=True, 
+                                   dynamic_fields=dynamic_fields, 
+                                   titles=titles)
+            
         elif action == 'copy_previous':
             copy_previous_data(service=service)
             return redirect(url_for('select_customer'))
@@ -143,7 +144,10 @@ def select_customer():
                     'label': col['title'],
                     'type': col.get('type', 'text')  # fallback to text input
                 })
-
+            
+            all_titles = load_titles()
+            wanted_ids = {"fixed_1", "fixed_2", "fixed_3", "fixed_4"}
+            titles = [item for item in all_titles if item["id"] in wanted_ids]
             
             return render_template(
                 'select_customer.html',
@@ -151,7 +155,8 @@ def select_customer():
                 service=service,
                 show_edit_popup=True,
                 current=current,
-                dynamic_fields=dynamic_fields
+                dynamic_fields=dynamic_fields,
+                titles=titles
             )
 
     return render_template('select_customer.html', customers=customers, service=service, show_popup=False)
@@ -259,7 +264,6 @@ def admin():
 
 @app.route('/api/columns', methods=['GET'])
 def get_columns():
-    """Get all configured columns"""
     try:
         columns = load_columns_from_excel()
         return jsonify(columns)
@@ -268,7 +272,6 @@ def get_columns():
 
 @app.route('/api/columns', methods=['POST'])
 def add_column():
-    """Add a new column configuration"""
     try:
         print("Received POST request to /api/columns")
         
@@ -336,6 +339,50 @@ def remove_column(column_id):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/fixed-columns', methods=['GET'])
+def get_fixed_columns():
+    return jsonify(load_titles())
+
+@app.route('/api/fixed-columns', methods=['POST'])
+def save_fixed_columns():
+    data = request.get_json()
+    save_titles(data)
+    
+    folder = 'data'
+    
+    new_column_names = [field["title"] for field in data]
+    
+    for filename in os.listdir(folder):
+        if filename.endswith(".xlsx") or filename.endswith(".xls"):
+            filepath = os.path.join(folder, filename)
+            print(f"Processing {filepath}...")
+
+            # Load the Excel file with all sheets
+            excel_file = pd.ExcelFile(filepath)
+            sheet_names = excel_file.sheet_names
+            
+            # Dictionary to store updated dataframes per sheet
+            updated_sheets = {}
+
+            # Process each sheet
+            for sheet in sheet_names:
+                df = pd.read_excel(excel_file, sheet_name=sheet)
+                
+                # Only rename first 8 columns if they exist
+                cols = df.columns.tolist()
+                for i in range(min(8, len(cols))):
+                    cols[i] = new_column_names[i]
+                df.columns = cols
+                
+                updated_sheets[sheet] = df
+
+            # Save back all sheets into the same Excel file (overwrite)
+            with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
+                for sheet, df in updated_sheets.items():
+                    df.to_excel(writer, sheet_name=sheet, index=False)
+    
+    return jsonify({"message": "Columns saved successfully"})
 
 if __name__ == '__main__':
     app.run(debug=True)

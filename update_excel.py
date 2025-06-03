@@ -20,6 +20,23 @@ n_days = {
     "December" : 31
 }
 
+def load_column_map():
+    with open('titles_config.json') as f:
+        titles_config = json.load(f)
+
+    COLUMN_MAP = {
+        'customer_name': next(col['title'] for col in titles_config if col['id'] == 'fixed_1'),
+        'unit_price':     next(col['title'] for col in titles_config if col['id'] == 'fixed_2'),
+        'period':         next(col['title'] for col in titles_config if col['id'] == 'fixed_3'),
+        'usage':          next(col['title'] for col in titles_config if col['id'] == 'fixed_4'),
+        'consumption':    next(col['title'] for col in titles_config if col['id'] == 'fixed_5'),
+        'net_price':      next(col['title'] for col in titles_config if col['id'] == 'fixed_6'),
+        'remarks':        next(col['title'] for col in titles_config if col['id'] == 'fixed_7'),
+        'month':          next(col['title'] for col in titles_config if col['id'] == 'fixed_8'),
+    }
+    
+    return COLUMN_MAP
+
 def get_services():
     service_files = os.listdir('data')
     services = [f[:-5] for f in service_files if f.endswith('.xlsx')]
@@ -38,7 +55,8 @@ def get_customers(service):
         # If current month not found, fall back to previous
         df = pd.read_excel(filepath, sheet_name=previous_month)
         df = df[0:0]
-    return df['Customer Name'].tolist()
+    COLUMN_MAP = load_column_map()
+    return df[COLUMN_MAP['customer_name']].tolist()
 
 def get_customer_info(service, customer_name):
     path = f'data/{service}.xlsx'
@@ -49,6 +67,7 @@ def get_customer_info(service, customer_name):
     current_month = now.strftime('%B')
     previous_month_date = now - relativedelta(months=1) 
     previous_month = previous_month_date.strftime('%B')
+    COLUMN_MAP = load_column_map()
     
     if current_month in xls:
         df = xls[current_month]
@@ -56,9 +75,9 @@ def get_customer_info(service, customer_name):
         if not customer_row.empty:
             row = customer_row.iloc[0]
             current_values = {
-                'usage': row.get('Usage (%)', ''),
-                'cost': row.get('Unit Price', ''),
-                'period': row.get('Consumption Period', '')
+                'usage': row.get(COLUMN_MAP['usage'], ''),
+                'cost': row.get(COLUMN_MAP['unit_price'], ''),
+                'period': row.get(COLUMN_MAP['period'], '')
             }
             return current_values
     
@@ -68,15 +87,16 @@ def get_customer_info(service, customer_name):
         if not customer_row_prev.empty:
             row = customer_row_prev.iloc[0]
             current_values = {
-                'usage': row.get('Usage (%)', ''),
-                'cost': row.get('Unit Price', ''),
-                'period': row.get('Consumption Period', '')
+                'usage': row.get(COLUMN_MAP['usage'], ''),
+                'cost': row.get(COLUMN_MAP['unit_price'], ''),
+                'period': row.get(COLUMN_MAP['period'], '')
             }
     
     return current_values
 
 def add_customer_info(service, name, price, period, usage, others=None):
     path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map()
     
     price = float(price)
     period = float(period)
@@ -100,13 +120,13 @@ def add_customer_info(service, name, price, period, usage, others=None):
         
     idx = len(df)
     
-    df.at[idx, 'Customer Name'] = name
-    df.at[idx, 'Unit Price'] = price
-    df.at[idx, 'Consumption Period'] = period
-    df.at[idx, 'Usage (%)'] = usage
-    df.at[idx, 'Consumption Duration'] = round(period/n_days[current_month], 2)
-    df.at[idx, 'Net Price'] = float(df.at[idx, 'Consumption Duration']) * price * usage/100
-    df.at[idx, 'Month'] = current_month
+    df.at[idx, COLUMN_MAP['customer_name']] = name
+    df.at[idx, COLUMN_MAP['unit_price']] = price
+    df.at[idx, COLUMN_MAP['period']] = period
+    df.at[idx, COLUMN_MAP['usage']] = usage
+    df.at[idx, COLUMN_MAP['consumption']] = round(period / n_days[current_month], 2)
+    df.at[idx, COLUMN_MAP['net_price']] = price * usage / 100 * (period / n_days[current_month])
+    df.at[idx, COLUMN_MAP['month']] = current_month
     
     if others:
         for key, value in others.items():
@@ -126,6 +146,7 @@ def add_customer_info(service, name, price, period, usage, others=None):
 def update_customer_info(service, customer_name, updates):
     print(f"Updating {customer_name} in {service} with: {updates}")
     path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map()
     
     now = datetime.now()
     current_month = now.strftime('%B')
@@ -137,16 +158,16 @@ def update_customer_info(service, customer_name, updates):
             config = json.load(f)
         FIELD_MAP = {col['title'].lower(): col['title'] for col in config}
         FIELD_MAP.update({
-            'usage': 'Usage (%)',
-            'cost': 'Unit Price',
-            'period': 'Consumption Period'
+            'usage': COLUMN_MAP['usage'],
+            'cost': COLUMN_MAP['unit_price'],
+            'period': COLUMN_MAP['period']
         })
     except Exception as e:
         print(f"Error reading columns_config.json: {e}")
         FIELD_MAP = {
-            'usage': 'Usage (%)',
-            'cost': 'Unit Price',
-            'period': 'Consumption Period'
+            'usage': COLUMN_MAP['usage'],
+            'cost': COLUMN_MAP['unit_price'],
+            'period': COLUMN_MAP['period']
         }
 
     # Read all sheets from the file
@@ -183,13 +204,13 @@ def update_customer_info(service, customer_name, updates):
             print(f"Updating '{excel_field}' to '{value.strip()}'")
             df.at[idx, excel_field] = value.strip()
 
-    df.at[idx, 'Consumption Duration'] = round(
-        float(df.at[idx, 'Consumption Period']) / n_days[current_month], 2
+    df.at[idx, COLUMN_MAP['consumption']] = round(
+        float(df.at[idx, COLUMN_MAP['period']]) / n_days[current_month], 2
     )
     df.at[idx, 'Net Price'] = (
-        float(df.at[idx, 'Consumption Duration']) *
-        float(df.at[idx, 'Usage (%)']) *
-        float(df.at[idx, 'Unit Price']) / 100
+        float(df.at[idx, COLUMN_MAP['consumption']]) *
+        float(df.at[idx, COLUMN_MAP['usage']]) *
+        float(df.at[idx, COLUMN_MAP['unit_price']]) / 100
     )
 
     all_sheets[current_month] = df
@@ -218,6 +239,8 @@ def your_invoice_function(action, service):
 def copy_previous_data(service):
     
     path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map()
+    
     now = datetime.now()
     current_month = now.strftime('%B')
     previous_month = now - relativedelta(months=1)
@@ -228,23 +251,41 @@ def copy_previous_data(service):
     if current_month in all_sheets:
         df = all_sheets[current_month].copy()
         copied = all_sheets[previous_month].copy()
-        copied['Month'] = current_month
-        copied['Consumption Period'] = pd.to_numeric(copied['Consumption Period'], errors='coerce')
-        copied['Usage (%)'] = pd.to_numeric(copied['Usage (%)'], errors='coerce')
-        copied['Unit Price'] = pd.to_numeric(copied['Unit Price'], errors='coerce')
-        copied['Consumption Duration'] = (copied['Consumption Period'] / n_days[current_month]).round(2)
-        copied['Net Price'] = (copied['Consumption Duration'] * copied['Usage (%)'] * copied['Unit Price']/ 100).round(2)
-        
-        
+        copied[COLUMN_MAP['month']] = current_month
+
+        copied[COLUMN_MAP['period']] = pd.to_numeric(copied[COLUMN_MAP['period']], errors='coerce')
+        copied[COLUMN_MAP['usage']] = pd.to_numeric(copied[COLUMN_MAP['usage']], errors='coerce')
+        copied[COLUMN_MAP['unit_price']] = pd.to_numeric(copied[COLUMN_MAP['unit_price']], errors='coerce')
+
+        copied[COLUMN_MAP['consumption']] = (
+            copied[COLUMN_MAP['period']] / n_days[current_month]
+        ).round(2)
+
+        copied[COLUMN_MAP['net_price']] = (
+            copied[COLUMN_MAP['consumption']] *
+            copied[COLUMN_MAP['usage']] *
+            copied[COLUMN_MAP['unit_price']] / 100
+        ).round(2)
+
         df = pd.concat([df, copied], ignore_index=True)
+
     elif previous_month in all_sheets:
         df = all_sheets[previous_month].copy()
-        df['Month'] = current_month
-        df['Consumption Period'] = pd.to_numeric(df['Consumption Period'], errors='coerce')
-        df['Usage (%)'] = pd.to_numeric(df['Usage (%)'], errors='coerce')
-        df['Unit Price'] = pd.to_numeric(df['Unit Price'], errors='coerce')
-        df['Consumption Duration'] = (df['Consumption Period'] / n_days[current_month]).round(2)
-        df['Net Price'] = (df['Consumption Duration'] * df['Usage (%)'] * df['Unit Price']/ 100).round(2)
+        df[COLUMN_MAP['month']] = current_month
+
+        df[COLUMN_MAP['period']] = pd.to_numeric(df[COLUMN_MAP['period']], errors='coerce')
+        df[COLUMN_MAP['usage']] = pd.to_numeric(df[COLUMN_MAP['usage']], errors='coerce')
+        df[COLUMN_MAP['unit_price']] = pd.to_numeric(df[COLUMN_MAP['unit_price']], errors='coerce')
+
+        df[COLUMN_MAP['consumption']] = (
+            df[COLUMN_MAP['period']] / n_days[current_month]
+        ).round(2)
+
+        df[COLUMN_MAP['net_price']] = (
+            df[COLUMN_MAP['consumption']] *
+            df[COLUMN_MAP['usage']] *
+            df[COLUMN_MAP['unit_price']] / 100
+        ).round(2)
     
     all_sheets[current_month] = df
     
