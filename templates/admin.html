@@ -44,22 +44,31 @@
             justify-content: center;
         }
 
+        .main-wrapper {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            align-items: flex-start;
+        }
+
         .container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            max-height: 60vh;
-            width: 100%;
+            height: 70vh;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
         }
 
         .form-title {
             text-align: center;
             color: #2e3192;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 600;
             margin-bottom: 30px;
         }
@@ -123,7 +132,7 @@
             flex: 1;
         }
 
-        .add-button {
+        .add-button, .save-button {
             background: linear-gradient(45deg, #2e3192, #1bffff);
             color: white;
             border: none;
@@ -136,7 +145,7 @@
             width: 100%;
         }
 
-        .add-button:hover {
+        .add-button:hover, .save-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(46, 49, 146, 0.3);
         }
@@ -145,6 +154,33 @@
             margin-top: 30px;
             padding-top: 20px;
             border-top: 2px solid #e1e5e9;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .columns-list-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .columns-list-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .columns-list-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+
+        .columns-list-content::-webkit-scrollbar-thumb {
+            background: rgba(46, 49, 146, 0.3);
+            border-radius: 3px;
+        }
+
+        .columns-list-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(46, 49, 146, 0.5);
         }
 
         .column-item {
@@ -155,6 +191,17 @@
             background: rgba(46, 49, 146, 0.05);
             border-radius: 8px;
             margin-bottom: 10px;
+        }
+
+        .fixed-column-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(27, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #1bffff;
         }
 
         .column-info {
@@ -187,6 +234,22 @@
             background: #ff3742;
         }
 
+        .edit-button {
+            background: #ffa502;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .edit-button:hover {
+            background: #ff9ff3;
+        }
+
         .empty-state {
             text-align: center;
             color: #666;
@@ -195,13 +258,13 @@
         }
 
         .back-button-container {
-            /* No need for margin-top here if placed directly after the container */
-            position: absolute;
-            bottom: 20px;
+            position: fixed;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             justify-content: center;
         }
+
         .back-button-container a {
             background-color: #007bff;
             color: white;
@@ -211,50 +274,90 @@
             font-size: 1rem;
             font-family: inherit;
             display: inline-block;
-            transition: background-color 0.3s ease; /* Smooth hover effect */
+            transition: background-color 0.3s ease;
         }
+
         .back-button-container a:hover {
-            background-color: #0056b3; /* Darken on hover */
+            background-color: #0056b3;
+        }
+
+        .fixed-column-input {
+            background: rgba(27, 255, 255, 0.1);
+            border: 2px solid #1bffff;
+        }
+
+        .fixed-column-input:focus {
+            border-color: #1bffff;
+            box-shadow: 0 0 0 3px rgba(27, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .container {
+                max-height: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="form-title">Excel Column Configuration</h1>
-        
-        <form id="columnForm">
-            <div class="form-group">
-                <div class="form-row">
-                    <div class="title-field">
-                        <label for="columnTitle">Column Title</label>
-                        <input type="text" id="columnTitle" name="columnTitle" placeholder="Enter column title" required>
-                    </div>
-                    <div class="type-field">
-                        <label for="dataType">Data Type</label>
-                        <select id="dataType" name="dataType" required>
-                            <option value="">Select type</option>
-                            <option value="text">Text</option>
-                            <option value="integer">Integer</option>
-                            <option value="decimal">Decimal</option>
-                            <option value="date">Date</option>
-                            <option value="boolean">Boolean</option>
-                        </select>
+    <div class="main-wrapper">
+        <!-- Custom Columns Container -->
+        <div class="container">
+            <h1 class="form-title">Custom Column Configuration</h1>
+            
+            <form id="columnForm">
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="title-field">
+                            <label for="columnTitle">Column Title</label>
+                            <input type="text" id="columnTitle" name="columnTitle" placeholder="Enter column title" required>
+                        </div>
+                        <div class="type-field">
+                            <label for="dataType">Data Type</label>
+                            <select id="dataType" name="dataType" required>
+                                <option value="">Select type</option>
+                                <option value="text">Text</option>
+                                <option value="integer">Integer</option>
+                                <option value="decimal">Decimal</option>
+                                <option value="date">Date</option>
+                                <option value="boolean">Boolean</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <button type="submit" class="add-button">Add Column</button>
-        </form>
+                
+                <button type="submit" class="add-button">Add Column</button>
+            </form>
 
-        <div class="columns-list">
-            <h3 style="color: #2e3192; margin-bottom: 15px;">Configured Columns</h3>
-            <div id="columnsList">
-                <div class="empty-state">No columns configured yet</div>
+            <div class="columns-list">
+                <h3 style="color: #2e3192; margin-bottom: 15px;">Custom Columns</h3>
+                <div class="columns-list-content" id="columnsList">
+                    <div class="empty-state">No custom columns configured yet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed Columns Container -->
+        <div class="container">
+            <h1 class="form-title">Fixed Column Titles</h1>
+            
+            <div class="columns-list">
+                <h3 style="color: #2e3192; margin-bottom: 15px;">Edit Fixed Column Titles</h3>
+                <div class="columns-list-content" id="fixedColumnsList">
+                    <!-- Fixed columns will be rendered here -->
+                </div>
+                <button type="button" class="save-button" onclick="saveFixedColumns()" style="margin-top: 20px; flex-shrink: 0;">
+                    Save Fixed Column Changes
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="back-button-container" style="position: fixed; bottom: 100px; display: flex; gap: 20px;">
+    <div class="back-button-container">
         <a href="#" onclick="fadeAndNavigate('{{ url_for('select_customer') }}'); return false;">
             Go Back
         </a>
@@ -262,6 +365,7 @@
 
     <script>
         let columns = [];
+        let fixedColumns = [];
 
         document.getElementById('columnForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -313,6 +417,18 @@
             }
         }
 
+        async function loadFixedColumns() {
+            try {
+                const response = await fetch('/api/fixed-columns');
+                if (response.ok) {
+                    fixedColumns = await response.json();
+                    renderFixedColumns()
+                }
+            } catch (error) {
+                console.error('Error loading fixed columns:', error);
+            }
+        }
+
         async function saveColumn(title, type) {
             try {
                 const response = await fetch('/api/columns', {
@@ -333,6 +449,27 @@
                 console.error('Error saving column:', error);
                 alert('Error saving column. Please try again.');
                 return null;
+            }
+        }
+
+        async function saveFixedColumns() {
+            try {
+                const response = await fetch('/api/fixed-columns', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(fixedColumns)
+                });
+                
+                if (response.ok) {
+                    alert('Fixed column titles saved successfully!');
+                } else {
+                    throw new Error('Failed to save fixed columns');
+                }
+            } catch (error) {
+                console.error('Error saving fixed columns:', error);
+                alert('Error saving fixed column titles. Please try again.');
             }
         }
 
@@ -357,7 +494,7 @@
             const columnsList = document.getElementById('columnsList');
             
             if (columns.length === 0) {
-                columnsList.innerHTML = '<div class="empty-state">No columns configured yet</div>';
+                columnsList.innerHTML = '<div class="empty-state">No custom columns configured yet</div>';
                 return;
             }
             
@@ -372,6 +509,35 @@
             `).join('');
         }
 
+        function renderFixedColumns() {
+            const fixedColumnsList = document.getElementById('fixedColumnsList');
+            
+            fixedColumnsList.innerHTML = fixedColumns.map((column, index) => `
+                <div class="fixed-column-item">
+                    <div class="column-info" style="flex: 1; margin-right: 15px;">
+                        <label for="fixed_${column.id}" style="font-size: 12px; color: #666; margin-bottom: 5px;">
+                            ${column.type.toUpperCase()}
+                        </label>
+                        <input 
+                            type="text" 
+                            id="fixed_${column.id}"
+                            class="fixed-column-input"
+                            value="${column.title}" 
+                            onchange="updateFixedColumnTitle('${column.id}', this.value)"
+                            style="margin-bottom: 0;"
+                        />
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateFixedColumnTitle(columnId, newTitle) {
+            const column = fixedColumns.find(col => col.id === columnId);
+            if (column) {
+                column.title = newTitle;
+            }
+        }
+
         async function removeColumn(index, columnId) {
             const success = await removeColumnFromBackend(columnId);
             if (success) {
@@ -383,6 +549,7 @@
         // Focus on title field when page loads
         window.addEventListener('load', function() {
             loadColumns();
+            loadFixedColumns();
             document.getElementById('columnTitle').focus();
         });
     </script>

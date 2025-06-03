@@ -1,0 +1,42 @@
+[
+    {
+        "id": "fixed_1",
+        "title": "Customer Name",
+        "type": "text"
+    },
+    {
+        "id": "fixed_2",
+        "title": "Unit Price",
+        "type": "integer"
+    },
+    {
+        "id": "fixed_3",
+        "title": "Consumption Days",
+        "type": "integer"
+    },
+    {
+        "id": "fixed_4",
+        "title": "Usage (%)",
+        "type": "integer"
+    },
+    {
+        "id": "fixed_5",
+        "title": "Consumption (%)",
+        "type": "decimal"
+    },
+    {
+        "id": "fixed_6",
+        "title": "Net Price",
+        "type": "decimal"
+    },
+    {
+        "id": "fixed_7",
+        "title": "Remarks",
+        "type": "text"
+    },
+    {
+        "id": "fixed_8",
+        "title": "Month",
+        "type": "text"
+    }
+]

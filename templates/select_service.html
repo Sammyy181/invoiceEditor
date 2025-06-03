@@ -820,29 +820,6 @@
       document.getElementById('popupMenu').style.display = 'none';
     }
 
-    function handleAction(action) {
-      if (action === 'update') {
-        navigateWithTransition('/select_customer');
-      } else if (action === 'view' || action === 'generate') {
-        //window.location.href = '/select_feature';
-      }
-      closePopup();
-    }
-
-    function navigateWithTransition(url) {
-        // Check if View Transitions API is supported
-        if (!document.startViewTransition) {
-            // Fallback to normal navigation
-            window.location.href = url;
-            return;
-        }
-
-        // Start the view transition
-        document.startViewTransition(() => {
-            window.location.href = url;
-        });
-    }
-
     function openAddServicePopup() {
       document.getElementById("overlay").style.display = "block";
       document.getElementById("addServicePopup").style.display = "block";
@@ -864,13 +841,13 @@
       button.textContent = serviceName;
       button.onclick = function () {
         openPopup(serviceName);
-fetch("/add_service", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: "service_name=" + encodeURIComponent(serviceName)
-    })
+      fetch("/add_service", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "service_name=" + encodeURIComponent(serviceName)
+      })
     .then(response => {
       if (response.ok) {
         // Optionally update the UI

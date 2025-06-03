@@ -543,6 +543,14 @@
     </style>
 </head>
 <body>
+    {% macro get_title_by_id(id) %}
+        {% for item in titles %}
+            {% if item.id == id %}
+                {{ item.title }}
+            {% endif %}
+        {% endfor %}
+    {% endmacro %}
+
     <div class="container">
         <form method="POST" id="customerForm">
             <h2>Select customer:</h2>
@@ -588,22 +596,22 @@
 
             <form id="addCustomerForm" method="POST" action="{{ url_for('add_customer') }}">
                 <div class="form-group">
-                    <label for="customerName">Customer Name</label>
+                    <label for="customerName">{{ get_title_by_id("fixed_1") }}</label> <!-- For Customer Name -->
                     <input type="text" id="customerName" name="customer_name" placeholder="Enter customer name" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="unitPrice">Unit Price</label>
+                    <label for="unitPrice">{{ get_title_by_id("fixed_2") }}</label> <!-- For Unit Price -->
                     <input type="number" id="unitPrice" name="unit_price" step="10" placeholder="0.00" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="consumptionPeriod">Consumption Period</label>
+                    <label for="consumptionPeriod">{{ get_title_by_id("fixed_3") }}</label> <!-- For Consumption Period -->
                     <input type="text" id="consumptionPeriod" name="consumption_period" placeholder="No. of Applicable Days" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="usagePercent">Usage %</label>
+                    <label for="usagePercent">{{ get_title_by_id("fixed_4") }}</label> <!-- For Usage (%) -->
                     <input type="number" id="usagePercent" name="usage_percent" min="0" max="100" step="1" placeholder="0.0" required>
                 </div>
 
@@ -632,18 +640,18 @@
             <h2>Edit Customer</h2>
             <form id="editCustomerForm" method="POST" action="{{ url_for('update_customer') }}">
                 <div class="form-group">
-                    <label for="usage_percent">Usage (%)</label>
-                    <input type="text" id="usage_percent" name="usage" placeholder="Currently {{ current['usage'] if current else 'N/A' }}" required>
+                    <label for="usage_percent">{{ get_title_by_id("fixed_4") }}</label> <!-- For Usage (%) -->
+                    <input type="text" id="usage_percent" name="usage" placeholder="Enter Usage % Here" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="price">Unit Price</label>
-                    <input type="text" id="price" name="cost" placeholder="Currently {{ current['cost'] if current else 'N/A' }}" required>
+                    <label for="price">{{ get_title_by_id("fixed_2") }}</label> <!-- For Unit Price -->
+                    <input type="text" id="price" name="cost" placeholder="Enter Unit Price Here" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="period">Consumption Period</label>
-                    <input type="text" id="period" name="period" placeholder="Currently {{ current['period'] if current else 'N/A' }}" required>
+                    <label for="period">{{ get_title_by_id("fixed_3") }}</label> <!-- For Consumption Period -->
+                    <input type="text" id="period" name="period" placeholder="Enter Consumption Period Here" required>
                 </div>
 
                 {% for field in dynamic_fields %}
