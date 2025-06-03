@@ -63,7 +63,7 @@
     }
 
     label {
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 700;
       color: #2d3748;
       text-align: left; /* Changed from center to left */
@@ -87,14 +87,15 @@
       flex: 1;
       overflow-y: auto; /* This makes it scrollable */
       overflow-x: hidden; /* Hide horizontal scroll */
+      padding-top: 15px;
       padding-right: 8px;
       margin-bottom: 20px;
-      max-height: 400px; /* Set explicit max height for better scroll control */
+      max-height: 425px; /* Set explicit max height for better scroll control */
     }
 
     /* Enhanced Custom Scrollbar */
     .service-buttons::-webkit-scrollbar {
-      width: 8px; /* Made scrollbar slightly wider */
+      width: 10px; /* Made scrollbar slightly wider */
     }
 
     .service-buttons::-webkit-scrollbar-track {
@@ -120,13 +121,13 @@
     }
 
     .service-buttons button {
-      padding: 16px 24px;
+      padding: 20px 24px;
       border: none;
       background: linear-gradient(145deg, #4f46e5, #7c3aed);
       color: white;
       border-radius: 16px;
       cursor: pointer;
-      font-size: 15px;
+      font-size: 20px;
       font-weight: 600;
       text-transform: capitalize;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
