@@ -1029,6 +1029,23 @@
                 alert('Network error occurred');
             }
         }
+
+        let isNavigatingAway = false;
+
+        // Set this flag when clicking a link or submitting a form
+        document.addEventListener('click', function (e) {
+            const target = e.target.closest('a, button, input[type="submit"]');
+            if (target) {
+                isNavigatingAway = true;
+            }
+        });
+
+        window.addEventListener("beforeunload", function (e) {
+            if (!isNavigatingAway) {
+                navigator.sendBeacon("/shutdown");
+            }
+        });
+
     </script>
 </body>
 </html>
