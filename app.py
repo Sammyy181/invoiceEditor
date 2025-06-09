@@ -361,6 +361,15 @@ def update_fixed_columns():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+import  threading 
+import webbrowser
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    print("🔴 Shutdown signal received from browser.")
+    threading.Thread(target=lambda: os._exit(0)).start()  # Hard exit like Ctrl+C
+    return 'Server shutting down...'
 
 if __name__ == '__main__':
-    app.run(port=7000, debug=True)
+    app.run(port=7000, debug=True, use_reloader = False)
