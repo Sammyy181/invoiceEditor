@@ -238,7 +238,7 @@ def get_invoice_data():
         service = data.get('service')
         
         df = your_invoice_function(action, service) 
-        df.drop(['Remarks', 'Month'], axis=1, inplace=True, errors='ignore')
+        df.drop(['Month'], axis=1, inplace=True, errors='ignore')
         
         total = df['Net Price'].sum()
         
@@ -361,6 +361,80 @@ def update_fixed_columns():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/categories', methods = ['GET'])
+def get_categories():
+    service = request.args.get('service')
+    if not service:
+        return jsonify({'error': 'Service parameter required'}), 400
+    
+    return jsonify(load_categories(service))
 
+@app.route('/api/categories', methods=['POST'])
+def save_category():
+    data = request.json
+    service = data.get('service')
+    name = data.get('name')
+    price = data.get('unitPrice')
+    
+    if not (service and name and isinstance(price, (int, float))):
+        return jsonify({'error': 'Invalid data'}), 400
+    
+    new_category = add_category(service, name, price)
+    return jsonify(new_category), 200
+
+@app.route('/api/categories/<int:category_id>', methods=['PUT'])
+def edit_category(category_id):
+    data = request.json
+    service = data.get('service')
+    name = data.get('name')
+    price = data.get('unitPrice')
+
+    if not (service and name and isinstance(price, (int, float))):
+        return jsonify({'error': 'Invalid data'}), 400
+
+    path = f'categories/{service}.json'
+    if not os.path.exists(path):
+        return jsonify({'error': 'Service not found'}), 404
+
+    with open(path, 'r') as f:
+        categories = json.load(f)
+
+    for category in categories:
+        if category['id'] == category_id:
+            category['name'] = name
+            category['unitPrice'] = price
+            break
+    else:
+        return jsonify({'error': 'Category not found'}), 404
+
+    with open(path, 'w') as f:
+        json.dump(categories, f, indent=2)
+
+    return jsonify({'message': 'Category updated', 'category': category})
+
+@app.route('/api/categories/<int:category_id>', methods=['DELETE'])
+def delete_category(category_id):
+    service = request.args.get('service')
+    if not service:
+        return jsonify({'error': 'Service is required'}), 400
+
+    path = f'categories/{service}.json'
+    if not os.path.exists(path):
+        return jsonify({'error': 'Service not found'}), 404
+
+    with open(path, 'r') as f:
+        categories = json.load(f)
+
+    filtered = [c for c in categories if c['id'] != category_id]
+
+    if len(filtered) == len(categories):
+        return jsonify({'error': 'Category not found'}), 404
+
+    with open(path, 'w') as f:
+        json.dump(filtered, f, indent=2)
+
+    return jsonify({'message': 'Category deleted'})
+ 
 if __name__ == '__main__':
     app.run(port=7000, debug=True)

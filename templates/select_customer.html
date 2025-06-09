@@ -39,6 +39,17 @@
             min-height: 100vh;
         }
 
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 300px; /* adjust based on your needs */
+            transform: translate(-50%, -50%);
+            opacity: 0.1;
+            z-index: 0;
+            pointer-events: none; /* don't interfere with clicks */
+        }
+
         .container {
             position: fixed;
             top: 50%;
@@ -550,6 +561,8 @@
             {% endif %}
         {% endfor %}
     {% endmacro %}
+
+    <img src="{{ url_for('static', filename='itc-infotech.png') }}" alt="Watermark" class="watermark">
 
     <div class="container">
         <form method="POST" id="customerForm">
