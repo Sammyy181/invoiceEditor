@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info, your_invoice_function, copy_previous_data
+from update_excel import *
 from admin_fn import *
 import os
 import shutil
@@ -17,6 +17,7 @@ TEMPLATE_FILE = 'template.xlsx'
 SERVICE_FOLDER = 'data'  
 TITLES_TEMPLATE = 'titles_config.json'
 TITLES_FOLDER = 'titles'
+CAT_FOLDER = 'categories'
 
 now = datetime.now()
 previous_month_date = now - relativedelta(months=1)
@@ -53,6 +54,7 @@ def add_service():
     title_name = f"{service_name}.json"
     dest_path = os.path.join(SERVICE_FOLDER, filename)
     title_path = os.path.join(TITLES_FOLDER, title_name)
+    category_path = os.path.join(CAT_FOLDER, title_name)
 
     # Check if file already exists
     if os.path.exists(dest_path):
@@ -61,6 +63,8 @@ def add_service():
     try:
         shutil.copyfile(TEMPLATE_FILE, dest_path)
         shutil.copyfile(TITLES_TEMPLATE, title_path)
+        with open(category_path, 'w') as f:
+            json.dump([], f, indent=4)
         print(f"Created new service file: {dest_path}")
         return redirect(url_for('select_service'))
     except Exception as e:
@@ -115,7 +119,7 @@ def select_customer():
                 })
                 
             all_titles = load_service_titles(service)
-            wanted_ids = {"fixed_1", "fixed_2", "fixed_3", "fixed_4"}
+            wanted_ids = {"fixed_1", "fixed_2", "fixed_3", "fixed_4", "fixed_7"}
             titles = [item for item in all_titles if item["id"] in wanted_ids]
             
             return render_template('select_customer.html', 
@@ -148,7 +152,7 @@ def select_customer():
                 })
             
             all_titles = load_service_titles(service)
-            wanted_ids = {"fixed_1", "fixed_2", "fixed_3", "fixed_4"}
+            wanted_ids = {"fixed_1", "fixed_2", "fixed_3", "fixed_4", "fixed_7"}
             titles = [item for item in all_titles if item["id"] in wanted_ids]
             
             return render_template(
@@ -171,6 +175,7 @@ def add_customer():
     price = float(request.form['unit_price'])
     period = int(request.form['consumption_period'])
     usage = float(request.form['usage_percent'])
+    category = request.form['selected_id']
     
     other_data = {}
     
@@ -187,10 +192,17 @@ def add_customer():
             if val != '':
                 other_data[field_name] = val
 
-    add_customer_info(service, name, price, period, usage, other_data)
+    add_customer_info(service, name, price, period, usage, category, other_data)
     
     flash("Added Customer Information Successfully!")
     return redirect(url_for('select_customer'))
+
+@app.route('/get_dropdown_options')
+def get_dropdown_options():
+    service = session.get('service')
+    
+    options = get_dropdown(service)
+    return jsonify(options)
 
 
 @app.route('/update_customer', methods=['POST'])
@@ -210,7 +222,7 @@ def update_customer():
         return redirect(url_for('select_customer'))
     
     allowed_fields = {col['title'].lower() for col in columns_config}
-    allowed_fields.update({'usage', 'cost', 'period'})
+    allowed_fields.update({'usage', 'cost', 'period', 'category'})
 
     # Filter out empty values, so only updated fields are sent
     updates = {
