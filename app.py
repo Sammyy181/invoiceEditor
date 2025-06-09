@@ -240,23 +240,32 @@ def get_invoice_data():
         df = your_invoice_function(action, service) 
         df.drop(['Month'], axis=1, inplace=True, errors='ignore')
         
-        total = df['Net Price'].sum()
+        net_total = df['Net Price'].sum()
         
+        # Hardcoded tax rates (can change later if needed)
+        SGST_RATE = 0.09
+        CGST_RATE = 0.09
+        
+        sgst_amount = net_total * SGST_RATE
+        cgst_amount = net_total * CGST_RATE
+        grand_total = net_total + sgst_amount + cgst_amount
+
         response_data = {
             'columns': df.columns.tolist(),
             'data': df.where(pd.notnull(df), None).values.tolist(),
-            'summary': None 
-        }
-        
-        if len(df):
-            response_data['summary'] = {
-                'Grand Total' : float(total)
+            'summary': {
+                'Net Total': round(net_total, 2),
+                'SGST (9%)': round(sgst_amount, 2),
+                'CGST (9%)': round(cgst_amount, 2),
+                'Grand Total': round(grand_total, 2)
             }
-        
+        }
+
         return jsonify(response_data)
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
         
 @app.route('/admin')
 def admin():

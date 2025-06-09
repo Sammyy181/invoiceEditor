@@ -1225,13 +1225,13 @@
 
     function displayInvoiceData(data) {
       const contentDiv = document.getElementById('invoiceContent');
-      
+
       if (!data || !data.columns || !data.data) {
         contentDiv.innerHTML = '<div class="error-state"><p>No invoice data available</p></div>';
         return;
       }
-      
-      // Create table HTML from dataframe data
+
+      // Create table from columns and rows
       let tableHtml = `
         <div class="invoice-table-container">
           <table class="invoice-table">
@@ -1242,41 +1242,44 @@
             </thead>
             <tbody>
       `;
-      
-      // Add data rows
+
       data.data.forEach(row => {
         tableHtml += '<tr>';
         row.forEach(cell => {
-          // Format cell data (handle numbers, dates, etc.)
-          //const formattedCell = formatCellData(cell);
           tableHtml += `<td>${cell}</td>`;
         });
         tableHtml += '</tr>';
       });
-      
+
       tableHtml += `
             </tbody>
           </table>
         </div>
       `;
-      
-      // Add summary if provided
+
+      // Summary section
       if (data.summary) {
+        const summaryOrder = ["Net Total", "SGST (9%)", "CGST (9%)", "Grand Total"];
         tableHtml += `
           <div class="invoice-summary">
             <h3>Summary</h3>
-            ${Object.entries(data.summary).map(([key, value]) => 
-              `<div class="summary-row">
-                <span class="summary-label">${key}:</span>
-                <span class="summary-value">${formatCellData(value)}</span>
-              </div>`
-            ).join('')}
+            ${summaryOrder.map((key, index) => {
+              const value = data.summary[key];
+              const isLast = index === summaryOrder.length - 1;
+              return `
+                <div class="summary-row${isLast ? ' grand-total' : ''}">
+                  <span class="summary-label">${key}:</span>
+                  <span class="summary-value">₹${value.toFixed(2)}</span>
+                </div>
+              `;
+            }).join('')}
           </div>
         `;
       }
-      
+
       contentDiv.innerHTML = tableHtml;
     }
+
 
     function formatCellData(cell) {
       if (cell === null || cell === undefined) {
@@ -1346,22 +1349,6 @@
           !mainPopup.contains(event.target)) {
         closeInvoicePopup();
       }
-    });
-
-    let isNavigatingAway = false;
-
-    // Set this flag when clicking a link or submitting a form
-    document.addEventListener('click', function (e) {
-        const target = e.target.closest('a, button, input[type="submit"]');
-        if (target) {
-            isNavigatingAway = true;
-        }
-    });
-
-    window.addEventListener("beforeunload", function (e) {
-        if (!isNavigatingAway) {
-            navigator.sendBeacon("/shutdown");
-        }
     });
 
   </script>
