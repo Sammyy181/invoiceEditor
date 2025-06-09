@@ -244,13 +244,13 @@ def get_invoice_data():
         
         response_data = {
             'columns': df.columns.tolist(),
-            'data': df.values.tolist(),
+            'data': df.where(pd.notnull(df), None).values.tolist(),
             'summary': None 
         }
         
         if len(df):
             response_data['summary'] = {
-                'Grand Total' : total
+                'Grand Total' : float(total)
             }
         
         return jsonify(response_data)
@@ -363,4 +363,4 @@ def update_fixed_columns():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=7000, debug=True)

@@ -207,11 +207,11 @@ def update_customer_info(service, customer_name, updates):
     df.at[idx, COLUMN_MAP['consumption']] = round(
         float(df.at[idx, COLUMN_MAP['period']]) / n_days[current_month], 2
     )
-    df.at[idx, 'Net Price'] = (
+    df.at[idx, 'Net Price'] = round((
         float(df.at[idx, COLUMN_MAP['consumption']]) *
         float(df.at[idx, COLUMN_MAP['usage']]) *
         float(df.at[idx, COLUMN_MAP['unit_price']]) / 100
-    )
+    ), 2)
 
     all_sheets[current_month] = df
 
@@ -230,10 +230,10 @@ def your_invoice_function(action, service):
     previous_month = previous_month.strftime('%B')
     
     if action == 'view':
-        print(previous_month)
         df = pd.read_excel(path, sheet_name=previous_month)
     else:  
-        df = pd.read_excel(path, sheet_name=current_month)    
+        df = pd.read_excel(path, sheet_name=current_month)  
+    df = df.where(pd.notnull(df), 'N/A')  
     return df
 
 def copy_previous_data(service):
