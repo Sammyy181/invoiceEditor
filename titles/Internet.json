@@ -6,7 +6,7 @@
     },
     {
         "id": "fixed_2",
-        "title": "Unit Price",
+        "title": "Price Per GB",
         "type": "integer"
     },
     {

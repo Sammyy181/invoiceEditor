@@ -15,7 +15,8 @@ app.secret_key = 'your-secret-key'
 
 TEMPLATE_FILE = 'template.xlsx'
 SERVICE_FOLDER = 'data'  
-FIXED_COLUMNS = load_titles()
+TITLES_TEMPLATE = 'titles_config.json'
+TITLES_FOLDER = 'titles'
 
 now = datetime.now()
 previous_month_date = now - relativedelta(months=1)
@@ -49,7 +50,9 @@ def add_service():
 
     # Sanitize and construct the path
     filename = f"{service_name}.xlsx"
+    title_name = f"{service_name}.json"
     dest_path = os.path.join(SERVICE_FOLDER, filename)
+    title_path = os.path.join(TITLES_FOLDER, title_name)
 
     # Check if file already exists
     if os.path.exists(dest_path):
@@ -57,6 +60,7 @@ def add_service():
 
     try:
         shutil.copyfile(TEMPLATE_FILE, dest_path)
+        shutil.copyfile(TITLES_TEMPLATE, title_path)
         print(f"Created new service file: {dest_path}")
         return redirect(url_for('select_service'))
     except Exception as e:
@@ -96,8 +100,7 @@ def select_customer():
         if action == 'add_new':
             # This just re-renders the page with the popup showing
             try:
-                with open('columns_config.json') as f:
-                    columns_config = json.load(f)
+                columns_config = load_service_columns(service)
             except Exception:
                 columns_config = []
                 
@@ -111,7 +114,7 @@ def select_customer():
                     'type': col.get('type', 'text')  # fallback to text input
                 })
                 
-            all_titles = load_titles()
+            all_titles = load_service_titles(service)
             wanted_ids = {"fixed_1", "fixed_2", "fixed_3", "fixed_4"}
             titles = [item for item in all_titles if item["id"] in wanted_ids]
             
@@ -130,8 +133,7 @@ def select_customer():
             current = get_customer_info(service, selected_customer)
             
             try:
-                with open('columns_config.json') as f:
-                    columns_config = json.load(f)
+                columns_config = load_service_columns(service)
             except Exception:
                 columns_config = []
                 
@@ -145,7 +147,7 @@ def select_customer():
                     'type': col.get('type', 'text')  # fallback to text input
                 })
             
-            all_titles = load_titles()
+            all_titles = load_service_titles(service)
             wanted_ids = {"fixed_1", "fixed_2", "fixed_3", "fixed_4"}
             titles = [item for item in all_titles if item["id"] in wanted_ids]
             
@@ -173,8 +175,7 @@ def add_customer():
     other_data = {}
     
     try:
-        with open('columns_config.json') as f:
-            columns = json.load(f)
+        columns =load_service_columns(service)
     except Exception as e:
         flash(f"Failed to load field configuration: {str(e)}", "error")
         return redirect(url_for('select_customer'))
@@ -203,8 +204,7 @@ def update_customer():
         return redirect(url_for('select_customer'))
     
     try:
-        with open('columns_config.json') as f:
-            columns_config = json.load(f)
+        columns_config = load_service_columns(service)
     except Exception as e:
         flash(f"Failed to load field configuration: {str(e)}", "error")
         return redirect(url_for('select_customer'))
@@ -244,13 +244,13 @@ def get_invoice_data():
         
         response_data = {
             'columns': df.columns.tolist(),
-            'data': df.values.tolist(),
+            'data': df.where(pd.notnull(df), None).values.tolist(),
             'summary': None 
         }
         
         if len(df):
             response_data['summary'] = {
-                'Grand Total' : total
+                'Grand Total' : float(total)
             }
         
         return jsonify(response_data)
@@ -260,12 +260,17 @@ def get_invoice_data():
         
 @app.route('/admin')
 def admin():
-    return render_template('admin.html')
+    services = get_services()
+    return render_template('admin.html', services=services)
 
 @app.route('/api/columns', methods=['GET'])
 def get_columns():
     try:
-        columns = load_columns_from_excel()
+        service = request.args.get('service')
+        if not service:
+            return jsonify({'error': 'Service parameter required'}), 400
+        
+        columns = load_service_columns(service)
         return jsonify(columns)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -273,57 +278,49 @@ def get_columns():
 @app.route('/api/columns', methods=['POST'])
 def add_column():
     try:
-        print("Received POST request to /api/columns")
-        
         data = request.get_json()
-        print(f"Request data: {data}")
+        service = data.get('service')
+        
+        if not service:
+            return jsonify({'error': 'Service parameter required'}), 400
         
         if not data or 'title' not in data or 'type' not in data:
-            print("Missing title or type in request")
             return jsonify({'error': 'Title and type are required'}), 400
         
-        print("Loading existing columns...")
-        columns = load_columns_from_excel()
-        print(f"Existing columns: {columns}")
+        columns = load_service_columns(service)
+        fixed_columns = load_service_titles(service)
         
         # Check if column already exists in both fixed and dynamic columns
-        all_existing_titles = [col['title'].lower() for col in FIXED_COLUMNS] + [col['title'].lower() for col in columns]
-        print(f"All existing titles: {all_existing_titles}")
+        all_existing_titles = [col['title'].lower() for col in fixed_columns] + [col['title'].lower() for col in columns]
         
         if data['title'].lower() in all_existing_titles:
-            print(f"Column title '{data['title']}' already exists")
             return jsonify({'error': 'Column title already exists'}), 400
         
         # Create new column with unique ID
         new_column = {
-            'id': str(len(FIXED_COLUMNS) + len(columns) + 1),
+            'id': str(len(fixed_columns) + len(columns) + 1),
             'title': data['title'],
             'type': data['type'],
             'created_at': datetime.now().isoformat()
         }
-        print(f"Creating new column: {new_column}")
         
         columns.append(new_column)
-        print("Saving columns to config...")
-        save_columns_to_config(columns)
+        save_service_columns(service, columns)
+        #update_service_excel_template(service, columns)
         
-        print("Updating Excel template...")
-        update_excel_template(columns)
-        
-        print("Column added successfully")
         return jsonify(new_column), 201
         
     except Exception as e:
-        print(f"Error in add_column: {str(e)}")
-        import traceback
-        traceback.print_exc()
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 @app.route('/api/columns/<column_id>', methods=['DELETE'])
 def remove_column(column_id):
-    """Remove a column configuration"""
     try:
-        columns = load_columns_from_excel()
+        service = request.args.get('service')
+        if not service:
+            return jsonify({'error': 'Service parameter required'}), 400
+        
+        columns = load_service_columns(service)
         
         # Find and remove column
         original_length = len(columns)
@@ -332,8 +329,8 @@ def remove_column(column_id):
         if len(columns) == original_length:
             return jsonify({'error': 'Column not found'}), 404
         
-        save_columns_to_config(columns)
-        update_excel_template(columns)
+        save_service_columns(service, columns)
+        #update_service_excel_template(service, columns)
         
         return jsonify({'message': 'Column removed successfully'})
         
@@ -342,47 +339,28 @@ def remove_column(column_id):
     
 @app.route('/api/fixed-columns', methods=['GET'])
 def get_fixed_columns():
-    return jsonify(load_titles())
-
-@app.route('/api/fixed-columns', methods=['POST'])
-def save_fixed_columns():
-    data = request.get_json()
-    save_titles(data)
+    service = request.args.get('service')
+    if not service:
+        return jsonify({'error': 'Service parameter required'}), 400
     
-    folder = 'data'
-    
-    new_column_names = [field["title"] for field in data]
-    
-    for filename in os.listdir(folder):
-        if filename.endswith(".xlsx") or filename.endswith(".xls"):
-            filepath = os.path.join(folder, filename)
-            print(f"Processing {filepath}...")
+    return jsonify(load_service_titles(service))
 
-            # Load the Excel file with all sheets
-            excel_file = pd.ExcelFile(filepath)
-            sheet_names = excel_file.sheet_names
-            
-            # Dictionary to store updated dataframes per sheet
-            updated_sheets = {}
-
-            # Process each sheet
-            for sheet in sheet_names:
-                df = pd.read_excel(excel_file, sheet_name=sheet)
-                
-                # Only rename first 8 columns if they exist
-                cols = df.columns.tolist()
-                for i in range(min(8, len(cols))):
-                    cols[i] = new_column_names[i]
-                df.columns = cols
-                
-                updated_sheets[sheet] = df
-
-            # Save back all sheets into the same Excel file (overwrite)
-            with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
-                for sheet, df in updated_sheets.items():
-                    df.to_excel(writer, sheet_name=sheet, index=False)
-    
-    return jsonify({"message": "Columns saved successfully"})
+@app.route('/api/fixed-columns', methods=['PUT'])
+def update_fixed_columns():
+    try:
+        data = request.get_json()
+        service = data.get('service')
+        
+        if not service:
+            return jsonify({'error': 'Service parameter required'}), 400
+        
+        fixed_columns = data.get('fixedColumns', [])
+        save_service_titles(service, fixed_columns)
+        
+        return jsonify({'message': 'Fixed columns updated successfully'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=7000, debug=True)

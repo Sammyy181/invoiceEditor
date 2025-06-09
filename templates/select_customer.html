@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Customer Selection Demo</title>
     <style>
 
@@ -83,6 +84,7 @@
         .customer-list {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             margin-top: 20px;
             padding-right: 10px;
             min-height: 0; /* This is crucial for flex scrolling */
@@ -414,7 +416,6 @@
             color: #2d3748;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow-y: auto;
         }
 
         .customer-btn::before {
@@ -455,7 +456,6 @@
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow-y: auto;
         }
 
         .add-new-btn::before {
@@ -569,7 +569,7 @@
                     + Add New Customer
                 </button>
                 <button type="submit" name="action" value="copy_previous" class="copy-prev-btn">
-                    📋 Copy Previous Data
+                    <i class="fas fa-copy"></i> Copy Previous Data
                 </button>
             </div>           
         </form>
@@ -584,9 +584,6 @@
    <div class="back-button-container" style="position: fixed; bottom: 100px; display: flex; gap: 20px;">
         <a href="#" onclick="fadeAndNavigate('{{ url_for('select_service') }}'); return false;">
             Go Back
-        </a>
-        <a href="#" onclick="fadeAndNavigate('{{ url_for('admin') }}'); return false;">
-            Access Admin Options
         </a>
     </div>
 
@@ -718,7 +715,6 @@
             document.getElementById('addCustomerForm').reset();
         }
 
-        // *** CHANGE 2: Modify hideEditCustomerPopup to use classList.remove("show") ***
         function hideEditCustomerPopup() {
             const popup = document.getElementById('editPopupOverlay');
             if (popup) {
@@ -727,7 +723,6 @@
             }
         }
 
-        // Close popup when clicking outside (Add Customer)
         document.getElementById('popupOverlay').addEventListener('click', function(e) {
             if (e.target === this) {
                 hideAddCustomerPopup();

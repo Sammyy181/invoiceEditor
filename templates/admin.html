@@ -150,6 +150,24 @@
             box-shadow: 0 10px 20px rgba(46, 49, 146, 0.3);
         }
 
+        .service-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px 0;
+        }
+
         .columns-list {
             margin-top: 30px;
             padding-top: 20px;
@@ -305,8 +323,27 @@
 </head>
 <body>
     <div class="main-wrapper">
-        <!-- Custom Columns Container -->
+        <!-- Service Selection Container -->
         <div class="container">
+            <h1 class="form-title">Select Service for Configuration</h1>
+            
+            <div class="form-group">
+                <label for="serviceSelect">Choose Service</label>
+                <select id="serviceSelect" class="service-select" onchange="loadServiceData()">
+                    <option value="">Select a service...</option>
+                    {% for service in services %}
+                    <option value="{{ service }}">{{ service }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div id="noServiceMessage" class="empty-state">
+                Please select a service to configure its columns and settings.
+            </div>
+        </div>
+
+        <!-- Custom Columns Container -->
+        <div class="container" id="customColumnsContainer" style="display: none;">
             <h1 class="form-title">Custom Column Configuration</h1>
             
             <form id="columnForm">
@@ -342,7 +379,7 @@
         </div>
 
         <!-- Fixed Columns Container -->
-        <div class="container">
+        <div class="container" id="fixedColumnsContainer" style="display: none;">
             <h1 class="form-title">Fixed Column Titles</h1>
             
             <div class="columns-list">
@@ -358,7 +395,7 @@
     </div>
 
     <div class="back-button-container">
-        <a href="#" onclick="fadeAndNavigate('{{ url_for('select_customer') }}'); return false;">
+        <a href="#" onclick="fadeAndNavigate('{{ url_for('select_service') }}'); return false;">
             Go Back
         </a>
     </div>
@@ -366,6 +403,25 @@
     <script>
         let columns = [];
         let fixedColumns = [];
+        let selectedService = ''
+
+        function loadServiceData() {
+            selectedService = document.getElementById('serviceSelect').value;
+            
+            if (!selectedService) {
+                document.getElementById('customColumnsContainer').style.display = 'none';
+                document.getElementById('fixedColumnsContainer').style.display = 'none';
+                document.getElementById('noServiceMessage').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('noServiceMessage').style.display = 'none';
+            document.getElementById('customColumnsContainer').style.display = 'flex';
+            document.getElementById('fixedColumnsContainer').style.display = 'flex';
+            
+            loadColumns();
+            loadFixedColumns();
+        }
 
         document.getElementById('columnForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -407,7 +463,7 @@
 
         async function loadColumns() {
             try {
-                const response = await fetch('/api/columns');
+                const response = await fetch(`/api/columns?service=${selectedService}`);
                 if (response.ok) {
                     columns = await response.json();
                     renderColumns();
@@ -419,10 +475,10 @@
 
         async function loadFixedColumns() {
             try {
-                const response = await fetch('/api/fixed-columns');
+                const response = await fetch(`/api/fixed-columns?service=${selectedService}`);
                 if (response.ok) {
                     fixedColumns = await response.json();
-                    renderFixedColumns()
+                    renderFixedColumns();
                 }
             } catch (error) {
                 console.error('Error loading fixed columns:', error);
@@ -436,122 +492,139 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ title, type })
+                    body: JSON.stringify({
+                        service: selectedService,
+                        title: title,
+                        type: type
+                    })
                 });
-                
+
                 if (response.ok) {
-                    const newColumn = await response.json();
-                    return newColumn;
+                    return await response.json();
                 } else {
-                    throw new Error('Failed to save column');
+                    const error = await response.json();
+                    alert(error.error || 'Failed to save column');
+                    return null;
                 }
             } catch (error) {
                 console.error('Error saving column:', error);
-                alert('Error saving column. Please try again.');
+                alert('Network error occurred');
                 return null;
             }
         }
 
-        async function saveFixedColumns() {
-            try {
-                const response = await fetch('/api/fixed-columns', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(fixedColumns)
-                });
-                
-                if (response.ok) {
-                    alert('Fixed column titles saved successfully!');
-                } else {
-                    throw new Error('Failed to save fixed columns');
-                }
-            } catch (error) {
-                console.error('Error saving fixed columns:', error);
-                alert('Error saving fixed column titles. Please try again.');
+        async function removeColumn(columnId) {
+            if (!confirm('Are you sure you want to remove this column?')) {
+                return;
             }
-        }
 
-        async function removeColumnFromBackend(columnId) {
             try {
-                const response = await fetch(`/api/columns/${columnId}`, {
+                const response = await fetch(`/api/columns/${columnId}?service=${selectedService}`, {
                     method: 'DELETE'
                 });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to remove column');
+
+                if (response.ok) {
+                    columns = columns.filter(col => col.id !== columnId);
+                    renderColumns();
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Failed to remove column');
                 }
             } catch (error) {
                 console.error('Error removing column:', error);
-                alert('Error removing column. Please try again.');
-                return false;
+                alert('Network error occurred');
             }
-            return true;
         }
-        
+
         function renderColumns() {
-            const columnsList = document.getElementById('columnsList');
+            const container = document.getElementById('columnsList');
             
             if (columns.length === 0) {
-                columnsList.innerHTML = '<div class="empty-state">No custom columns configured yet</div>';
+                container.innerHTML = '<div class="empty-state">No custom columns configured yet</div>';
                 return;
             }
-            
-            columnsList.innerHTML = columns.map((column, index) => `
+
+            container.innerHTML = columns.map(column => `
                 <div class="column-item">
                     <div class="column-info">
                         <div class="column-title">${column.title}</div>
                         <div class="column-type">${column.type}</div>
                     </div>
-                    <button class="remove-button" onclick="removeColumn(${index}, '${column.id || index}')">Remove</button>
+                    <button class="remove-button" onclick="removeColumn('${column.id}')">Remove</button>
                 </div>
             `).join('');
         }
 
         function renderFixedColumns() {
-            const fixedColumnsList = document.getElementById('fixedColumnsList');
+            const container = document.getElementById('fixedColumnsList');
             
-            fixedColumnsList.innerHTML = fixedColumns.map((column, index) => `
+            if (!fixedColumns || fixedColumns.length === 0) {
+                container.innerHTML = '<div class="empty-state">No fixed columns found</div>';
+                return;
+            }
+
+            container.innerHTML = fixedColumns.map(column => `
                 <div class="fixed-column-item">
-                    <div class="column-info" style="flex: 1; margin-right: 15px;">
-                        <label for="fixed_${column.id}" style="font-size: 12px; color: #666; margin-bottom: 5px;">
-                            ${column.type.toUpperCase()}
-                        </label>
-                        <input 
-                            type="text" 
-                            id="fixed_${column.id}"
-                            class="fixed-column-input"
-                            value="${column.title}" 
-                            onchange="updateFixedColumnTitle('${column.id}', this.value)"
-                            style="margin-bottom: 0;"
-                        />
+                    <div class="column-info">
+                        <div class="column-title">${column.title}</div>
+                        <div class="column-type">${column.type}</div>
                     </div>
+                    <input type="text" 
+                        class="fixed-column-input" 
+                        value="${column.title}" 
+                        data-id="${column.id}"
+                        placeholder="Enter column title">
                 </div>
             `).join('');
         }
 
-        function updateFixedColumnTitle(columnId, newTitle) {
-            const column = fixedColumns.find(col => col.id === columnId);
-            if (column) {
-                column.title = newTitle;
+        async function saveFixedColumns() {
+            if (!selectedService) {
+                alert('Please select a service first!');
+                return;
+            }
+
+            const inputs = document.querySelectorAll('.fixed-column-input');
+            const updatedColumns = Array.from(inputs).map(input => {
+                const columnId = input.getAttribute('data-id');
+                const originalColumn = fixedColumns.find(col => col.id === columnId);
+                return {
+                    ...originalColumn,
+                    title: input.value.trim()
+                };
+            });
+
+            // Validate that all titles are filled
+            if (updatedColumns.some(col => !col.title)) {
+                alert('All column titles must be filled!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/fixed-columns', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        service: selectedService,
+                        fixedColumns: updatedColumns
+                    })
+                });
+
+                if (response.ok) {
+                    fixedColumns = updatedColumns;
+                    alert('Fixed column titles updated successfully!');
+                    renderFixedColumns();
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Failed to update fixed columns');
+                }
+            } catch (error) {
+                console.error('Error saving fixed columns:', error);
+                alert('Network error occurred');
             }
         }
-
-        async function removeColumn(index, columnId) {
-            const success = await removeColumnFromBackend(columnId);
-            if (success) {
-                columns.splice(index, 1);
-                renderColumns();
-            }
-        }
-
-        // Focus on title field when page loads
-        window.addEventListener('load', function() {
-            loadColumns();
-            loadFixedColumns();
-            document.getElementById('columnTitle').focus();
-        });
     </script>
 </body>
 </html>
