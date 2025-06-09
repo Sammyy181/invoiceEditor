@@ -59,6 +59,17 @@ Your Company Name"""
             msg['From'] = sender
             msg['To'] = recipient
             msg.set_content(body)
+            
+            selected_service = service_var.get()
+            if selected_service:
+                attachment_path = os.path.join("data", selected_service + ".xlsx")
+                if os.path.exists(attachment_path):
+                    with open(attachment_path, "rb") as f:
+                        file_data = f.read()
+                        msg.add_attachment(file_data, maintype="application",
+                                        subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                        filename=os.path.basename(attachment_path))
+
 
             if use_ssl:
                 with smtplib.SMTP_SSL(smtp_server, smtp_port) as smtp:
@@ -197,6 +208,25 @@ recipient_entry.pack(fill='x', ipady=8, pady=(0, 30))
 recipient_entry.bind("<FocusIn>", on_entry_focus)
 recipient_entry.bind("<FocusOut>", on_entry_unfocus)
 
+import os
+
+# Scan the 'data' folder for Excel files
+def get_services():
+    files = os.listdir("data")
+    return [f[:-5] for f in files if f.endswith(".xlsx")]
+
+# GUI: Service Selection
+service_label = tk.Label(main_frame, text="🛠 Select Service", 
+                         font=label_font, fg='#2c3e50', bg='#f8f9fa')
+service_label.pack(anchor='w', pady=(0, 5))
+
+service_var = tk.StringVar()
+service_combo = ttk.Combobox(main_frame, textvariable=service_var,
+                             values=get_services(), font=("Helvetica", 10),
+                             style='Custom.TCombobox', state="readonly")
+service_combo.pack(fill='x', pady=(0, 30))
+
+
 # Progress bar (initially hidden)
 progress_bar = ttk.Progressbar(main_frame, mode='indeterminate', 
                               style='Custom.Horizontal.TProgressbar')
@@ -211,7 +241,7 @@ style.configure('Custom.Horizontal.TProgressbar',
 
 # Send Button
 button_frame = tk.Frame(main_frame, bg='#f8f9fa')
-button_frame.pack(fill='x', pady=20)
+button_frame.pack(fill='x', pady=0)
 
 send_button = tk.Button(button_frame, text="Send Email", 
                        command=send_email,
