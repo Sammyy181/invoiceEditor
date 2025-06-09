@@ -7,6 +7,219 @@
     <title>Customer Selection Demo</title>
     <style>
 
+        .logo-container {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        pointer-events: none;
+        }
+
+        .logo-wrapper {
+        pointer-events: all;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        animation: logoFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        }
+
+        .logo-bg-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(124, 58, 237, 0.3));
+        animation: logoRotate 20s linear infinite;
+        pointer-events: none;
+        }
+
+        .circle-1 {
+        width: 60px;
+        height: 60px;
+        top: -10px;
+        left: -10px;
+        animation-delay: 0s;
+        }
+
+        .circle-2 {
+        width: 40px;
+        height: 40px;
+        bottom: -5px;
+        right: -5px;
+        animation-delay: -7s;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.3));
+        }
+
+        .circle-3 {
+        width: 30px;
+        height: 30px;
+        top: 50%;
+        right: -15px;
+        animation-delay: -14s;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.3));
+        }
+
+        @keyframes logoRotate {
+        0% { transform: rotate(0deg) scale(1); }
+        25% { transform: rotate(90deg) scale(1.1); }
+        50% { transform: rotate(180deg) scale(1); }
+        75% { transform: rotate(270deg) scale(0.9); }
+        100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .logo-main {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 2;
+        }
+
+        .logo-icon {
+        position: relative;
+        }
+
+        .logo-shape {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+        animation: logoShapeGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoShapeGlow {
+        0% { 
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+            transform: scale(1);
+        }
+        100% { 
+            box-shadow: 0 15px 40px rgba(79, 70, 229, 0.6);
+            transform: scale(1.05);
+        }
+        }
+
+        .logo-shape::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: logoShine 3s linear infinite;
+        }
+
+        @keyframes logoShine {
+        0% { transform: rotate(0deg) translate(-100%, -100%); }
+        50% { transform: rotate(0deg) translate(100%, 100%); }
+        100% { transform: rotate(0deg) translate(100%, 100%); }
+        }
+
+        .logo-inner {
+        position: relative;
+        z-index: 2;
+        color: white;
+        font-size: 28px;
+        animation: logoIconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoIconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        }
+
+        .logo-text h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        color: #2d3748;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed, #06b6d4);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        letter-spacing: -0.5px;
+        animation: logoTextShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes logoTextShimmer {
+        0%, 100% { 
+            background-position: 0% 50%; 
+        }
+        50% { 
+            background-position: 100% 50%; 
+        }
+        }
+
+        .logo-tagline {
+        display: block;
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 2px;
+        opacity: 0.8;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+        .logo-wrapper {
+            padding: 15px;
+            gap: 12px;
+        }
+        
+        .logo-shape {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .logo-inner {
+            font-size: 24px;
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+        }
+        
+        .logo-tagline {
+            font-size: 11px;
+        }
+        }
+
+        @media (max-width: 480px) {
+        .logo-main {
+            flex-direction: column;
+            text-align: center;
+            gap: 10px;
+        }
+        
+        .logo-text h1 {
+            font-size: 22px;
+        }
+        
+        .logo-tagline {
+            font-size: 10px;
+        }
+        }
+
         body {
             transition: opacity 0.3s ease-in;
         }
@@ -595,7 +808,29 @@
         {% endfor %}
     {% endmacro %}
 
-    <img src="{{ url_for('static', filename='itc-infotech.png') }}" alt="Watermark" class="watermark">
+    <div class="logo-container">
+        <div class="logo-wrapper">
+        <!-- Animated background circles -->
+        <div class="logo-bg-circle circle-1"></div>
+        <div class="logo-bg-circle circle-2"></div>
+        <div class="logo-bg-circle circle-3"></div>
+        
+        <!-- Main logo -->
+        <div class="logo-main">
+            <div class="logo-icon">
+            <div class="logo-shape">
+                <div class="logo-inner">
+                <i class="fas fa-bolt"></i>
+                </div>
+            </div>
+            </div>
+            <div class="logo-text">
+            <h1>ServiceHub</h1>
+            <span class="logo-tagline">Invoice Management</span>
+            </div>
+        </div>
+        </div>
+    </div>
 
     <div class="container">
         <form method="POST" id="customerForm">
