@@ -332,7 +332,7 @@ def download_data(service, type):
     previous_month = previous_month.strftime('%B')
     file_path = f'data/{service}.xlsx'
     COLUMN_MAP = load_column_map(service)
-    tax_data = load_tax_config
+    tax_data = load_tax_config()
     default_cgst = 0.09
     default_sgst = 0.09
 
