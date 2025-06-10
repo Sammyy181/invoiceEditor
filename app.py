@@ -6,8 +6,8 @@ import shutil
 from datetime import datetime
 from openpyxl import load_workbook
 from dateutil.relativedelta import relativedelta
+import  threading 
 
-# Get current month as full name (e.g., "May")
 month_name = datetime.now().strftime("%B")
 
 app = Flask(__name__)
@@ -18,13 +18,14 @@ SERVICE_FOLDER = 'data'
 TITLES_TEMPLATE = 'titles_config.json'
 TITLES_FOLDER = 'titles'
 CAT_FOLDER = 'categories'
+TAX_CONFIG_FILE = 'tax_config.json' 
 
 now = datetime.now()
 previous_month_date = now - relativedelta(months=1)
 previous_month_name = previous_month_date.strftime('%B')    
 
 wb = load_workbook(TEMPLATE_FILE)
-first_sheet = wb.worksheets[0]  # or wb.active
+first_sheet = wb.worksheets[0] 
 second_sheet = wb.worksheets[1]
 first_sheet.title = previous_month_name
 second_sheet.title = month_name
@@ -49,14 +50,12 @@ def add_service():
     if not service_name:
         return "No service name provided", 400
 
-    # Sanitize and construct the path
     filename = f"{service_name}.xlsx"
     title_name = f"{service_name}.json"
     dest_path = os.path.join(SERVICE_FOLDER, filename)
     title_path = os.path.join(TITLES_FOLDER, title_name)
     category_path = os.path.join(CAT_FOLDER, title_name)
 
-    # Check if file already exists
     if os.path.exists(dest_path):
         return "Service already exists", 409
 
@@ -82,13 +81,10 @@ def select_feature():
         if feature == 'update_preferences':
             return redirect(url_for('select_customer'))
         elif feature == 'view_invoice':
-            # Add your invoice viewing logic here
             return render_template('coming_soon.html', feature='View Last Generated Invoice')
         elif feature == 'generate_invoice':
-            # Add your invoice generation logic here
             return render_template('coming_soon.html', feature='Generate New Invoice')
         elif feature == 'manage_customer':
-            # Add your customer management logic here
             return render_template('coming_soon.html', feature='Add or Delete Customer')
     
     return render_template('select_feature.html', service=service)
@@ -106,7 +102,6 @@ def select_customer():
 
     if request.method == 'POST':
         if action == 'add_new':
-            # This just re-renders the page with the popup showing
             try:
                 columns_config = load_service_columns(service)
             except Exception:
@@ -114,12 +109,11 @@ def select_customer():
                 
             dynamic_fields = []
             for col in columns_config:
-                # Normalize title to a safe form name (lowercase, underscores instead of spaces)
                 field_name = col['title'].lower().replace(' ', '_')
                 dynamic_fields.append({
                     'name': field_name,
                     'label': col['title'],
-                    'type': col.get('type', 'text')  # fallback to text input
+                    'type': col.get('type', 'text') 
                 })
                 
             all_titles = load_service_titles(service)
@@ -148,12 +142,11 @@ def select_customer():
                 
             dynamic_fields = []
             for col in columns_config:
-                # Normalize title to a safe form name (lowercase, underscores instead of spaces)
                 field_name = col['title'].lower().replace(' ', '_')
                 dynamic_fields.append({
                     'name': field_name,
                     'label': col['title'],
-                    'type': col.get('type', 'text')  # fallback to text input
+                    'type': col.get('type', 'text') 
                 })
             
             all_titles = load_service_titles(service)
@@ -213,7 +206,6 @@ def get_dropdown_options():
 
 @app.route('/update_customer', methods=['POST'])
 def update_customer():
-    # Make sure these session keys exist
     service = session.get('service')
     customer = session.get('customer')
 
@@ -230,7 +222,6 @@ def update_customer():
     allowed_fields = {col['title'].lower() for col in columns_config}
     allowed_fields.update({'usage', 'cost', 'period', 'category'})
 
-    # Filter out empty values, so only updated fields are sent
     updates = {
         k: v.strip() for k, v in request.form.items()
         if k in allowed_fields and v.strip() != ''
@@ -339,13 +330,11 @@ def add_column():
         columns = load_service_columns(service)
         fixed_columns = load_service_titles(service)
         
-        # Check if column already exists in both fixed and dynamic columns
         all_existing_titles = [col['title'].lower() for col in fixed_columns] + [col['title'].lower() for col in columns]
         
         if data['title'].lower() in all_existing_titles:
             return jsonify({'error': 'Column title already exists'}), 400
         
-        # Create new column with unique ID
         new_column = {
             'id': str(len(fixed_columns) + len(columns) + 1),
             'title': data['title'],
@@ -355,7 +344,6 @@ def add_column():
         
         columns.append(new_column)
         save_service_columns(service, columns)
-        #update_service_excel_template(service, columns)
         
         return jsonify(new_column), 201
         
@@ -371,7 +359,6 @@ def remove_column(column_id):
         
         columns = load_service_columns(service)
         
-        # Find and remove column
         original_length = len(columns)
         columns = [col for col in columns if col['id'] != column_id]
         
@@ -379,7 +366,6 @@ def remove_column(column_id):
             return jsonify({'error': 'Column not found'}), 404
         
         save_service_columns(service, columns)
-        #update_service_excel_template(service, columns)
         
         return jsonify({'message': 'Column removed successfully'})
         
@@ -483,50 +469,40 @@ def delete_category(category_id):
     with open(path, 'w') as f:
         json.dump(filtered, f, indent=2)
 
-    return jsonify({'message': 'Category deleted'})
-
-
-TAX_CONFIG_FILE = 'tax_config.json'  # adjust this path
+    return jsonify({'message': 'Category deleted'}) 
 
 @app.route('/update_tax', methods=['POST'])
 def update_tax():
     service = request.form.get('service')
     try:
-        cgst = float(request.form.get('cgst')) / 100  # convert percent to decimal
+        cgst = float(request.form.get('cgst')) / 100 
         sgst = float(request.form.get('sgst')) / 100
     except (ValueError, TypeError):
         flash('Invalid input for tax rates.', 'error')
         return redirect(url_for('select_customer'))
 
-    # Load current tax config JSON
     if os.path.exists(TAX_CONFIG_FILE):
         with open(TAX_CONFIG_FILE, 'r') as f:
             tax_data = json.load(f)
     else:
         tax_data = {}
 
-    # Update the tax config for the service
     if service not in tax_data:
         tax_data[service] = {}
 
     tax_data[service]['cgst'] = cgst
     tax_data[service]['sgst'] = sgst
 
-    # Save back to JSON file
     with open(TAX_CONFIG_FILE, 'w') as f:
         json.dump(tax_data, f, indent=4)
 
     flash('Tax rates updated successfully.', 'success')
     return redirect(url_for('select_customer'))
- 
-    
-import  threading 
-import webbrowser
 
 @app.route('/shutdown', methods=['POST'])
 def shutdown():
     print("🔴 Shutdown signal received from browser.")
-    threading.Thread(target=lambda: os._exit(0)).start()  # Hard exit like Ctrl+C
+    threading.Thread(target=lambda: os._exit(0)).start()  
     return 'Server shutting down...'
 
 if __name__ == '__main__':

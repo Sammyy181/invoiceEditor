@@ -53,7 +53,6 @@ def get_customers(service):
     try:
         df = pd.read_excel(filepath, sheet_name=current_month)
     except Exception:
-        # If current month not found, fall back to previous
         df = pd.read_excel(filepath, sheet_name=previous_month)
         df = df[0:0]
     COLUMN_MAP = load_column_map(service)
@@ -117,11 +116,9 @@ def add_customer_info(service, name, price, period, usage, category, others=None
     previous_month = now - relativedelta(months=1)
     previous_month = previous_month.strftime('%B')
 
-    # Read all sheets from the file
     all_sheets = pd.read_excel(path, sheet_name=None)
 
     if current_month in all_sheets:
-        # Current month sheet exists, edit it directly
         df = all_sheets[current_month].copy()
         print(f"Editing existing sheet for {current_month}.")
     
@@ -141,7 +138,6 @@ def add_customer_info(service, name, price, period, usage, category, others=None
     
     if others:
         for key, value in others.items():
-            # Capitalize column name to match Excel? Adjust as needed
             col_name = key
             if col_name not in df.columns:
                 print(f"Adding new column '{col_name}' for dynamic field.")
@@ -183,18 +179,15 @@ def update_customer_info(service, customer_name, updates):
             'category' : COLUMN_MAP['category']
         }
 
-    # Read all sheets from the file
     all_sheets = pd.read_excel(path, sheet_name=None)
 
     if current_month in all_sheets:
-        # Current month sheet exists, edit it directly
         df = all_sheets[current_month].copy()
         print(f"Editing existing sheet for {current_month}.")
     elif previous_month in all_sheets:
-        # Current month sheet missing, copy previous month sheet as base
         df = all_sheets[previous_month].copy()
         df = df[0:0]
-        df['Month'] = current_month  # Update Month column for all rows just in case
+        df['Month'] = current_month  
         print(f"Creating new sheet for {current_month} from {previous_month}.")
     else:
         print(f"Neither current month ({current_month}) nor previous month ({previous_month}) sheets found in {service} file.")
@@ -209,8 +202,8 @@ def update_customer_info(service, customer_name, updates):
     df.at[idx, 'Month'] = current_month
     
     try:
-        with open(f'categories/{service}.json') as f:  # Adjust the filename/path as needed
-            category_map = json.load(f)  # Should be a list of dicts like [{'id': 'abc123', 'name': 'Gold'}]
+        with open(f'categories/{service}.json') as f:  
+            category_map = json.load(f)  
             id_to_name = {str(item['id']): item['name'] for item in category_map}
     except Exception as e:
         print(f"Error loading category JSON for mapping: {e}")
@@ -223,10 +216,9 @@ def update_customer_info(service, customer_name, updates):
 
         excel_field = FIELD_MAP.get(field, field)
 
-        # Handle category ID to name mapping
         if field == 'category':
             original_value = value
-            value = id_to_name.get(value, value)  # Default to ID if name not found
+            value = id_to_name.get(value, value)  
             print(f"Mapping category ID '{original_value}' to name '{value}'")
 
         if excel_field not in df.columns:

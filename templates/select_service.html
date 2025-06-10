@@ -179,7 +179,6 @@
       opacity: 0.8;
     }
 
-    /* Mobile Responsiveness */
     @media (max-width: 768px) {
       .logo-wrapper {
         padding: 15px;
@@ -228,7 +227,6 @@
         transition: opacity 0.3s ease-in;
     }
 
-    /* Fade in on page load */
     body {
         animation: fadeIn 0.3s ease-in;
     }
@@ -254,11 +252,11 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 300px; /* adjust based on your needs */
+      width: 300px;  
       transform: translate(-50%, -50%);
       opacity: 0.1;
       z-index: 0;
-      pointer-events: none; /* don't interfere with clicks */
+      pointer-events: none;
     }
 
     .form-container {
@@ -292,7 +290,7 @@
       font-size: 30px;
       font-weight: 700;
       color: #2d3748;
-      text-align: left; /* Changed from center to left */
+      text-align: left;
       margin-bottom: 35px;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       position: relative;
@@ -311,23 +309,22 @@
       flex-direction: column;
       gap: 12px;
       flex: 1;
-      overflow-y: auto; /* This makes it scrollable */
-      overflow-x: hidden; /* Hide horizontal scroll */
+      overflow-y: auto; 
+      overflow-x: hidden; 
       padding-top: 15px;
       padding-right: 8px;
       margin-bottom: 20px;
-      max-height: 425px; /* Set explicit max height for better scroll control */
+      max-height: 425px; 
     }
 
-    /* Enhanced Custom Scrollbar */
     .service-buttons::-webkit-scrollbar {
-      width: 10px; /* Made scrollbar slightly wider */
+      width: 10px; 
     }
 
     .service-buttons::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.1);
       border-radius: 10px;
-      margin: 4px 0; /* Add margin to track */
+      margin: 4px 0;
     }
 
     .service-buttons::-webkit-scrollbar-thumb {
@@ -340,7 +337,6 @@
       background: linear-gradient(145deg, #5b21b6, #6366f1);
     }
 
-    /* Firefox scrollbar styling */
     .service-buttons {
       scrollbar-width: thin;
       scrollbar-color: #4f46e5 rgba(0, 0, 0, 0.1);
@@ -397,7 +393,7 @@
 
     .add-service-container {
       margin-top: auto;
-      text-align: left; /* Changed from center to left */
+      text-align: left;
       position: relative;
       z-index: 1;
     }
@@ -449,7 +445,6 @@
       transform: translateY(-1px) scale(0.98);
     }
 
-    /* Main Service Popup */
     .popup {
       display: none;
       position: fixed;
@@ -549,7 +544,6 @@
       box-shadow: none;
     }
 
-    /* Overlay */
     .overlay {
       position: fixed;
       top: 0;
@@ -568,7 +562,6 @@
       to { opacity: 1; }
     }
 
-    /* Add Service Popup */
     .add-service-popup {
       position: fixed;
       top: 50%;
@@ -656,11 +649,10 @@
       background: linear-gradient(145deg, #dc2626, #b91c1c);
     }
 
-    /* Mobile Responsiveness */
     @media (max-width: 768px) {
       body {
         padding: 15px;
-        justify-content: center; /* Center on mobile for better UX */
+        justify-content: center;  
         padding-left: 15px;
       }
 
@@ -675,11 +667,11 @@
       label {
         font-size: 24px;
         margin-bottom: 25px;
-        text-align: center; /* Center on mobile */
+        text-align: center; 
       }
 
       .add-service-container {
-        text-align: center; /* Center on mobile */
+        text-align: center; 
       }
 
       .service-buttons button,
@@ -726,7 +718,7 @@
     .invoice-popup {
       position: fixed;
       top: 50%;
-      right: -450px; /* Start off-screen */
+      right: -450px; 
       transform: translateY(-50%);
       width: 420px;
       max-height: 80vh;
@@ -734,14 +726,14 @@
       backdrop-filter: blur(15px);
       border-radius: 24px;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-      z-index: 1002; /* Higher than main popup */
+      z-index: 1002;
       border: 1px solid rgba(255, 255, 255, 0.2);
       transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
     }
 
     .invoice-popup.show {
-      right: 20px; /* Slide in position */
+      right: 20px;
     }
 
     .invoice-header {
@@ -790,7 +782,6 @@
       overflow-x: hidden;
     }
 
-    /* Custom scrollbar for invoice content */
     .invoice-content::-webkit-scrollbar {
       width: 6px;
     }
@@ -911,7 +902,6 @@
       box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
     }
 
-    /* Invoice Table Styles */
     .invoice-table-container {
       overflow-x: auto;
       margin-bottom: 20px;
@@ -953,7 +943,6 @@
       border-bottom: none;
     }
 
-    /* Invoice Summary Styles */
     .invoice-summary {
       background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(124, 58, 237, 0.05));
       border-radius: 12px;
@@ -993,7 +982,6 @@
       font-weight: 600;
     }
 
-    /* Mobile responsiveness for invoice popup */
     @media (max-width: 768px) {
       .invoice-popup {
         width: 100%;
@@ -1030,9 +1018,9 @@
 
     .admin-link-container {
         position: fixed;
-        bottom: 20px;         /* 20px from bottom of the screen */
-        left: 50%;            /* Center horizontally */
-        transform: translateX(-50%); /* Offset 50% of its width to truly center it */
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%); 
         text-align: center;
         z-index: 1000; 
     }
@@ -1065,12 +1053,10 @@
 
   <div class="logo-container">
     <div class="logo-wrapper">
-      <!-- Animated background circles -->
       <div class="logo-bg-circle circle-1"></div>
       <div class="logo-bg-circle circle-2"></div>
       <div class="logo-bg-circle circle-3"></div>
       
-      <!-- Main logo -->
       <div class="logo-main">
         <div class="logo-icon">
           <div class="logo-shape">
@@ -1097,7 +1083,6 @@
       </div>
     </form>
 
-    <!-- Add New Service Button -->
     <div class="add-service-container">
       <button class="add-service-button" onclick="openAddServicePopup()">+ Add New Service</button>
     </div>
@@ -1109,7 +1094,6 @@
       </a>
   </div>
 
-  <!-- Main Popup -->
   <div class="popup" id="popupMenu">
     <h2 id="selectedService">Selected Service</h2>
     <button class="popup-button" onclick="handleAction('view')">View Last Month Invoice</button>
@@ -1118,7 +1102,6 @@
     <div class="close" onclick="closePopup()">Cancel</div>
   </div>
 
-  <!-- Add New Service Popup -->
   <div class="overlay" id="overlay"></div>
   <div class="add-service-popup" id="addServicePopup">
     <h2>Add New Service</h2>
@@ -1135,7 +1118,6 @@
       <button class="invoice-close-btn" onclick="closeInvoicePopup()">×</button>
     </div>
     <div class="invoice-content" id="invoiceContent">
-      <!-- Invoice content will be populated here -->
       <div class="invoice-placeholder">
         <p>Invoice content will be displayed here...</p>
       </div>
@@ -1191,8 +1173,7 @@
       })
     .then(response => {
       if (response.ok) {
-        // Optionally update the UI
-        location.reload(); // or update DOM to add the button without reload
+        location.reload(); 
       } else {
         alert("Error adding service: " + response.statusText);
       }
@@ -1211,7 +1192,6 @@
       const currentMonth = now.toLocaleString('default', { month: 'long' });
       const currentYear = now.getFullYear();
 
-      // Previous month logic
       const prevMonthIndex = now.getMonth() - 1;
       const prevMonthDate = new Date(now.getFullYear(), prevMonthIndex, 1);
       const previousMonth = prevMonthDate.toLocaleString('default', { month: 'long' });
@@ -1223,17 +1203,14 @@
         title.textContent = `New Invoice : ${currentMonth} ${currentYear}`;
       }
       
-      // Show the popup with slide-in animation
       popup.classList.add('show');
       
-      // Load invoice content
       loadInvoiceContent(type);
     }
 
     async function loadInvoiceContent(type) {
       const contentDiv = document.getElementById('invoiceContent');
       
-      // Show loading state
       contentDiv.innerHTML = `
         <div class="loading-state">
           <div class="spinner"></div>
@@ -1242,7 +1219,6 @@
       `;
       
       try {
-        // Make API call to get dataframe data
         const response = await fetch('/get_invoice_data', {
           method: 'POST',
           headers: {
@@ -1260,7 +1236,6 @@
         
         const data = await response.json();
         
-        // Display the dataframe data
         displayInvoiceData(data, type);
         
       } catch (error) {
@@ -1283,7 +1258,6 @@
         return;
       }
 
-      // Create table from columns and rows
       let tableHtml = `
         <div class="invoice-table-container">
           <table class="invoice-table">
@@ -1309,7 +1283,6 @@
         </div>
       `;
 
-      // Summary section
       if (data.summary) {
         const cgstRate = data.tax_config?.cgst ?? 0;
         const sgstRate = data.tax_config?.sgst ?? 0;
@@ -1355,7 +1328,6 @@
       const downloadBtn = document.getElementById('downloadBtn');
       const originalText = downloadBtn.innerHTML;
       
-      // Show loading state
       downloadBtn.disabled = true;
       downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
       
@@ -1375,7 +1347,6 @@
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        // Get the filename from the response headers
         const contentDisposition = response.headers.get('content-disposition');
         let filename = 'invoice.xlsx';
         if (contentDisposition) {
@@ -1385,7 +1356,6 @@
           }
         }
         
-        // Create blob and download
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -1397,7 +1367,6 @@
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
         
-        // Show success state briefly
         downloadBtn.innerHTML = '<i class="fas fa-check"></i> Downloaded!';
         setTimeout(() => {
           downloadBtn.innerHTML = originalText;
@@ -1414,32 +1383,21 @@
       }
     }
 
-    // Helper function to track current invoice type
-    /* let currentInvoiceType = '';
-
-    function getCurrentInvoiceType() {
-      return currentInvoiceType;
-    } */
-
     function formatCellData(cell) {
       if (cell === null || cell === undefined) {
         return '-';
       }
       
-      // Format numbers
       if (typeof cell === 'number') {
-        // If it looks like currency (has decimals), format as currency
         if (cell % 1 !== 0) {
           return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'INR'
           }).format(cell);
         }
-        // Otherwise format as regular number
         return new Intl.NumberFormat('en-US').format(cell);
       }
       
-      // Format dates (if string looks like date)
       if (typeof cell === 'string' && /^\d{4}-\d{2}-\d{2}/.test(cell)) {
         try {
           const date = new Date(cell);
@@ -1457,29 +1415,24 @@
       popup.classList.remove('show');
     }
 
-    // Update your existing handleAction function to call showInvoicePopup
     function handleAction(action) {
       if (action === 'update') {
         fadeAndNavigate('/select_customer');
       } else if (action === 'view' || action === 'generate') {
-        // Show invoice popup instead of redirecting
         showInvoicePopup(action);
-        closePopup(); // Close the main popup
+        closePopup(); 
       }
     }
 
     function fadeAndNavigate(url) {
-        // Fade out current page
         document.body.style.transition = 'opacity 0.3s ease-out';
         document.body.style.opacity = '0';
         
-        // Navigate after fade completes
         setTimeout(() => {
             window.location.href = url;
         }, 300);
     }
 
-    // Optional: Close invoice popup when clicking outside (if you want this behavior)
     document.addEventListener('click', function(event) {
       const invoicePopup = document.getElementById('invoicePopup');
       const mainPopup = document.getElementById('popupMenu');

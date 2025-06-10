@@ -179,7 +179,6 @@
         opacity: 0.8;
         }
 
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
         .logo-wrapper {
             padding: 15px;
@@ -224,7 +223,6 @@
             transition: opacity 0.3s ease-in;
         }
 
-        /* Fade in on page load */
         body {
             animation: fadeIn 0.3s ease-in;
         }
@@ -234,7 +232,6 @@
             to { opacity: 1; }
         }
 
-        /* Style your buttons to look like links if needed */
         .back-button-container button {
             background: none;
             border: none;
@@ -256,11 +253,11 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            width: 300px; /* adjust based on your needs */
+            width: 300px; 
             transform: translate(-50%, -50%);
             opacity: 0.1;
             z-index: 0;
-            pointer-events: none; /* don't interfere with clicks */
+            pointer-events: none; 
         }
 
         .container {
@@ -283,7 +280,6 @@
         }
 
         .back-button-container {
-            /* No need for margin-top here if placed directly after the container */
             position: absolute;
             bottom: 20px;
             left: 50%;
@@ -299,10 +295,10 @@
             font-size: 1rem;
             font-family: inherit;
             display: inline-block;
-            transition: background-color 0.3s ease; /* Smooth hover effect */
+            transition: background-color 0.3s ease;  
         }
         .back-button-container a:hover {
-            background-color: #0056b3; /* Darken on hover */
+            background-color: #0056b3;
         }
 
         .customer-list {
@@ -311,8 +307,8 @@
             overflow-x: hidden;
             margin-top: 20px;
             padding-right: 10px;
-            min-height: 0; /* This is crucial for flex scrolling */
-            max-height: calc(60vh - 200px); /* Explicit max height */
+            min-height: 0;
+            max-height: calc(60vh - 200px);
         }
 
         .customer-list::-webkit-scrollbar {
@@ -349,14 +345,14 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
-            display: none; /* Default hidden */
+            display: none;
             z-index: 1000;
-            align-items: center; /* This centers vertically */
-            justify-content: center; /* This centers horizontally */
+            align-items: center; 
+            justify-content: center;
         }
 
         .popup-overlay.show {
-            display: flex; /* Overrides 'display: none' to show and enable centering */
+            display: flex;
         }
 
         .popup-form {
@@ -525,7 +521,6 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* This .popup-overlay is for the messages, not the forms. It should be separate */
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -544,9 +539,9 @@
             display: flex;
         }
 
-        .popup { /* This seems to be for flashes or other non-form popups */
+        .popup {  
             position: relative;
-            top: calc(20px + 60vh + 20px); /* This makes it appear at the bottom right */
+            top: calc(20px + 60vh + 20px); 
             right: 20px;
             width: 400px;
             background: rgba(255, 255, 255, 0.98);
@@ -647,7 +642,7 @@
         .popup-btn.cancel:hover {
             background: rgba(255, 255, 255, 1);
             border-color: #cbd5e0;
-            transform: translateY(-1px); /* Added missing transform property */
+            transform: translateY(-1px); 
         }
 
         label {
@@ -806,9 +801,9 @@
         }
 
         .tax-container {
-            position: absolute; /* Add this */
-            left: 25px; /* Add this - adjust the value as needed */
-            top: 200px; /* Add this - adjust the value as needed */
+            position: absolute;
+            left: 25px; 
+            top: 200px;
             width: 350px;
             height: 50vh;
             background: rgba(255, 255, 255, 0.95);
@@ -836,12 +831,10 @@
 
     <div class="logo-container">
         <div class="logo-wrapper">
-        <!-- Animated background circles -->
         <div class="logo-bg-circle circle-1"></div>
         <div class="logo-bg-circle circle-2"></div>
         <div class="logo-bg-circle circle-3"></div>
         
-        <!-- Main logo -->
         <div class="logo-main">
             <div class="logo-icon">
             <div class="logo-shape">
@@ -944,7 +937,7 @@
 
             <form id="addCustomerForm" method="POST" action="{{ url_for('add_customer') }}">
                 <div class="form-group">
-                    <label for="customerName">{{ get_title_by_id("fixed_1") }}</label> <!-- For Customer Name -->
+                    <label for="customerName">{{ get_title_by_id("fixed_1") }}</label> 
                     <input type="text" id="customerName" name="customer_name" placeholder="Enter customer name" required>
                 </div>
 
@@ -956,17 +949,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="unitPrice">{{ get_title_by_id("fixed_2") }}</label> <!-- For Unit Price -->
+                    <label for="unitPrice">{{ get_title_by_id("fixed_2") }}</label>
                     <input type="number" id="unitPrice" name="unit_price" step="10" placeholder="0.00" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="consumptionPeriod">{{ get_title_by_id("fixed_3") }}</label> <!-- For Consumption Period -->
+                    <label for="consumptionPeriod">{{ get_title_by_id("fixed_3") }}</label>
                     <input type="text" id="consumptionPeriod" name="consumption_period" placeholder="No. of Applicable Days" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="usagePercent">{{ get_title_by_id("fixed_4") }}</label> <!-- For Usage (%) -->
+                    <label for="usagePercent">{{ get_title_by_id("fixed_4") }}</label> 
                     <input type="number" id="usagePercent" name="usage_percent" min="0" max="100" step="1" placeholder="0.0" required>
                 </div>
 
@@ -995,7 +988,7 @@
             <h2>Edit Customer</h2>
             <form id="editCustomerForm" method="POST" action="{{ url_for('update_customer') }}">
                 <div class="form-group">
-                    <label for="usage_percent">{{ get_title_by_id("fixed_4") }}</label> <!-- For Usage (%) -->
+                    <label for="usage_percent">{{ get_title_by_id("fixed_4") }}</label>
                     <input type="text" id="usage_percent" name="usage" placeholder="Enter Usage % Here" required>
                 </div>
 
@@ -1007,12 +1000,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="price">{{ get_title_by_id("fixed_2") }}</label> <!-- For Unit Price -->
+                    <label for="price">{{ get_title_by_id("fixed_2") }}</label>
                     <input type="text" id="price" name="cost" placeholder="Enter Unit Price Here" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="period">{{ get_title_by_id("fixed_3") }}</label> <!-- For Consumption Period -->
+                    <label for="period">{{ get_title_by_id("fixed_3") }}</label>
                     <input type="text" id="period" name="period" placeholder="Enter Consumption Period Here" required>
                 </div>
 
@@ -1039,11 +1032,9 @@
     <script>
 
         function fadeAndNavigate(url) {
-            // Fade out current page
             document.body.style.transition = 'opacity 0.3s ease-out';
             document.body.style.opacity = '0';
             
-            // Navigate after fade completes
             setTimeout(() => {
                 window.location.href = url;
             }, 300);
@@ -1051,10 +1042,8 @@
 
         {% if show_popup %}
             document.addEventListener("DOMContentLoaded", function() {
-                // Show the add customer popup
                 showAddCustomerPopup();
 
-                // Fetch and populate the dropdown
                 fetch("/get_dropdown_options")
                     .then(response => response.json())
                     .then(data => {
@@ -1070,7 +1059,6 @@
                                 dropdown.appendChild(option);
                             });
 
-                            // Auto-fill price when dropdown changes
                             dropdown.addEventListener("change", function () {
                                 const selectedOption = this.options[this.selectedIndex];
                                 const unitPrice = selectedOption.getAttribute("data-price");
@@ -1090,12 +1078,10 @@
             });
         {% endif %}
 
-        // Shows the Edit Customer popup (triggered by Flask if show_edit_popup is true)
         {% if show_edit_popup %}
             document.addEventListener("DOMContentLoaded", function() {
                 showEditCustomerPopup();
 
-                // Load dropdown options from backend
                 fetch("/get_dropdown_options")
                     .then(response => response.json())
                     .then(data => {
@@ -1111,7 +1097,6 @@
                                 dropdown.appendChild(option);
                             });
 
-                            // Attach listener to auto-fill price
                             dropdown.addEventListener("change", function () {
                                 const selectedOption = this.options[this.selectedIndex];
                                 const unitPrice = selectedOption.getAttribute("data-price");
@@ -1156,7 +1141,7 @@
             const popup = document.getElementById('editPopupOverlay');
             if (popup) {
                 popup.classList.remove('show');
-                document.getElementById('editCustomerForm').reset(); // Also good practice to reset the form
+                document.getElementById('editCustomerForm').reset(); 
             }
         }
 
@@ -1166,21 +1151,17 @@
             }
         });
 
-        // Close popup when clicking outside (Edit Customer)
-        // *** CHANGE 3: Add event listener for editPopupOverlay as well ***
         document.getElementById('editPopupOverlay').addEventListener('click', function(e) {
             if (e.target === this) {
                 hideEditCustomerPopup();
             }
         });
 
-        // Close popup with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (document.getElementById('popupOverlay').classList.contains('show')) {
                     hideAddCustomerPopup();
                 }
-                // *** CHANGE 4: Add check for editPopupOverlay for Escape key ***
                 if (document.getElementById('editPopupOverlay').classList.contains('show')) {
                     hideEditCustomerPopup();
                 }

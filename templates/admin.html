@@ -43,14 +43,13 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            width: 300px; /* adjust based on your needs */
+            width: 300px;
             transform: translate(-50%, -50%);
             opacity: 0.1;
             z-index: 0;
-            pointer-events: none; /* don't interfere with clicks */
+            pointer-events: none;
         }
 
-        /* Tab System */
         .tab-container {
             max-width: 1200px;
             width: 100%;
@@ -111,7 +110,6 @@
             overflow-y: auto;
         }
 
-        /* Responsive Grid Layout */
         .grid-layout {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -394,7 +392,6 @@
             box-shadow: 0 0 0 3px rgba(27, 255, 255, 0.2);
         }
 
-        /* Hide inactive tabs */
         .tab-content {
             display: none;
         }
@@ -473,7 +470,6 @@
 
     <img src="{{ url_for('static', filename='itc-infotech.png') }}" alt="Watermark" class="watermark">
 
-    <!-- Tab Navigation -->
     <div class="tab-container">
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('service-selection')">Service Selection</button>
@@ -483,7 +479,6 @@
         </div>
     </div>
 
-    <!-- Tab Content: Service Selection -->
     <div id="service-selection" class="tab-content active">
         <div class="main-wrapper">
             <div class="container">
@@ -506,7 +501,6 @@
         </div>
     </div>
 
-    <!-- Tab Content: Custom Columns -->
     <div id="custom-columns" class="tab-content">
         <div class="grid-layout">
             <div class="container">
@@ -546,7 +540,6 @@
         </div>
     </div>
 
-    <!-- Tab Content: Fixed Columns -->
     <div id="fixed-columns" class="tab-content">
         <div class="grid-layout">
             <div class="container">
@@ -555,7 +548,6 @@
                 <div class="columns-list">
                     <h3 style="color: #2e3192; margin-bottom: 15px;">Edit Fixed Column Titles</h3>
                     <div class="columns-list-content" id="fixedColumnsList">
-                        <!-- Fixed columns will be rendered here -->
                     </div>
                     <button type="button" class="save-button" onclick="saveFixedColumns()" style="margin-top: 20px; flex-shrink: 0;">
                         Save Fixed Column Changes
@@ -565,7 +557,6 @@
         </div>
     </div>
 
-    <!-- Tab Content: New Feature -->
     <div id="new-feature" class="tab-content">
         <div class="grid-layout">
             <div class="container">
@@ -595,7 +586,6 @@
 
                 <div class="columns-list">
                     <div class="columns-list-content" id="categoriesList">
-                        <!-- Categories will be displayed here -->
                     </div>
                 </div>
             </div>
@@ -618,18 +608,14 @@
         let editingId = null;
 
         function showTab(tabName) {
-            // Hide all tab contents
             const tabContents = document.querySelectorAll('.tab-content');
             tabContents.forEach(content => content.classList.remove('active'));
             
-            // Remove active class from all tab buttons
             const tabButtons = document.querySelectorAll('.tab-button');
             tabButtons.forEach(button => button.classList.remove('active'));
             
-            // Show selected tab content
             document.getElementById(tabName).classList.add('active');
             
-            // Add active class to clicked tab button
             event.target.classList.add('active');
         }
 
@@ -656,19 +642,16 @@
             const type = document.getElementById('dataType').value;
             
             if (title && type) {
-                // Check if column title already exists
                 if (columns.some(col => col.title.toLowerCase() === title.toLowerCase())) {
                     alert('Column title already exists!');
                     return;
                 }
                 
-                // Save to backend
                 const savedColumn = await saveColumn(title, type);
                 if (savedColumn) {
                     columns.push(savedColumn);
                     renderColumns();
                     
-                    // Clear form
                     document.getElementById('columnTitle').value = '';
                     document.getElementById('dataType').value = '';
                     document.getElementById('columnTitle').focus();
@@ -805,7 +788,6 @@
             form.classList.remove('active');
             btn.textContent = '+ Add New Category';
             
-            // Clear form
             document.getElementById('categoryName').value = '';
             document.getElementById('unitPrice').value = '';
             editingId = null;
@@ -836,7 +818,6 @@
                 return;
             }
 
-            // Check for duplicate names (excluding the one being edited)
             const isDuplicate = categories.some(cat =>
                 cat.name.toLowerCase() === name.toLowerCase() && cat.id !== editingId
             );
@@ -848,7 +829,6 @@
             }
 
             if (editingId !== null) {
-                // EDIT mode
                 const response = await fetch(`/api/categories/${editingId}`, {
                     method: 'PUT',
                     headers: {
@@ -872,7 +852,6 @@
                     alert(error.error || 'Failed to update category');
                 }
             } else {
-                // ADD mode
                 const response = await fetch('/api/categories', {
                     method: 'POST',
                     headers: {
@@ -912,7 +891,7 @@
             document.getElementById('addCategoryForm').classList.add('active');
             document.getElementById('addCategoryBtn').textContent = 'Cancel';
 
-            editingId = id;  // Global variable to track if editing
+            editingId = id; 
         }
 
         async function removeColumn(columnId) {
