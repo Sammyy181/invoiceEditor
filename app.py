@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_file
 from update_excel import *
 from admin_fn import *
 import os
@@ -278,7 +278,24 @@ def get_invoice_data():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/download_invoice_excel', methods=['POST'])
+def download_invoice_excel():
+    try:
+        data = request.get_json()
+        service = data.get('service')
+        type = data.get('type')
+        file_path = download_data(service, type)    
         
+        return send_file(
+            file_path,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=f'{service}_{type}.xlsx'
+        )  
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+            
 @app.route('/admin')
 def admin():
     services = get_services()
