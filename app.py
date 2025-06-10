@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-from update_excel import get_services, get_customers, update_customer_info, get_customer_info, add_customer_info, your_invoice_function, copy_previous_data
+from update_excel import*
 from admin_fn import *
 import os
 import shutil
@@ -20,7 +20,7 @@ TITLES_FOLDER = 'titles'
 
 now = datetime.now()
 previous_month_date = now - relativedelta(months=1)
-previous_month_name = previous_month_date.strftime('%B')
+previous_month_name = previous_month_date.strftime('%B')    
 
 wb = load_workbook(TEMPLATE_FILE)
 first_sheet = wb.worksheets[0]  # or wb.active
@@ -95,6 +95,10 @@ def select_customer():
     action = request.form.get('action')
     selected_customer = request.form.get('customer')
     customers = get_customers(service)
+    if service:
+        tax_config = get_service_tax(service)
+    else:
+        tax_config = {'cgst': 0.0, 'sgst': 0.0}
 
     if request.method == 'POST':
         if action == 'add_new':
@@ -123,7 +127,8 @@ def select_customer():
                                    service=service, 
                                    show_popup=True, 
                                    dynamic_fields=dynamic_fields, 
-                                   titles=titles)
+                                   titles=titles,
+                                   tax_config=tax_config)
             
         elif action == 'copy_previous':
             copy_previous_data(service=service)
@@ -158,10 +163,11 @@ def select_customer():
                 show_edit_popup=True,
                 current=current,
                 dynamic_fields=dynamic_fields,
-                titles=titles
+                titles=titles,
+                tax_config=tax_config
             )
 
-    return render_template('select_customer.html', customers=customers, service=service, show_popup=False)
+    return render_template('select_customer.html', customers=customers, service=service, show_popup=False, tax_config=tax_config)
 
 @app.route('/add_customer', methods=['POST'])
 def add_customer():
@@ -242,9 +248,9 @@ def get_invoice_data():
         
         net_total = df['Net Price'].sum()
         
-        # Hardcoded tax rates (can change later if needed)
-        SGST_RATE = 0.09
-        CGST_RATE = 0.09
+        tax_config = get_service_tax(service)
+        SGST_RATE = tax_config['sgst']
+        CGST_RATE = tax_config['cgst']
         
         sgst_amount = net_total * SGST_RATE
         cgst_amount = net_total * CGST_RATE
@@ -255,10 +261,15 @@ def get_invoice_data():
             'data': df.where(pd.notnull(df), None).values.tolist(),
             'summary': {
                 'Net Total': round(net_total, 2),
-                'SGST (9%)': round(sgst_amount, 2),
-                'CGST (9%)': round(cgst_amount, 2),
+                'SGST': round(sgst_amount, 2),
+                'CGST': round(cgst_amount, 2),
                 'Grand Total': round(grand_total, 2)
-            }
+            },
+            'tax_config': {
+                'cgst': CGST_RATE,
+                'sgst': SGST_RATE
+            },
+            'service': service
         }
 
         return jsonify(response_data)
@@ -444,6 +455,40 @@ def delete_category(category_id):
         json.dump(filtered, f, indent=2)
 
     return jsonify({'message': 'Category deleted'})
+
+
+TAX_CONFIG_FILE = 'tax_config.json'  # adjust this path
+
+@app.route('/update_tax', methods=['POST'])
+def update_tax():
+    service = request.form.get('service')
+    try:
+        cgst = float(request.form.get('cgst')) / 100  # convert percent to decimal
+        sgst = float(request.form.get('sgst')) / 100
+    except (ValueError, TypeError):
+        flash('Invalid input for tax rates.', 'error')
+        return redirect(url_for('select_customer'))
+
+    # Load current tax config JSON
+    if os.path.exists(TAX_CONFIG_FILE):
+        with open(TAX_CONFIG_FILE, 'r') as f:
+            tax_data = json.load(f)
+    else:
+        tax_data = {}
+
+    # Update the tax config for the service
+    if service not in tax_data:
+        tax_data[service] = {}
+
+    tax_data[service]['cgst'] = cgst
+    tax_data[service]['sgst'] = sgst
+
+    # Save back to JSON file
+    with open(TAX_CONFIG_FILE, 'w') as f:
+        json.dump(tax_data, f, indent=4)
+
+    flash('Tax rates updated successfully.', 'success')
+    return redirect(url_for('select_customer'))
  
     
 import  threading 

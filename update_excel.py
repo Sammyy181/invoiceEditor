@@ -293,3 +293,21 @@ def copy_previous_data(service):
         for sheet_name, sheet_df in all_sheets.items():
             sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
         
+
+TAX_CONFIG_FILE = 'tax_config.json'
+
+def load_tax_config():
+    if not os.path.exists(TAX_CONFIG_FILE):
+        return {}
+    with open(TAX_CONFIG_FILE, 'r') as f:
+        return json.load(f)
+
+def get_service_tax(service):
+    data = load_tax_config()
+    return data.get(service, {'cgst': 0.09, 'sgst': 0.09})
+
+def update_service_tax(service, cgst, sgst):
+    data = load_tax_config()
+    data[service] = {'cgst': cgst, 'sgst': sgst}
+    with open(TAX_CONFIG_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
