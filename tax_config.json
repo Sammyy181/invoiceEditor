@@ -1,0 +1,14 @@
+{
+    "Electricity": {
+        "cgst": 0.05,
+        "sgst": 0.05
+    },
+    "Water": {
+        "cgst": 0.12,
+        "sgst": 0.05
+    },
+    "Internet": {
+        "cgst": 0.1,
+        "sgst": 0.1
+    }
+}

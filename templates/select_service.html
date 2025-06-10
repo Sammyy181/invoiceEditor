@@ -1311,17 +1311,29 @@
 
       // Summary section
       if (data.summary) {
-        const summaryOrder = ["Net Total", "SGST (9%)", "CGST (9%)", "Grand Total"];
+        const cgstRate = data.tax_config?.cgst ?? 0;
+        const sgstRate = data.tax_config?.sgst ?? 0;
+
+        const cgstLabel = `CGST (${(cgstRate * 100).toFixed(1)}%)`;
+        const sgstLabel = `SGST (${(sgstRate * 100).toFixed(1)}%)`;
+
+        const summaryOrder = [
+          { label: "Net Total", key: "Net Total" },
+          { label: sgstLabel, key: "SGST" },
+          { label: cgstLabel, key: "CGST" },
+          { label: "Grand Total", key: "Grand Total" },
+        ];
+
         tableHtml += `
           <div class="invoice-summary">
             <h3>Summary</h3>
-            ${summaryOrder.map((key, index) => {
+            ${summaryOrder.map(({ label, key }, index) => {
               const value = data.summary[key];
               const isLast = index === summaryOrder.length - 1;
               return `
                 <div class="summary-row${isLast ? ' grand-total' : ''}">
-                  <span class="summary-label">${key}:</span>
-                  <span class="summary-value">₹${value.toFixed(2)}</span>
+                  <span class="summary-label">${label}:</span>
+                  <span class="summary-value">₹${(value ?? 0).toFixed(2)}</span>
                 </div>
               `;
             }).join('')}

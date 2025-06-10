@@ -797,6 +797,32 @@
             }
         }
 
+        .page-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .tax-container {
+            position: absolute; /* Add this */
+            left: 25px; /* Add this - adjust the value as needed */
+            top: 200px; /* Add this - adjust the value as needed */
+            width: 350px;
+            height: 50vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 32px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
     </style>
 </head>
 <body>
@@ -832,35 +858,79 @@
         </div>
     </div>
 
-    <div class="container">
-        <form method="POST" id="customerForm">
-            <h2>Select customer:</h2>
+    
+    <div class="page-wrapper">
+        <div class="container">
+            <form method="POST" id="customerForm">
+                <h2>Select customer:</h2>
 
-            <div class="customer-list">
+                <div class="customer-list">
 
-                {% for c in customers %}
-                <button type="submit" name="customer" value="{{ c }}" class="customer-btn">
-                    {{ c }}
-                </button>
-                {% endfor %}
+                    {% for c in customers %}
+                    <button type="submit" name="customer" value="{{ c }}" class="customer-btn">
+                        {{ c }}
+                    </button>
+                    {% endfor %}
+                </div>
+
+                <div class="add-new-container">
+                    <button type="submit" name="action" value="add_new" class="add-new-btn">
+                        + Add New Customer
+                    </button>
+                    <button type="submit" name="action" value="copy_previous" class="copy-prev-btn">
+                        <i class="fas fa-copy"></i> Copy Previous Data
+                    </button>
+                </div>           
+            </form>
+            
+            <div class="warning-message" style="color: red; margin: 10px 0; padding: 0 10px; box-sizing: border-box;">
+            ⚠️ Clicking on Copy Previous Data multiple times will result in repeated copies.
             </div>
 
-            <div class="add-new-container">
-                <button type="submit" name="action" value="add_new" class="add-new-btn">
-                    + Add New Customer
-                </button>
-                <button type="submit" name="action" value="copy_previous" class="copy-prev-btn">
-                    <i class="fas fa-copy"></i> Copy Previous Data
-                </button>
-            </div>           
-        </form>
-        
-        <div class="warning-message" style="color: red; margin: 10px 0; padding: 0 10px; box-sizing: border-box;">
-        ⚠️ Clicking on Copy Previous Data multiple times will result in repeated copies.
+            <div id="result" class="result"></div>
         </div>
 
-        <div id="result" class="result"></div>
+        <div class="tax-container">
+            <h2 style="margin-bottom: 20px;">Update Tax Rates</h2>
+            <form method="POST" action="{{ url_for('update_tax') }}">
+            <input type="hidden" name="service" value="{{ service }}">
+
+            <div class="form-group">
+                <label for="cgst">CGST Rate (%)</label>
+                <input 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                max="100" 
+                name="cgst" 
+                value="{{ (tax_config.cgst | default(0) * 100) | round(2) }}" 
+                required 
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="sgst">SGST Rate (%)</label>
+                <input 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                max="100" 
+                name="sgst" 
+                value="{{ (tax_config.sgst | default(0) * 100) | round(2) }}" 
+                required 
+                >
+            </div>
+
+            <button 
+                type="submit" 
+                class="form-btn save"
+            >
+                Update Tax Rates
+            </button>
+            </form>
+        </div>
     </div>
+
 
    <div class="back-button-container" style="position: fixed; bottom: 100px; display: flex; gap: 20px;">
         <a href="#" onclick="fadeAndNavigate('{{ url_for('select_service') }}'); return false;">
@@ -1127,6 +1197,7 @@
             </div>
         {% endif %}
     {% endwith %}
+
 
 </body>
 </html>
