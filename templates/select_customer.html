@@ -7,6 +7,219 @@
     <title>Customer Selection Demo</title>
     <style>
 
+        .logo-container {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        pointer-events: none;
+        }
+
+        .logo-wrapper {
+        pointer-events: all;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        animation: logoFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        }
+
+        .logo-bg-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(124, 58, 237, 0.3));
+        animation: logoRotate 20s linear infinite;
+        pointer-events: none;
+        }
+
+        .circle-1 {
+        width: 60px;
+        height: 60px;
+        top: -10px;
+        left: -10px;
+        animation-delay: 0s;
+        }
+
+        .circle-2 {
+        width: 40px;
+        height: 40px;
+        bottom: -5px;
+        right: -5px;
+        animation-delay: -7s;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.3));
+        }
+
+        .circle-3 {
+        width: 30px;
+        height: 30px;
+        top: 50%;
+        right: -15px;
+        animation-delay: -14s;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.3));
+        }
+
+        @keyframes logoRotate {
+        0% { transform: rotate(0deg) scale(1); }
+        25% { transform: rotate(90deg) scale(1.1); }
+        50% { transform: rotate(180deg) scale(1); }
+        75% { transform: rotate(270deg) scale(0.9); }
+        100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .logo-main {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 2;
+        }
+
+        .logo-icon {
+        position: relative;
+        }
+
+        .logo-shape {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+        animation: logoShapeGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoShapeGlow {
+        0% { 
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+            transform: scale(1);
+        }
+        100% { 
+            box-shadow: 0 15px 40px rgba(79, 70, 229, 0.6);
+            transform: scale(1.05);
+        }
+        }
+
+        .logo-shape::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: logoShine 3s linear infinite;
+        }
+
+        @keyframes logoShine {
+        0% { transform: rotate(0deg) translate(-100%, -100%); }
+        50% { transform: rotate(0deg) translate(100%, 100%); }
+        100% { transform: rotate(0deg) translate(100%, 100%); }
+        }
+
+        .logo-inner {
+        position: relative;
+        z-index: 2;
+        color: white;
+        font-size: 28px;
+        animation: logoIconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoIconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        }
+
+        .logo-text h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        color: #2d3748;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed, #06b6d4);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        letter-spacing: -0.5px;
+        animation: logoTextShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes logoTextShimmer {
+        0%, 100% { 
+            background-position: 0% 50%; 
+        }
+        50% { 
+            background-position: 100% 50%; 
+        }
+        }
+
+        .logo-tagline {
+        display: block;
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 2px;
+        opacity: 0.8;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+        .logo-wrapper {
+            padding: 15px;
+            gap: 12px;
+        }
+        
+        .logo-shape {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .logo-inner {
+            font-size: 24px;
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+        }
+        
+        .logo-tagline {
+            font-size: 11px;
+        }
+        }
+
+        @media (max-width: 480px) {
+        .logo-main {
+            flex-direction: column;
+            text-align: center;
+            gap: 10px;
+        }
+        
+        .logo-text h1 {
+            font-size: 22px;
+        }
+        
+        .logo-tagline {
+            font-size: 10px;
+        }
+        }
+
         body {
             transition: opacity 0.3s ease-in;
         }
@@ -218,6 +431,39 @@
         .form-group input::placeholder {
             color: #a0aec0;
             font-style: italic;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #2d3748;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D'10'%20height%3D'6'%20viewBox%3D'0%200%2010%206'%20fill%3D'none'%20xmlns%3D'http%3A//www.w3.org/2000/svg'%3E%3Cpath%20d%3D'M1%201L5%205L9%201'%20stroke%3D'%23667eea'%20stroke-width%3D'2'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1.2rem center;
+            background-size: 12px;
+            box-sizing: border-box;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .form-group select:disabled {
+            background-color: #edf2f7;
+            color: #a0aec0;
+            cursor: not-allowed;
         }
 
         .form-buttons {
@@ -588,7 +834,29 @@
         {% endfor %}
     {% endmacro %}
 
-    <img src="{{ url_for('static', filename='itc-infotech.png') }}" alt="Watermark" class="watermark">
+    <div class="logo-container">
+        <div class="logo-wrapper">
+        <!-- Animated background circles -->
+        <div class="logo-bg-circle circle-1"></div>
+        <div class="logo-bg-circle circle-2"></div>
+        <div class="logo-bg-circle circle-3"></div>
+        
+        <!-- Main logo -->
+        <div class="logo-main">
+            <div class="logo-icon">
+            <div class="logo-shape">
+                <div class="logo-inner">
+                <i class="fas fa-bolt"></i>
+                </div>
+            </div>
+            </div>
+            <div class="logo-text">
+            <h1>ServiceHub</h1>
+            <span class="logo-tagline">Invoice Management</span>
+            </div>
+        </div>
+        </div>
+    </div>
 
     
     <div class="page-wrapper">
@@ -680,6 +948,13 @@
                     <input type="text" id="customerName" name="customer_name" placeholder="Enter customer name" required>
                 </div>
 
+                <div class ="form-group">
+                    <label for="dropdown">{{ get_title_by_id("fixed_7") }}</label>
+                    <select id="dropdown" name="selected_id" required>
+                        <option value="" disabled selected>Choose an option</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label for="unitPrice">{{ get_title_by_id("fixed_2") }}</label> <!-- For Unit Price -->
                     <input type="number" id="unitPrice" name="unit_price" step="10" placeholder="0.00" required>
@@ -722,6 +997,13 @@
                 <div class="form-group">
                     <label for="usage_percent">{{ get_title_by_id("fixed_4") }}</label> <!-- For Usage (%) -->
                     <input type="text" id="usage_percent" name="usage" placeholder="Enter Usage % Here" required>
+                </div>
+
+                <div class ="form-group">
+                    <label for="editDropdown">{{ get_title_by_id("fixed_7") }}</label>
+                    <select id="editDropdown" name="category" required>
+                        <option value="" disabled selected>Choose an option</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -769,15 +1051,83 @@
 
         {% if show_popup %}
             document.addEventListener("DOMContentLoaded", function() {
+                // Show the add customer popup
                 showAddCustomerPopup();
+
+                // Fetch and populate the dropdown
+                fetch("/get_dropdown_options")
+                    .then(response => response.json())
+                    .then(data => {
+                        const dropdown = document.getElementById("dropdown");
+                        dropdown.innerHTML = '<option value="" disabled selected>Choose an option</option>';
+
+                        if (Array.isArray(data)) {
+                            data.forEach(item => {
+                                const option = document.createElement("option");
+                                option.value = item.id;
+                                option.textContent = `${item.name}`;
+                                option.setAttribute("data-price", item.unitPrice);
+                                dropdown.appendChild(option);
+                            });
+
+                            // Auto-fill price when dropdown changes
+                            dropdown.addEventListener("change", function () {
+                                const selectedOption = this.options[this.selectedIndex];
+                                const unitPrice = selectedOption.getAttribute("data-price");
+                                if (unitPrice) {
+                                    document.getElementById("unitPrice").value = unitPrice;
+                                }
+                            });
+                        } else {
+                            dropdown.innerHTML = '<option disabled>Error loading options</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Dropdown fetch error:", error);
+                        const dropdown = document.getElementById("dropdown");
+                        dropdown.innerHTML = '<option disabled>Error loading options</option>';
+                    });
             });
         {% endif %}
 
         // Shows the Edit Customer popup (triggered by Flask if show_edit_popup is true)
         {% if show_edit_popup %}
             document.addEventListener("DOMContentLoaded", function() {
-                // *** CHANGE 1: Use classList.add("show") instead of style.display = "block" ***
-                document.getElementById("editPopupOverlay").classList.add("show");
+                showEditCustomerPopup();
+
+                // Load dropdown options from backend
+                fetch("/get_dropdown_options")
+                    .then(response => response.json())
+                    .then(data => {
+                        const dropdown = document.getElementById("editDropdown");
+                        dropdown.innerHTML = '<option value="" disabled selected>Choose an option</option>';
+
+                        if (Array.isArray(data)) {
+                            data.forEach(item => {
+                                const option = document.createElement("option");
+                                option.value = item.id;
+                                option.textContent = `${item.name}`;
+                                option.setAttribute("data-price", item.unitPrice);
+                                dropdown.appendChild(option);
+                            });
+
+                            // Attach listener to auto-fill price
+                            dropdown.addEventListener("change", function () {
+                                const selectedOption = this.options[this.selectedIndex];
+                                const unitPrice = selectedOption.getAttribute("data-price");
+                                if (unitPrice) {
+                                    document.getElementById("price").value = unitPrice;
+                                }
+                            });
+                        } else {
+                            dropdown.innerHTML = '<option disabled>Error loading options</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Dropdown fetch error:", error);
+                        const dropdown = document.getElementById("editDropdown");
+                        dropdown.innerHTML = '<option disabled>Error loading options</option>';
+                    });
             });
         {% endif %}
 
@@ -796,6 +1146,10 @@
         function hideAddCustomerPopup() {
             document.getElementById('popupOverlay').classList.remove('show');
             document.getElementById('addCustomerForm').reset();
+        }
+
+        function showEditCustomerPopup() {
+            document.getElementById('editPopupOverlay').classList.add('show');
         }
 
         function hideEditCustomerPopup() {

@@ -31,7 +31,7 @@ def load_column_map(service):
         'usage':          next(col['title'] for col in titles_config if col['id'] == 'fixed_4'),
         'consumption':    next(col['title'] for col in titles_config if col['id'] == 'fixed_5'),
         'net_price':      next(col['title'] for col in titles_config if col['id'] == 'fixed_6'),
-        'remarks':        next(col['title'] for col in titles_config if col['id'] == 'fixed_7'),
+        'category':        next(col['title'] for col in titles_config if col['id'] == 'fixed_7'),
         'month':          next(col['title'] for col in titles_config if col['id'] == 'fixed_8'),
     }
     
@@ -94,13 +94,22 @@ def get_customer_info(service, customer_name):
     
     return current_values
 
-def add_customer_info(service, name, price, period, usage, others=None):
+def add_customer_info(service, name, price, period, usage, category, others=None):
     path = f'data/{service}.xlsx'
+    category_path = f'categories/{service}.xlsx'
     COLUMN_MAP = load_column_map(service)
     
     price = float(price)
     period = float(period)
     usage = float(usage)
+    
+    if os.path.exists(category_path):
+        with open(category_path, 'r') as f:
+            categories = json.load(f)
+        for cat in categories:
+            if cat.get('id') == category:
+                category = cat.get('name')
+                break 
     
     now = datetime.now()
     current_month = now.strftime('%B')
@@ -127,6 +136,7 @@ def add_customer_info(service, name, price, period, usage, others=None):
     df.at[idx, COLUMN_MAP['consumption']] = round(period / n_days[current_month], 2)
     df.at[idx, COLUMN_MAP['net_price']] = price * usage / 100 * (period / n_days[current_month])
     df.at[idx, COLUMN_MAP['month']] = current_month
+    df.at[idx, COLUMN_MAP['category']] = category
     
     if others:
         for key, value in others.items():
@@ -160,14 +170,16 @@ def update_customer_info(service, customer_name, updates):
         FIELD_MAP.update({
             'usage': COLUMN_MAP['usage'],
             'cost': COLUMN_MAP['unit_price'],
-            'period': COLUMN_MAP['period']
+            'period': COLUMN_MAP['period'],
+            'category' : COLUMN_MAP['category']
         })
     except Exception as e:
         print(f"Error reading columns_config.json: {e}")
         FIELD_MAP = {
             'usage': COLUMN_MAP['usage'],
             'cost': COLUMN_MAP['unit_price'],
-            'period': COLUMN_MAP['period']
+            'period': COLUMN_MAP['period'],
+            'category' : COLUMN_MAP['category']
         }
 
     # Read all sheets from the file
@@ -194,15 +206,34 @@ def update_customer_info(service, customer_name, updates):
         return
 
     df.at[idx, 'Month'] = current_month
+    
+    try:
+        with open(f'categories/{service}.json') as f:  # Adjust the filename/path as needed
+            category_map = json.load(f)  # Should be a list of dicts like [{'id': 'abc123', 'name': 'Gold'}]
+            id_to_name = {str(item['id']): item['name'] for item in category_map}
+    except Exception as e:
+        print(f"Error loading category JSON for mapping: {e}")
+        id_to_name = {}
 
     for field, value in updates.items():
-        if value.strip():
-            excel_field = FIELD_MAP.get(field, field)  
-            if excel_field not in df.columns:
-                print(f"Column '{excel_field}' not found in sheet, creating it.")
-                df[excel_field] = ''
-            print(f"Updating '{excel_field}' to '{value.strip()}'")
-            df.at[idx, excel_field] = value.strip()
+        value = value.strip()
+        if not value:
+            continue
+
+        excel_field = FIELD_MAP.get(field, field)
+
+        # Handle category ID to name mapping
+        if field == 'category':
+            original_value = value
+            value = id_to_name.get(value, value)  # Default to ID if name not found
+            print(f"Mapping category ID '{original_value}' to name '{value}'")
+
+        if excel_field not in df.columns:
+            print(f"Column '{excel_field}' not found in sheet, creating it.")
+            df[excel_field] = ''
+
+        print(f"Updating '{excel_field}' to '{value}'")
+        df.at[idx, excel_field] = value
 
     df.at[idx, COLUMN_MAP['consumption']] = round(
         float(df.at[idx, COLUMN_MAP['period']]) / n_days[current_month], 2
@@ -292,6 +323,57 @@ def copy_previous_data(service):
     with pd.ExcelWriter(path, engine='openpyxl', mode='w') as writer:
         for sheet_name, sheet_df in all_sheets.items():
             sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
+            
+def get_dropdown(service):
+    file_path = f'categories/{service}.json'
+    
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            return json.load(f)
+    return []
+    
+def download_data(service, type):
+    now = datetime.now()
+    current_month = now.strftime('%B')
+    previous_month = now - relativedelta(months=1)
+    previous_month = previous_month.strftime('%B')
+    file_path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map(service)
+    
+    try:
+        if type == 'view':
+            df = pd.read_excel(file_path, sheet_name=previous_month)
+        else:
+            df = pd.read_excel(file_path, sheet_name=current_month)
+        
+        blank_row = pd.Series([None] * df.shape[1], index=df.columns)
+        df = pd.concat([df, pd.DataFrame([blank_row])], ignore_index=True)
+        
+        value_col = df.columns[-1]
+        title_col = df.columns[-2]
+        
+        df[COLUMN_MAP['net_price']] = pd.to_numeric(df[COLUMN_MAP['net_price']], errors='coerce')
+        
+        net_total = df[COLUMN_MAP['net_price']].dropna().sum()
+        cgst = round(net_total * 0.09, 2)
+        sgst = round(net_total * 0.09, 2)
+        grand_total = round(net_total + cgst + sgst, 2)
+        
+        totals = [
+            {title_col: "Net Total (Before Tax)", value_col: net_total},
+            {title_col: "CGST", value_col: cgst},
+            {title_col: "SGST", value_col: sgst},
+            {title_col: "Grand Total", value_col: grand_total}
+        ]
+        
+        df = pd.concat([df, pd.DataFrame(totals)], ignore_index=True)
+        output_path = f'{service}_{type}.xlsx'
+        df.to_excel(output_path, index=False)
+        print(f"Saved processed sheet as '{output_path}'")
+        return output_path
+            
+    except Exception as e:
+        return e
         
 
 TAX_CONFIG_FILE = 'tax_config.json'

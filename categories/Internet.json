@@ -3,5 +3,15 @@
     "id": 1,
     "name": "A1",
     "unitPrice": 100
+  },
+  {
+    "id": 2,
+    "name": "A2",
+    "unitPrice": 200
+  },
+  {
+    "id": 3,
+    "name": "A3",
+    "unitPrice": 400
   }
 ]
