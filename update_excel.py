@@ -19,6 +19,7 @@ n_days = {
     "November" : 30,
     "December" : 31
 }
+TAX_CONFIG_FILE = 'tax_config.json'
 
 def load_column_map(service):
     with open(f'titles/{service}.json') as f:
@@ -339,6 +340,14 @@ def download_data(service, type):
     previous_month = previous_month.strftime('%B')
     file_path = f'data/{service}.xlsx'
     COLUMN_MAP = load_column_map(service)
+    tax_data = load_tax_config
+    default_cgst = 0.09
+    default_sgst = 0.09
+
+    # Get tax rates with defaults
+    service_tax = tax_data.get(service, {})
+    cgst_per = service_tax.get("cgst", default_cgst)
+    sgst_per = service_tax.get("sgst", default_sgst)
     
     try:
         if type == 'view':
@@ -355,8 +364,8 @@ def download_data(service, type):
         df[COLUMN_MAP['net_price']] = pd.to_numeric(df[COLUMN_MAP['net_price']], errors='coerce')
         
         net_total = df[COLUMN_MAP['net_price']].dropna().sum()
-        cgst = round(net_total * 0.09, 2)
-        sgst = round(net_total * 0.09, 2)
+        cgst = round(net_total * cgst_per, 2)
+        sgst = round(net_total * sgst_per, 2)
         grand_total = round(net_total + cgst + sgst, 2)
         
         totals = [
@@ -374,9 +383,6 @@ def download_data(service, type):
             
     except Exception as e:
         return e
-        
-
-TAX_CONFIG_FILE = 'tax_config.json'
 
 def load_tax_config():
     if not os.path.exists(TAX_CONFIG_FILE):
