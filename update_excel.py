@@ -332,4 +332,45 @@ def get_dropdown(service):
             return json.load(f)
     return []
     
+def download_data(service, type):
+    now = datetime.now()
+    current_month = now.strftime('%B')
+    previous_month = now - relativedelta(months=1)
+    previous_month = previous_month.strftime('%B')
+    file_path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map(service)
+    
+    try:
+        if type == 'view':
+            df = pd.read_excel(file_path, sheet_name=previous_month)
+        else:
+            df = pd.read_excel(file_path, sheet_name=current_month)
         
+        blank_row = pd.Series([None] * df.shape[1], index=df.columns)
+        df = pd.concat([df, pd.DataFrame([blank_row])], ignore_index=True)
+        
+        value_col = df.columns[-1]
+        title_col = df.columns[-2]
+        
+        df[COLUMN_MAP['net_price']] = pd.to_numeric(df[COLUMN_MAP['net_price']], errors='coerce')
+        
+        net_total = df[COLUMN_MAP['net_price']].dropna().sum()
+        cgst = round(net_total * 0.09, 2)
+        sgst = round(net_total * 0.09, 2)
+        grand_total = round(net_total + cgst + sgst, 2)
+        
+        totals = [
+            {title_col: "Net Total (Before Tax)", value_col: net_total},
+            {title_col: "CGST", value_col: cgst},
+            {title_col: "SGST", value_col: sgst},
+            {title_col: "Grand Total", value_col: grand_total}
+        ]
+        
+        df = pd.concat([df, pd.DataFrame(totals)], ignore_index=True)
+        output_path = f'{service}_{type}.xlsx'
+        df.to_excel(output_path, index=False)
+        print(f"Saved processed sheet as '{output_path}'")
+        return output_path
+            
+    except Exception as e:
+        return e
