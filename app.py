@@ -6,7 +6,8 @@ import shutil
 from datetime import datetime
 from openpyxl import load_workbook
 from dateutil.relativedelta import relativedelta
-import  threading 
+import threading 
+import sys
 
 month_name = datetime.now().strftime("%B")
 
@@ -506,4 +507,96 @@ def shutdown():
     return 'Server shutting down...'
 
 if __name__ == '__main__':
-    app.run(port=7000, debug=True, use_reloader = False)
+    import socket
+    import errno
+    
+    debug_mode = "--debug" in sys.argv
+    port = 7001
+    
+    # Check if port is already in use
+    def is_port_in_use(port):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(('127.0.0.1', port))
+                return False
+            except socket.error as e:
+                if e.errno == errno.EADDRINUSE:
+                    return True
+                raise
+    
+    if is_port_in_use(port):
+        print(f"Port {port} is already in use!")
+        print("Please stop the existing process or choose a different port.")
+        sys.exit(1)
+    
+    print(f"Starting Flask app on http://127.0.0.1:{port}")
+    
+    try:
+        # Try the standard Flask development server first
+        app.run(
+            host='127.0.0.1',
+            port=port,
+            debug=False,  # Always disable debug to avoid reloader issues
+            use_reloader=False,
+            use_debugger=False,
+            threaded=True,
+            processes=1
+        )
+    except OSError as e:
+        if e.errno == 9:  # Bad file descriptor
+            print("File descriptor error detected - using alternative server method...")
+            
+            # Fallback: Use Werkzeug server directly
+            from werkzeug.serving import make_server, WSGIRequestHandler
+            
+            class QuietHandler(WSGIRequestHandler):
+                def log_request(self, code='-', size='-'):
+                    # Only log errors, not every request
+                    if str(code).startswith('4') or str(code).startswith('5'):
+                        super().log_request(code, size)
+            
+            try:
+                server = make_server(
+                    '127.0.0.1', 
+                    port, 
+                    app, 
+                    threaded=True,
+                    request_handler=QuietHandler
+                )
+                print(f"✅ Flask app running on http://127.0.0.1:{port}")
+                print("Press Ctrl+C to quit")
+                server.serve_forever()
+            except Exception as fallback_error:
+                print(f"Fallback method also failed: {fallback_error}")
+                
+                # Last resort: Basic threading approach
+                import threading
+                import time
+                from werkzeug.serving import run_simple
+                
+                def run_app():
+                    try:
+                        run_simple(
+                            '127.0.0.1', 
+                            port, 
+                            app, 
+                            threaded=True, 
+                            use_reloader=False,
+                            use_debugger=False
+                        )
+                    except:
+                        pass
+                
+                thread = threading.Thread(target=run_app, daemon=True)
+                thread.start()
+                
+                print(f"✅ Flask app started on http://127.0.0.1:{port} (background thread)")
+                try:
+                    while thread.is_alive():
+                        time.sleep(1)
+                except KeyboardInterrupt:
+                    print("\nShutting down...")
+                    sys.exit(0)
+        else:
+            # Re-raise other OSErrors
+            raise
