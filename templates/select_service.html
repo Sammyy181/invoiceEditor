@@ -1084,7 +1084,7 @@
     </form>
 
     <div class="add-service-container">
-      <button class="add-service-button" onclick="openAddServicePopup()">+ Add New Service</button>
+      <button id="add-service-button" class="add-service-button" onclick="openAddServicePopup()">+ Add New Service</button>
     </div>
   </div>
 
@@ -1107,8 +1107,8 @@
     <h2>Add New Service</h2>
     <input type="text" id="newServiceInput" placeholder="Enter service name" />
     <div class="popup-buttons">
-      <button onclick="submitNewService()">Add</button>
-      <button class="cancel-btn" onclick="closeAddServicePopup()">Cancel</button>
+      <button id="submitNewServiceBtn" onclick="submitNewService()">Add</button>
+      <button id="cancelNewServiceBtn" class="cancel-btn" onclick="closeAddServicePopup()">Cancel</button>
     </div>
   </div>
 
