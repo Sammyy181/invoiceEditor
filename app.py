@@ -502,7 +502,7 @@ def update_tax():
 
 @app.route('/shutdown', methods=['POST'])
 def shutdown():
-    print("🔴 Shutdown signal received from browser.")
+    print("Shutdown signal received from browser.")
     threading.Thread(target=lambda: os._exit(0)).start()  
     return 'Server shutting down...'
 
@@ -543,7 +543,7 @@ if __name__ == '__main__':
             processes=1
         )
     except OSError as e:
-        if e.errno == 9:  # Bad file descriptor
+        if e.errno == 9 or getattr(e, 'winerror', None) == 10038:  # Bad file descriptor
             print("File descriptor error detected - using alternative server method...")
             
             # Fallback: Use Werkzeug server directly
@@ -563,7 +563,7 @@ if __name__ == '__main__':
                     threaded=True,
                     request_handler=QuietHandler
                 )
-                print(f"✅ Flask app running on http://127.0.0.1:{port}")
+                print(f"Flask app running on http://127.0.0.1:{port}")
                 print("Press Ctrl+C to quit")
                 server.serve_forever()
             except Exception as fallback_error:
@@ -590,7 +590,7 @@ if __name__ == '__main__':
                 thread = threading.Thread(target=run_app, daemon=True)
                 thread.start()
                 
-                print(f"✅ Flask app started on http://127.0.0.1:{port} (background thread)")
+                print(f"Flask app started on http://127.0.0.1:{port} (background thread)")
                 try:
                     while thread.is_alive():
                         time.sleep(1)
