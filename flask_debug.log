@@ -1,2 +1,6 @@
-127.0.0.1 - - [12/Jun/2025 15:51:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-127.0.0.1 - - [12/Jun/2025 15:52:23] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [17/Jun/2025 12:11:08] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [17/Jun/2025 12:12:15] "GET /favicon.ico HTTP/1.1" 404 -
+Starting Flask app on http://127.0.0.1:7001
+File descriptor error detected - using alternative server method...
+Flask app running on http://127.0.0.1:7001
+Press Ctrl+C to quit
