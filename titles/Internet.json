@@ -38,5 +38,10 @@
         "id": "fixed_8",
         "title": "Month",
         "type": "text"
+    },
+    {
+        "id" : "fixed_9",
+        "title": "invoiced",
+        "type": "boolean"
     }
 ]

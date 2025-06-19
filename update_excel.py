@@ -34,6 +34,7 @@ def load_column_map(service):
         'net_price':      next(col['title'] for col in titles_config if col['id'] == 'fixed_6'),
         'category':        next(col['title'] for col in titles_config if col['id'] == 'fixed_7'),
         'month':          next(col['title'] for col in titles_config if col['id'] == 'fixed_8'),
+        'invoiced':       next(col['title'] for col in titles_config if col['id'] == 'fixed_9')
     }
     
     return COLUMN_MAP
@@ -135,6 +136,7 @@ def add_customer_info(service, name, price, period, usage, category, others=None
     df.at[idx, COLUMN_MAP['net_price']] = price * usage / 100 * (period / n_days[current_month])
     df.at[idx, COLUMN_MAP['month']] = current_month
     df.at[idx, COLUMN_MAP['category']] = category
+    df.at[idx, COLUMN_MAP['invoiced']] = False 
     
     if others:
         for key, value in others.items():
@@ -300,6 +302,7 @@ def copy_previous_data(service):
         df[COLUMN_MAP['period']] = pd.to_numeric(df[COLUMN_MAP['period']], errors='coerce')
         df[COLUMN_MAP['usage']] = pd.to_numeric(df[COLUMN_MAP['usage']], errors='coerce')
         df[COLUMN_MAP['unit_price']] = pd.to_numeric(df[COLUMN_MAP['unit_price']], errors='coerce')
+        df[COLUMN_MAP['invoiced']] = False
 
         df[COLUMN_MAP['consumption']] = (
             df[COLUMN_MAP['period']] / n_days[current_month]
