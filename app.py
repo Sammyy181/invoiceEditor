@@ -36,6 +36,10 @@ wb.save(TEMPLATE_FILE)
 def home():
     return redirect(url_for('select_service'))
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 @app.route('/select_service', methods=['GET', 'POST'])
 def select_service():
     services = get_services()
