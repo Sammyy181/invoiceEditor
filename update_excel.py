@@ -71,7 +71,7 @@ def get_customer_info(service, customer_name):
     
     if current_month in xls:
         df = xls[current_month]
-        customer_row = df[df['Customer Name'].str.strip() == customer_name.strip()]
+        customer_row = df[df[COLUMN_MAP['customer_name']].str.strip() == customer_name.strip()]
         if not customer_row.empty:
             row = customer_row.iloc[0]
             current_values = {
@@ -83,7 +83,7 @@ def get_customer_info(service, customer_name):
     
     if previous_month in xls:
         df_prev = xls[previous_month]
-        customer_row_prev = df_prev[df_prev['Customer Name'].str.strip() == customer_name.strip()]
+        customer_row_prev = df_prev[df_prev[COLUMN_MAP['customer_name']].str.strip() == customer_name.strip()]
         if not customer_row_prev.empty:
             row = customer_row_prev.iloc[0]
             current_values = {
@@ -194,7 +194,7 @@ def update_customer_info(service, customer_name, updates):
         return
 
     try:
-        idx = df[df['Customer Name'].str.strip() == customer_name.strip()].index[0]
+        idx = df[df[COLUMN_MAP['customer_name']].str.strip() == customer_name.strip()].index[0]
     except IndexError:
         print(f"Customer '{customer_name}' not found in {service} sheet '{current_month}'.")
         return

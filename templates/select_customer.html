@@ -897,6 +897,8 @@
                 min="0" 
                 max="100" 
                 name="cgst" 
+                id="cgst"
+                placeholder="Enter CGST Rate Here"
                 value="{{ (tax_config.cgst | default(0) * 100) | round(2) }}" 
                 required 
                 >
@@ -910,6 +912,8 @@
                 min="0" 
                 max="100" 
                 name="sgst" 
+                id="sgst"
+                placeholder="Enter SGST Rate Here"
                 value="{{ (tax_config.sgst | default(0) * 100) | round(2) }}" 
                 required 
                 >
@@ -938,7 +942,7 @@
             <form id="addCustomerForm" method="POST" action="{{ url_for('add_customer') }}">
                 <div class="form-group">
                     <label for="customerName">{{ get_title_by_id("fixed_1") }}</label> 
-                    <input type="text" id="customerName" name="customer_name" placeholder="Enter customer name" required>
+                    <input type="text" id="customerName" name="customer_name" placeholder="Enter" {{ get_title_by_id("fixed_1") }} required>
                 </div>
 
                 <div class ="form-group">

@@ -1,7 +1,7 @@
 [
     {
         "id": "fixed_1",
-        "title": "Customer Name",
+        "title": "Customer ID",
         "type": "text"
     },
     {
