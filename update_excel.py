@@ -53,10 +53,7 @@ def get_customers(service):
     
     try:
         df = pd.read_excel(filepath, sheet_name=current_month)
-        summary_cols = df.columns[-2:]
-        summary_words = ['Net Price', 'CGST', 'SGST', 'Grand Total']
-        df = df[~df[summary_cols[0]].astype(str).isin(summary_words)]
-        df = df.dropna(how='all').reset_index(drop=True)
+        df = df.iloc[:-5]  # Exclude last 5 rows which are summary rows
     except Exception:
         df = pd.read_excel(filepath, sheet_name=previous_month)
         df = df[0:0]
@@ -76,6 +73,7 @@ def get_customer_info(service, customer_name):
     
     if current_month in xls:
         df = xls[current_month]
+        df = df.iloc[:-5]
         customer_row = df[df[COLUMN_MAP['customer_name']].str.strip() == customer_name.strip()]
         if not customer_row.empty:
             row = customer_row.iloc[0]
@@ -322,8 +320,10 @@ def your_invoice_function(action, service):
     
     if action == 'view':
         df = pd.read_excel(path, sheet_name=previous_month)
+        df = df.iloc[:-5]  # Exclude last 5 rows which are summary rows
     else:  
         df = pd.read_excel(path, sheet_name=current_month)  
+        df = df.iloc[:-5]  # Exclude last 5 rows which are summary rows
     df = df.where(pd.notnull(df), 'N/A')  
     return df
 
@@ -486,3 +486,38 @@ def delete_customer(service, customer_name):
     df.to_excel(path, sheet_name=current_month, index=False)
     print(f"Customer '{customer_name}' deleted from {service} for {current_month}.")
     
+def get_invoiced(service):
+    path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map(service)
+    
+    now = datetime.now()
+    current_month = now.strftime('%B')
+    try:
+        df = pd.read_excel(path, sheet_name=current_month)
+        df = df.iloc[:-5]
+        invoiced = []
+        uninvoiced = []
+        invoiced_tot = 0
+        uninvoiced_tot = 0
+        for _, row in df.iterrows():
+            print(f"Customer - {row[COLUMN_MAP['customer_name']]}, Invoiced - {row[COLUMN_MAP['invoiced']]}")
+            if row[COLUMN_MAP['invoiced']]:
+                invoiced.append(row[COLUMN_MAP['customer_name']])
+                invoiced_tot += row[COLUMN_MAP['net_price']]
+            else:
+                uninvoiced.append(row[COLUMN_MAP['customer_name']])
+                uninvoiced_tot += row[COLUMN_MAP['net_price']]
+        return {
+            'invoiced': invoiced,
+            'uninvoiced': uninvoiced,
+            'invoiced_total': invoiced_tot,
+            'uninvoiced_total': uninvoiced_tot
+        }
+    except Exception as e:
+        print(f"Error reading {service} data for invoiced status: {e}")
+        return {
+            'invoiced': [],
+            'uninvoiced': [],
+            'invoiced_total': 0,
+            'uninvoiced_total': 0
+        }

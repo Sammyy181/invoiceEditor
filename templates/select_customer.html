@@ -903,6 +903,177 @@
             opacity: 1;
         }
 
+        .customer-list-panel {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .customer-list-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .customer-list-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .customer-list-panel::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 2px;
+        }
+
+        .customer-item {
+            font-size: 13px;
+            padding: 6px 10px;
+            margin-bottom: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .customer-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .summary-section {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 14px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .right-panel {
+            position: fixed;
+            right: -400px; /* Hidden by default */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 380px;
+            height: 60vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px 0 0 20px;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-right: none;
+            padding: 32px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+        }
+
+        .right-panel.open {
+            right: 0;
+        }
+
+        .right-panel h3 {
+            margin: 0 0 20px 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: #2d3748;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .data-columns {
+            display: flex;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .data-column {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .data-column h4 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a5568;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .data-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2d3748;
+            border-left: 3px solid #667eea;
+        }
+
+        .panel-toggle-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel-toggle-btn:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        .panel-toggle-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .panel-toggle-btn.open i {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
@@ -946,12 +1117,10 @@
                 <div class="customer-list">
                      {% for c in customers %}
                     <div class="customer-entry">
-                        <!-- Customer name button takes most space -->
                         <button type="submit" name="customer" value="{{ c }}" class="customer-name-btn">
                             {{ c }}
                         </button>
 
-                        <!-- Action button -->
                         <div class="tooltip-container">
                             <button type="button" onclick="handleCustomerAction('{{ c }}')" class="icon-btn">
                                 ✅
@@ -1136,6 +1305,31 @@
         </div>
     </div>
 
+    <div id="rightPanel" class="right-panel">
+        <h3>Data Overview</h3>
+        <div class="data-columns">
+            <div class="data-column">
+                <h4>Invoiced</h4>
+                <div class="data-item">Sample Data 1</div>
+                <div class="data-item">Sample Data 2</div>
+                <div class="data-item">Sample Data 3</div>
+                <div class="data-item">Sample Data 4</div>
+            </div>
+            <div class="data-column">
+                <h4>Yet to Invoice</h4>
+                <div class="data-item">Info Item A</div>
+                <div class="data-item">Info Item B</div>
+                <div class="data-item">Info Item C</div>
+                <div class="data-item">Info Item D</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Toggle Button -->
+    <button id="panelToggleBtn" class="panel-toggle-btn" onclick="toggleRightPanel()">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+
     <script>
 
         function fadeAndNavigate(url) {
@@ -1282,6 +1476,97 @@
             return false; // cancel submit
         }
 
+        // Function to load customer data from Python backend
+        function loadCustomerData() {
+            fetch('/get_invoiced_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    service: "{{ service }}"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateRightPanel(data);
+            })
+            .catch(error => {
+                console.error('Error loading customer data:', error);
+                updateRightPanel({
+                    type1: { customers: [], total_price: 0 },
+                    type2: { customers: [], total_price: 0 }
+                });
+            });
+        }
+
+        // Function to update the right panel with data
+        function updateRightPanel(data) {
+            const panel = document.getElementById('rightPanel');
+
+            panel.innerHTML = `
+                <h3>Customer Overview</h3>
+                <div class="data-columns">
+                    <div class="data-column">
+                        <h4>Invoiced Customers</h4>
+                        <div class="customer-list-panel">
+                            ${data.invoiced.map(customer => 
+                                `<div class="data-item customer-item">${customer}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <div class="data-column">
+                        <h4>Uninvoiced Customers</h4>
+                        <div class="customer-list-panel">
+                            ${data.uninvoiced.map(customer => 
+                                `<div class="data-item customer-item">${customer}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+                <div class="summary-section">
+                    <div class="summary-item">
+                        <span class="summary-label">Invoiced Count:</span>
+                        <span class="summary-value">${data.invoiced.length}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Uninvoiced Count:</span>
+                        <span class="summary-value">${data.uninvoiced.length}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Invoiced Total:</span>
+                        <span class="summary-value">₹${data.invoiced_total.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Uninvoiced Total:</span>
+                        <span class="summary-value">₹${data.uninvoiced_total.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Modified toggle function to load data when opening
+        function toggleRightPanel() {
+            const panel = document.getElementById('rightPanel');
+            const btn = document.getElementById('panelToggleBtn');
+            
+            panel.classList.toggle('open');
+            btn.classList.toggle('open');
+            
+            // Load data when opening panel
+            if (panel.classList.contains('open')) {
+                loadCustomerData();
+            }
+            
+            // Change icon based on state
+            const icon = btn.querySelector('i');
+            if (panel.classList.contains('open')) {
+                icon.className = 'fas fa-chevron-right';
+            } else {
+                icon.className = 'fas fa-chevron-left';
+            }
+        }
+
         document.getElementById('popupOverlay').addEventListener('click', function(e) {
             if (e.target === this) {
                 hideAddCustomerPopup();
@@ -1315,7 +1600,5 @@
             </div>
         {% endif %}
     {% endwith %}
-
-
 </body>
 </html>

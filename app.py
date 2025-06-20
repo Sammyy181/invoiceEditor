@@ -512,6 +512,17 @@ def update_tax():
     flash('Tax rates updated successfully.', 'success')
     return redirect(url_for('select_customer'))
 
+@app.route('/get_invoiced_data', methods=['POST'])
+def get_invoice():
+    try:
+        data = request.get_json()
+        service = data.get('service')
+        
+        result = get_invoiced(service)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/shutdown', methods=['POST'])
 def shutdown():
     print("Shutdown signal received from browser.")
