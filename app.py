@@ -510,6 +510,24 @@ def shutdown():
     threading.Thread(target=lambda: os._exit(0)).start()  
     return 'Server shutting down...'
 
+@app.route('/log_invoiced', methods=['POST'])
+def log_invoiced():
+    data = request.get_json()
+    service = data.get('service')
+    customer = data.get('customer')
+    
+    try:
+        log_customer(service, customer)
+        return jsonify({'message': 'Customer logged as invoiced successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/delete_customer', methods=['POST'])
+def delete_customer():
+    customer_name = request.form['customer_to_delete']
+    delete_customer(customer_name) 
+    return redirect(url_for('dashboard'))
+
 if __name__ == '__main__':
     import socket
     import errno

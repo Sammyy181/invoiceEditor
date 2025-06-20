@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <title>Service Selection</title>
   <style>
-
     .logo-container {
       position: fixed;
       top: 20px;
@@ -238,13 +237,7 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, 
-      #1e3c72 0%, 
-      #2a5298 25%, 
-      #4facfe 50%, 
-      #00f2fe 75%, 
-      #0575e6 100%
-      );
+      background: linear-gradient(45deg, #2e3192 0%, #1bffff 100%);
       min-height: 100vh;
       margin: 0;
       padding: 20px;
@@ -252,8 +245,6 @@
       align-items: center;
       justify-content: flex-start; 
       padding-left: 40px; 
-      position: relative;
-      overflow-x: hidden;
     }
 
     .watermark {
@@ -262,28 +253,24 @@
       left: 50%;
       width: 300px;  
       transform: translate(-50%, -50%);
-      opacity: 0.05;
+      opacity: 0.1;
       z-index: 0;
       pointer-events: none;
-      filter: brightness(1.5) contrast(1.2);
     }
 
     .form-container {
-      background: rgba(59, 130, 246, 0.1);
-      backdrop-filter: blur(25px);
-      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 24px;
       padding: 45px;
-      box-shadow: 
-        0 25px 50px rgba(30, 64, 175, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 0 0 1px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
       width: 100%;
       max-width: 450px;
       height: 650px;
       display: flex;
       flex-direction: column;
       position: relative;
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .form-container::before {
@@ -293,49 +280,20 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: 
-        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%),
-        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
-      border-radius: 30px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border-radius: 24px;
       pointer-events: none;
-    }
-
-    .form-container::after {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, 
-        rgba(59, 130, 246, 0.6) 0%, 
-        rgba(30, 64, 175, 0.4) 25%, 
-        rgba(14, 165, 233, 0.6) 50%, 
-        rgba(99, 102, 241, 0.4) 75%, 
-        rgba(59, 130, 246, 0.6) 100%);
-      border-radius: 32px;
-      z-index: -1;
-      animation: borderGlow 4s ease-in-out infinite alternate;
-    }
-
-    @keyframes borderGlow {
-      0% { opacity: 0.6; }
-      100% { opacity: 1; }
     }
 
     label {
       font-size: 30px;
       font-weight: 700;
-      color: #f8fafc;
+      color: #2d3748;
       text-align: left;
       margin-bottom: 35px;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       position: relative;
       z-index: 1;
-      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
 
     .services-wrapper {
@@ -359,50 +317,44 @@
     }
 
     .service-buttons::-webkit-scrollbar {
-      width: 8px; 
+      width: 10px; 
     }
 
     .service-buttons::-webkit-scrollbar-track {
-      background: rgba(30, 64, 175, 0.1);
+      background: rgba(0, 0, 0, 0.1);
       border-radius: 10px;
       margin: 4px 0;
-      backdrop-filter: blur(10px);
     }
 
     .service-buttons::-webkit-scrollbar-thumb {
-      background: linear-gradient(145deg, rgba(59, 130, 246, 0.8), rgba(30, 64, 175, 0.8));
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
     }
 
     .service-buttons::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(145deg, rgba(67, 56, 202, 0.9), rgba(99, 102, 241, 0.9));
+      background: linear-gradient(145deg, #5b21b6, #6366f1);
     }
 
     .service-buttons {
       scrollbar-width: thin;
-      scrollbar-color: rgba(59, 130, 246, 0.8) rgba(30, 64, 175, 0.1);
+      scrollbar-color: #4f46e5 rgba(0, 0, 0, 0.1);
     }
 
     .service-buttons button {
       padding: 20px 24px;
       border: none;
-      background: 
-        linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(30, 64, 175, 0.9)),
-        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
       color: white;
-      border-radius: 20px;
+      border-radius: 16px;
       cursor: pointer;
       font-size: 20px;
       font-weight: 600;
       text-transform: capitalize;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
-      box-shadow: 
-        0 8px 25px rgba(30, 64, 175, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
       width: 100%;
       text-align: left;
       min-height: 56px;
@@ -410,9 +362,7 @@
       align-items: center;
       justify-content: flex-start;
       flex-shrink: 0;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      backdrop-filter: blur(15px);
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .service-buttons button::before {
@@ -422,47 +372,22 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transition: left 0.6s ease;
     }
 
-    .service-buttons button::after {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, 
-        rgba(59, 130, 246, 0.8) 0%, 
-        rgba(14, 165, 233, 0.6) 50%, 
-        rgba(99, 102, 241, 0.8) 100%);
-      border-radius: 22px;
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
     .service-buttons button:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 
-        0 15px 35px rgba(30, 64, 175, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      background: 
-        linear-gradient(135deg, rgba(67, 56, 202, 0.95), rgba(99, 102, 241, 0.95)),
-        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+      background: linear-gradient(145deg, #5b21b6, #6366f1);
     }
 
     .service-buttons button:hover::before {
       left: 100%;
     }
 
-    .service-buttons button:hover::after {
-      opacity: 1;
-    }
-
     .service-buttons button:active {
-      transform: translateY(-1px) scale(0.98);
+      transform: translateY(0) scale(0.98);
     }
 
     .add-service-container {
@@ -474,30 +399,24 @@
 
     .add-service-button {
       padding: 16px 32px;
-      background: 
-        linear-gradient(135deg, rgba(14, 165, 233, 0.9), rgba(3, 105, 161, 0.9)),
-        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+      background: linear-gradient(145deg, #10b981, #059669);
       color: white;
       border: none;
-      border-radius: 20px;
+      border-radius: 16px;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 
-        0 8px 25px rgba(14, 165, 233, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       width: 100%;
       min-height: 56px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      border: 1px solid rgba(14, 165, 233, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       position: relative;
       overflow: hidden;
-      backdrop-filter: blur(15px);
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .add-service-button::before {
@@ -507,47 +426,22 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transition: left 0.6s ease;
     }
 
-    .add-service-button::after {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, 
-        rgba(14, 165, 233, 0.8) 0%, 
-        rgba(6, 182, 212, 0.6) 50%, 
-        rgba(14, 165, 233, 0.8) 100%);
-      border-radius: 22px;
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
     .add-service-button:hover {
-      transform: translateY(-4px) scale(1.03);
-      box-shadow: 
-        0 15px 40px rgba(14, 165, 233, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      background: 
-        linear-gradient(135deg, rgba(3, 105, 161, 0.95), rgba(8, 145, 178, 0.95)),
-        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
+      background: linear-gradient(145deg, #059669, #047857);
     }
 
     .add-service-button:hover::before {
       left: 100%;
     }
 
-    .add-service-button:hover::after {
-      opacity: 1;
-    }
-
     .add-service-button:active {
-      transform: translateY(-2px) scale(0.98);
+      transform: translateY(-1px) scale(0.98);
     }
 
     .popup {
@@ -556,37 +450,17 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(30, 64, 175, 0.15);
-      backdrop-filter: blur(25px);
-      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 24px;
       padding: 45px;
-      box-shadow: 
-        0 25px 50px rgba(30, 64, 175, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
       z-index: 1001;
       width: 90%;
       max-width: 480px;
       text-align: center;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      animation: popupSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .popup::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, 
-        rgba(59, 130, 246, 0.6) 0%, 
-        rgba(30, 64, 175, 0.4) 25%, 
-        rgba(14, 165, 233, 0.6) 50%, 
-        rgba(99, 102, 241, 0.4) 75%, 
-        rgba(59, 130, 246, 0.6) 100%);
-      border-radius: 32px;
-      z-index: -1;
-      animation: borderGlow 3s ease-in-out infinite alternate;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: popupSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     @keyframes popupSlideIn {
@@ -603,30 +477,21 @@
     .popup h2 {
       font-size: 24px;
       margin-bottom: 35px;
-      color: #f8fafc;
+      color: #2d3748;
       font-weight: 700;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
 
     .popup .popup-button {
       padding: 16px 28px;
       border: none;
-      background: 
-        linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(30, 64, 175, 0.9)),
-        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
       color: white;
-      border-radius: 18px;
+      border-radius: 16px;
       cursor: pointer;
       font-size: 16px;
       font-weight: 600;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 
-        0 8px 25px rgba(30, 64, 175, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
       width: 100%;
       margin: 8px 0;
       min-height: 56px;
@@ -635,9 +500,7 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      backdrop-filter: blur(15px);
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .popup .popup-button::before {
@@ -647,18 +510,14 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transition: left 0.6s ease;
     }
 
     .popup .popup-button:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 
-        0 15px 35px rgba(30, 64, 175, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      background: 
-        linear-gradient(135deg, rgba(67, 56, 202, 0.95), rgba(99, 102, 241, 0.95)),
-        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+      background: linear-gradient(145deg, #5b21b6, #6366f1);
     }
 
     .popup .popup-button:hover::before {
@@ -667,22 +526,21 @@
 
     .popup .close {
       background: none;
-      color: #cbd5e1;
+      color: #666;
       font-size: 16px;
       margin-top: 20px;
       text-decoration: underline;
       cursor: pointer;
       border: none;
       padding: 10px;
-      transition: all 0.3s ease;
+      transition: color 0.3s ease;
       font-weight: 500;
     }
 
     .popup .close:hover {
-      color: #f8fafc;
+      color: #333;
       transform: none;
       box-shadow: none;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .overlay {
@@ -691,8 +549,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(12px);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
       display: none;
       z-index: 1000;
       animation: fadeIn 0.3s ease;
@@ -708,50 +566,25 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(30, 64, 175, 0.15);
-      backdrop-filter: blur(25px);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
       padding: 45px;
-      border-radius: 30px;
-      box-shadow: 
-        0 25px 50px rgba(30, 64, 175, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
       z-index: 1001;
       width: 90%;
       max-width: 420px;
       display: none;
       text-align: center;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      animation: popupSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .add-service-popup::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, 
-        rgba(59, 130, 246, 0.6) 0%, 
-        rgba(30, 64, 175, 0.4) 25%, 
-        rgba(14, 165, 233, 0.6) 50%, 
-        rgba(99, 102, 241, 0.4) 75%, 
-        rgba(59, 130, 246, 0.6) 100%);
-      border-radius: 32px;
-      z-index: -1;
-      animation: borderGlow 3s ease-in-out infinite alternate;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: popupSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .add-service-popup h2 {
       margin-bottom: 30px;
-      color: #f8fafc;
+      color: #2d3748;
       font-size: 24px;
       font-weight: 700;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
 
     .add-service-popup input {
@@ -1210,7 +1043,6 @@
         transform: translateY(-2px);
         box-shadow: 0 10px 20px rgba(46, 49, 146, 0.3);
     }
-
   </style>
 </head>
 <body>

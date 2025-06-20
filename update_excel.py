@@ -394,3 +394,18 @@ def update_service_tax(service, cgst, sgst):
     data[service] = {'cgst': cgst, 'sgst': sgst}
     with open(TAX_CONFIG_FILE, 'w') as f:
         json.dump(data, f, indent=2)
+
+def log_customer(service, customer_name):
+    path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map(service)
+    
+    now = datetime.now()
+    current_month = now.strftime('%B')
+    
+    df = pd.read_excel(path, sheet_name=current_month)
+    
+    if customer_name in df[COLUMN_MAP['customer_name']].values:
+        idx = df[df[COLUMN_MAP['customer_name']] == customer_name].index[0]
+        df.at[idx, COLUMN_MAP['invoiced']] = True
+        df.to_excel(path, sheet_name=current_month, index=False)
+        print(f"Customer '{customer_name}' logged as invoiced in {service} for {current_month}.")

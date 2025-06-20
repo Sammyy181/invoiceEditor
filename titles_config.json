@@ -11,17 +11,17 @@
     },
     {
         "id": "fixed_3",
-        "title": "Consumption Period",
+        "title": "Consumption Percentage",
         "type": "integer"
     },
     {
         "id": "fixed_4",
-        "title": "Utilisation (%)",
+        "title": "Usage (%)",
         "type": "integer"
     },
     {
         "id": "fixed_5",
-        "title": "Consumption (%)",
+        "title": "Consumption Duration",
         "type": "decimal"
     },
     {
@@ -38,5 +38,10 @@
         "id": "fixed_8",
         "title": "Month",
         "type": "text"
+    },
+    {
+        "id" : "fixed_9",
+        "title": "Invoiced",
+        "type": "boolean"
     }
 ]

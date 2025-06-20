@@ -818,6 +818,91 @@
             overflow-y: auto;
         }
 
+        .customer-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 6px;
+            border-radius: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .customer-entry:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .customer-name-btn {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: left;
+            background: linear-gradient(135deg, #f0f4ff, #e6ecff);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .customer-name-btn:hover {
+            background: linear-gradient(135deg, #e0eaff, #d4deff);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #ffffff, #f5f8ff);
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a4a4a;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+
+        .icon-btn:hover {
+            background: linear-gradient(135deg, #e0eaff, #cdd9ff);
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body>
@@ -858,11 +943,27 @@
                 <h2>Select customer:</h2>
 
                 <div class="customer-list">
+                     {% for c in customers %}
+                    <div class="customer-entry">
+                        <!-- Customer name button takes most space -->
+                        <button type="submit" name="customer" value="{{ c }}" class="customer-name-btn">
+                            {{ c }}
+                        </button>
 
-                    {% for c in customers %}
-                    <button type="submit" name="customer" value="{{ c }}" class="customer-btn">
-                        {{ c }}
-                    </button>
+                        <!-- Action button -->
+                        <div class="tooltip-container">
+                            <button type="button" onclick="handleCustomerAction('{{ c }}')" class="icon-btn">
+                                ✅
+                            </button>
+                            <span class="tooltip-text">Log as Invoiced</span>
+                        </div>
+
+                        <div class="tooltip-container">
+                            <button type="submit" class="icon-btn" onclick="return confirm('Delete {{ c }}?')" title="Delete Customer">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
 
@@ -1147,6 +1248,28 @@
                 popup.classList.remove('show');
                 document.getElementById('editCustomerForm').reset(); 
             }
+        }
+
+        function handleCustomerAction(customerName){
+            const serviceName = "{{ service }}";
+
+            fetch('/log_invoiced', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    customer_name: customerName, 
+                    service: serviceName 
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(`${customerName} logged as invoiced.`);
+                } else {
+                    alert("Failed to log.");
+                }
+            });
         }
 
         document.getElementById('popupOverlay').addEventListener('click', function(e) {

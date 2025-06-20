@@ -41,7 +41,7 @@
     },
     {
         "id" : "fixed_9",
-        "title": "invoiced",
+        "title": "Invoiced",
         "type": "boolean"
     }
 ]
