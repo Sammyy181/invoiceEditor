@@ -940,6 +940,7 @@
     <div class="page-wrapper">
         <div class="container">
             <form method="POST" id="customerForm">
+                <input type="hidden" name="customer" id="customerToDelete" value="">
                 <h2>Select customer:</h2>
 
                 <div class="customer-list">
@@ -959,7 +960,8 @@
                         </div>
 
                         <div class="tooltip-container">
-                            <button type="submit" class="icon-btn" onclick="return confirm('Delete {{ c }}?')" title="Delete Customer">
+                            <button type="submit" name="action" value="delete" class="icon-btn"
+                                    onclick="return confirmAndSetCustomer('{{ c }}')" title="Delete Customer">
                                 🗑️
                             </button>
                         </div>
@@ -1270,6 +1272,14 @@
                     alert("Failed to log.");
                 }
             });
+        }
+
+        function confirmAndSetCustomer(customerName) {
+            if (confirm('Delete ' + customerName + '?')) {
+                document.getElementById('customerToDelete').value = customerName;
+                return true;  // proceed with form submit
+            }
+            return false; // cancel submit
         }
 
         document.getElementById('popupOverlay').addEventListener('click', function(e) {

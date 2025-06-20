@@ -446,3 +446,43 @@ def log_customer(service, customer_name):
         print(f"Customer '{customer_name}' logged as invoiced in {service} for {current_month}.")
     else:
         Exception(f"Error finding {customer_name} in data.")
+
+def delete_customer(service, customer_name):
+    path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map(service)
+    now = datetime.now()
+    current_month = now.strftime('%B')
+    
+    df = pd.read_excel(path, sheet_name=current_month)
+    summary_cols = df.columns[-2:]
+    summary_words = ['Net Price', 'CGST', 'SGST', 'Grand Total']
+    df = df[~df[summary_cols[0]].astype(str).isin(summary_words)]
+    df = df.dropna(how='all').reset_index(drop=True)
+    
+    if customer_name in df[COLUMN_MAP['customer_name']].values:
+        df = df[df[COLUMN_MAP['customer_name']] != customer_name]
+    
+    blank_row = pd.DataFrame([[None]*len(df.columns)], columns=df.columns)
+    total = df[COLUMN_MAP['net_price']].sum()
+    try:
+        with open(TAX_CONFIG_FILE, 'r') as f:
+            tax_data = json.load(f)
+            cgst = round(total * tax_data[service]['cgst'], 2)
+            sgst = round(total * tax_data[service]['sgst'], 2)
+    except (FileNotFoundError, KeyError):
+        cgst = round(total * 0.09, 2)
+        sgst = round(total * 0.09, 2)
+    
+    grand_total = round(total + cgst + sgst, 2)
+    
+    summary_rows = pd.DataFrame([
+        {summary_cols[0]: "Net Price", summary_cols[1]: total},
+        {summary_cols[0]: "CGST", summary_cols[1]: cgst},
+        {summary_cols[0]: "SGST", summary_cols[1]: sgst},
+        {summary_cols[0]: "Grand Total", summary_cols[1]: grand_total}
+    ])
+    
+    df = pd.concat([df, blank_row, summary_rows], ignore_index=True)
+    df.to_excel(path, sheet_name=current_month, index=False)
+    print(f"Customer '{customer_name}' deleted from {service} for {current_month}.")
+    

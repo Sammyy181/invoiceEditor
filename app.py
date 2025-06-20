@@ -106,6 +106,12 @@ def select_customer():
         tax_config = {'cgst': 0.0, 'sgst': 0.0}
 
     if request.method == 'POST':
+        if action == 'delete':
+            print(f"Deleting customer: {selected_customer} from service: {service}")
+            delete_customer(service, selected_customer)
+            flash("Customer Deleted Successfully!")
+            return redirect(url_for('select_customer'))
+        
         if action == 'add_new':
             try:
                 columns_config = load_service_columns(service)
@@ -253,6 +259,8 @@ def get_invoice_data():
         
         df = your_invoice_function(action, service) 
         df.drop(['Month'], axis=1, inplace=True, errors='ignore')
+        df = df.iloc[:-5]
+        #print(df)
         
         net_total = df['Net Price'].sum()
         
@@ -521,12 +529,6 @@ def log_invoiced():
         return jsonify({'message': 'Customer logged as invoiced successfully.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-@app.route('/delete_customer', methods=['POST'])
-def delete_customer():
-    customer_name = request.form['customer_to_delete']
-    delete_customer(customer_name) 
-    return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
     import socket
