@@ -514,7 +514,7 @@ def shutdown():
 def log_invoiced():
     data = request.get_json()
     service = data.get('service')
-    customer = data.get('customer')
+    customer = data.get('customer_name')
     
     try:
         log_customer(service, customer)

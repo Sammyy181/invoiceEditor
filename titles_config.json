@@ -11,7 +11,7 @@
     },
     {
         "id": "fixed_3",
-        "title": "Consumption Percentage",
+        "title": "Consumption Period",
         "type": "integer"
     },
     {

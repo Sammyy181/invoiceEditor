@@ -53,6 +53,10 @@ def get_customers(service):
     
     try:
         df = pd.read_excel(filepath, sheet_name=current_month)
+        summary_cols = df.columns[-2:]
+        summary_words = ['Net Price', 'CGST', 'SGST', 'Grand Total']
+        df = df[~df[summary_cols[0]].astype(str).isin(summary_words)]
+        df = df.dropna(how='all').reset_index(drop=True)
     except Exception:
         df = pd.read_excel(filepath, sheet_name=previous_month)
         df = df[0:0]
@@ -125,6 +129,12 @@ def add_customer_info(service, name, price, period, usage, category, others=None
     
     else:
         df = all_sheets[previous_month].copy()
+    
+            
+    summary_cols = df.columns[-2:]
+    summary_words = ['Net Price', 'CGST', 'SGST', 'Grand Total']
+    df = df[~df[summary_cols[0]].astype(str).isin(summary_words)]
+    df = df.dropna(how='all').reset_index(drop=True)
         
     idx = len(df)
     
@@ -133,9 +143,16 @@ def add_customer_info(service, name, price, period, usage, category, others=None
     df.at[idx, COLUMN_MAP['period']] = period
     df.at[idx, COLUMN_MAP['usage']] = usage
     df.at[idx, COLUMN_MAP['consumption']] = round(period / n_days[current_month], 2)
-    df.at[idx, COLUMN_MAP['net_price']] = price * usage / 100 * (period / n_days[current_month])
+    df.at[idx, COLUMN_MAP['net_price']] = round(price * usage / 100 * (period / n_days[current_month]), 2)
     df.at[idx, COLUMN_MAP['month']] = current_month
-    df.at[idx, COLUMN_MAP['category']] = category
+    try:
+        with open(f'categories/{service}.json') as f:  
+            category_map = json.load(f)  
+            id_to_name = {str(item['id']): item['name'] for item in category_map}
+            df.at[idx, COLUMN_MAP['category']] = id_to_name.get(category, category)
+    except Exception as e:
+        print(f"Error loading category JSON for mapping: {e}")
+        df.at[idx, COLUMN_MAP['category']] = category
     df.at[idx, COLUMN_MAP['invoiced']] = False 
     
     if others:
@@ -145,6 +162,28 @@ def add_customer_info(service, name, price, period, usage, category, others=None
                 print(f"Adding new column '{col_name}' for dynamic field.")
                 df[col_name] = '' 
             df.at[idx, col_name] = value
+    
+    blank_row = pd.DataFrame([[None]*len(df.columns)], columns=df.columns)
+    total = df[COLUMN_MAP['net_price']].sum()
+    try:
+        with open(TAX_CONFIG_FILE, 'r') as f:
+            tax_data = json.load(f)
+            cgst = round(total * tax_data[service]['cgst'], 2)
+            sgst = round(total * tax_data[service]['sgst'], 2)
+    except (FileNotFoundError, KeyError):
+        cgst = round(total * 0.09, 2)
+        sgst = round(total * 0.09, 2)
+    
+    grand_total = round(total + cgst + sgst, 2)
+    
+    summary_rows = pd.DataFrame([
+        {summary_cols[0]: "Net Price", summary_cols[1]: total},
+        {summary_cols[0]: "CGST", summary_cols[1]: cgst},
+        {summary_cols[0]: "SGST", summary_cols[1]: sgst},
+        {summary_cols[0]: "Grand Total", summary_cols[1]: grand_total}
+    ])
+
+    df = pd.concat([df, blank_row, summary_rows], ignore_index=True)
     
     all_sheets[current_month] = df
     
@@ -200,6 +239,11 @@ def update_customer_info(service, customer_name, updates):
     except IndexError:
         print(f"Customer '{customer_name}' not found in {service} sheet '{current_month}'.")
         return
+    
+    summary_cols = df.columns[-2:]
+    summary_words = ['Net Price', 'CGST', 'SGST', 'Grand Total']
+    df = df[~df[summary_cols[0]].astype(str).isin(summary_words)]
+    df = df.dropna(how='all').reset_index(drop=True)
 
     df.at[idx, 'Month'] = current_month
     
@@ -238,7 +282,28 @@ def update_customer_info(service, customer_name, updates):
         float(df.at[idx, COLUMN_MAP['usage']]) *
         float(df.at[idx, COLUMN_MAP['unit_price']]) / 100
     ), 2)
-
+    
+    blank_row = pd.DataFrame([[None]*len(df.columns)], columns=df.columns)
+    total = df[COLUMN_MAP['net_price']].sum()
+    try:
+        with open(TAX_CONFIG_FILE, 'r') as f:
+            tax_data = json.load(f)
+            cgst = round(total * tax_data[service]['cgst'], 2)
+            sgst = round(total * tax_data[service]['sgst'], 2)
+    except (FileNotFoundError, KeyError):
+        cgst = round(total * 0.09, 2)
+        sgst = round(total * 0.09, 2)
+    
+    grand_total = round(total + cgst + sgst, 2)
+    
+    summary_rows = pd.DataFrame([
+        {summary_cols[0]: "Net Price", summary_cols[1]: total},
+        {summary_cols[0]: "CGST", summary_cols[1]: cgst},
+        {summary_cols[0]: "SGST", summary_cols[1]: sgst},
+        {summary_cols[0]: "Grand Total", summary_cols[1]: grand_total}
+    ])
+    
+    df = pd.concat([df, blank_row, summary_rows], ignore_index=True)
     all_sheets[current_month] = df
 
     with pd.ExcelWriter(path, engine='openpyxl', mode='w') as writer:
@@ -334,43 +399,13 @@ def download_data(service, type):
     previous_month = now - relativedelta(months=1)
     previous_month = previous_month.strftime('%B')
     file_path = f'data/{service}.xlsx'
-    COLUMN_MAP = load_column_map(service)
-    tax_data = load_tax_config()
-    default_cgst = 0.09
-    default_sgst = 0.09
-
-    # Get tax rates with defaults
-    service_tax = tax_data.get(service, {})
-    cgst_per = service_tax.get("cgst", default_cgst)
-    sgst_per = service_tax.get("sgst", default_sgst)
     
     try:
         if type == 'view':
             df = pd.read_excel(file_path, sheet_name=previous_month)
         else:
             df = pd.read_excel(file_path, sheet_name=current_month)
-        
-        blank_row = pd.Series([None] * df.shape[1], index=df.columns)
-        df = pd.concat([df, pd.DataFrame([blank_row])], ignore_index=True)
-        
-        value_col = df.columns[-1]
-        title_col = df.columns[-2]
-        
-        df[COLUMN_MAP['net_price']] = pd.to_numeric(df[COLUMN_MAP['net_price']], errors='coerce')
-        
-        net_total = df[COLUMN_MAP['net_price']].dropna().sum()
-        cgst = round(net_total * cgst_per, 2)
-        sgst = round(net_total * sgst_per, 2)
-        grand_total = round(net_total + cgst + sgst, 2)
-        
-        totals = [
-            {title_col: "Net Total (Before Tax)", value_col: net_total},
-            {title_col: "CGST", value_col: cgst},
-            {title_col: "SGST", value_col: sgst},
-            {title_col: "Grand Total", value_col: grand_total}
-        ]
-        
-        df = pd.concat([df, pd.DataFrame(totals)], ignore_index=True)
+            
         output_path = f'{service}_{type}.xlsx'
         df.to_excel(output_path, index=False)
         print(f"Saved processed sheet as '{output_path}'")
@@ -409,3 +444,5 @@ def log_customer(service, customer_name):
         df.at[idx, COLUMN_MAP['invoiced']] = True
         df.to_excel(path, sheet_name=current_month, index=False)
         print(f"Customer '{customer_name}' logged as invoiced in {service} for {current_month}.")
+    else:
+        Exception(f"Error finding {customer_name} in data.")
