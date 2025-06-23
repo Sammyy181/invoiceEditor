@@ -123,7 +123,9 @@ def add_service():
 
 @app.route('/reports')
 def reports():
-    return render_template('reports.html')
+    services = get_services()
+    invoiced_data = get_all_invoiced()
+    return render_template('reports.html', services=services, invoiced_data=invoiced_data)
 
 @app.route('/select_feature', methods=['GET', 'POST'])
 def select_feature():
@@ -571,17 +573,6 @@ def update_tax():
 
     flash('Tax rates updated successfully.', 'success')
     return redirect(url_for('select_customer'))
-
-@app.route('/get_invoiced_data', methods=['POST'])
-def get_invoice():
-    try:
-        data = request.get_json()
-        service = data.get('service')
-        
-        result = get_invoiced(service)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/shutdown', methods=['POST'])
 def shutdown():

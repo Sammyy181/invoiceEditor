@@ -1455,30 +1455,6 @@
             return false; // cancel submit
         }
 
-        // Function to load customer data from Python backend
-        function loadCustomerData() {
-            fetch('/get_invoiced_data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    service: "{{ service }}"
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                updateRightPanel(data);
-            })
-            .catch(error => {
-                console.error('Error loading customer data:', error);
-                updateRightPanel({
-                    type1: { customers: [], total_price: 0 },
-                    type2: { customers: [], total_price: 0 }
-                });
-            });
-        }
-
         document.getElementById('popupOverlay').addEventListener('click', function(e) {
             if (e.target === this) {
                 hideAddCustomerPopup();

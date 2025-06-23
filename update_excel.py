@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 from dateutil.relativedelta import relativedelta
 import json
+import calendar
 
 n_days = {
     "January" : 31,
@@ -493,14 +494,12 @@ def delete_customer(service, customer_name):
     df.to_excel(path, sheet_name=current_month, index=False)
     print(f"Customer '{customer_name}' deleted from {service} for {current_month}.")
     
-def get_invoiced(service):
+def get_invoiced(service, month):
     path = f'data/{service}.xlsx'
     COLUMN_MAP = load_column_map(service)
     
-    now = datetime.now()
-    current_month = now.strftime('%B')
     try:
-        df = pd.read_excel(path, sheet_name=current_month)
+        df = pd.read_excel(path, sheet_name=month)
         df = df.iloc[:-5]
         invoiced = []
         uninvoiced = []
@@ -515,16 +514,79 @@ def get_invoiced(service):
                 uninvoiced.append(row[COLUMN_MAP['customer_name']])
                 uninvoiced_tot += row[COLUMN_MAP['net_price']]
         return {
-            'invoiced': invoiced,
-            'uninvoiced': uninvoiced,
-            'invoiced_total': invoiced_tot,
-            'uninvoiced_total': uninvoiced_tot
+            'invoiced' : {
+                'customers' : len(invoiced),
+                'netPrice' : invoiced_tot
+            },
+            'uninvoiced' : {
+                'customers' : len(uninvoiced),
+                'netPrice' : uninvoiced_tot
+            }
         }
+
     except Exception as e:
         print(f"Error reading {service} data for invoiced status: {e}")
         return {
-            'invoiced': [],
-            'uninvoiced': [],
-            'invoiced_total': 0,
-            'uninvoiced_total': 0
+            'invoiced': {
+                'customers': 0,
+                'netPrice': 0
+            },
+            'uninvoiced': {
+                'customers': 0,
+                'netPrice': 0
+            }
         }
+
+def get_financial_quarter(month):
+    month = month.lower()
+    if month in ['january', 'february', 'march']:
+        return 'Q1'
+    elif month in ['april', 'may', 'june']:
+        return 'Q2'
+    elif month in ['july', 'august', 'september']:
+        return 'Q3'
+    elif month in ['october', 'november', 'december']:
+        return 'Q4'
+    else:
+        raise ValueError(f"Invalid month: {month}")
+
+def get_all_invoiced():
+    services = get_services()
+    all_invoiced = {}
+    
+    for service in services:
+        service_data = []
+        
+        for month in range(1, 13):
+            month_name = calendar.month_name[month]
+            invoiced_data = get_invoiced(service, month_name)
+            service_data.append(invoiced_data)
+        
+        Q1 = {
+            'months' : ['January', 'February', 'March'],
+            'data' : service_data[0:3]
+        }
+        
+        Q2 = {
+            'months' : ['April', 'May', 'June'],
+            'data' : service_data[3:6]
+        }  
+        
+        Q3 = {
+            'months' : ['July', 'August', 'September'],
+            'data' : service_data[6:9]
+        }
+        
+        Q4 = {
+            'months' : ['October', 'November', 'December'],
+            'data' : service_data[9:12]
+        }
+        
+        all_invoiced[service] = {
+            'Q1': Q1,
+            'Q2': Q2,
+            'Q3': Q3,
+            'Q4': Q4
+        }
+    
+    return all_invoiced            

@@ -427,6 +427,9 @@
                 <div class="dropdown-container">
                     <select id="serviceSelect">
                         <option value="">Choose a service...</option>
+                        {% for s in services %}
+                            <option value="{{ s }}">{{ s.replace('_', ' ').title() }}</option>
+                        {% endfor %} 
                         <option value="web-hosting">Web Hosting</option>
                         <option value="cloud-storage">Cloud Storage</option>
                         <option value="email-service">Email Service</option>
@@ -441,10 +444,10 @@
                 <h2 class="panel-title">Financial Quarter Data</h2>
                 
                 <div class="quarter-selector">
-                    <button class="quarter-btn" data-quarter="Q1">Q1 2024</button>
-                    <button class="quarter-btn" data-quarter="Q2">Q2 2024</button>
-                    <button class="quarter-btn" data-quarter="Q3">Q3 2024</button>
-                    <button class="quarter-btn active" data-quarter="Q4">Q4 2024</button>
+                    <button class="quarter-btn" data-quarter="Q1">Q1 2025</button>
+                    <button class="quarter-btn" data-quarter="Q2">Q2 2025</button>
+                    <button class="quarter-btn" data-quarter="Q3">Q3 2025</button>
+                    <button class="quarter-btn active" data-quarter="Q4">Q4 2025</button>
                 </div>
                 
                 <div class="data-display">
@@ -667,8 +670,10 @@
                     ]
                 }
             }
-        };
+        }; 
 
+        //const serviceData = {{ invoiced_data | tojson }};
+        //console.log("Invoiced Data:", invoicedData);
         let currentService = '';
         let currentQuarter = 'Q4';
 
