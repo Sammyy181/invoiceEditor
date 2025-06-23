@@ -441,9 +441,16 @@ def log_customer(service, customer_name):
     
     if customer_name in df[COLUMN_MAP['customer_name']].values:
         idx = df[df[COLUMN_MAP['customer_name']] == customer_name].index[0]
-        df.at[idx, COLUMN_MAP['invoiced']] = True
-        df.to_excel(path, sheet_name=current_month, index=False)
-        print(f"Customer '{customer_name}' logged as invoiced in {service} for {current_month}.")
+        if df.at[idx, COLUMN_MAP['invoiced']]:
+            df.at[idx, COLUMN_MAP['invoiced']] = False
+            print(f"Customer '{customer_name}' logged as uninvoiced in {service} for {current_month}.")
+            df.to_excel(path, sheet_name=current_month, index=False)
+            return False
+        else:
+            df.at[idx, COLUMN_MAP['invoiced']] = True
+            print(f"Customer '{customer_name}' logged as invoiced in {service} for {current_month}.")
+            df.to_excel(path, sheet_name=current_month, index=False)
+            return True
     else:
         Exception(f"Error finding {customer_name} in data.")
 

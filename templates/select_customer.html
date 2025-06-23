@@ -1305,31 +1305,6 @@
         </div>
     </div>
 
-    <div id="rightPanel" class="right-panel">
-        <h3>Data Overview</h3>
-        <div class="data-columns">
-            <div class="data-column">
-                <h4>Invoiced</h4>
-                <div class="data-item">Sample Data 1</div>
-                <div class="data-item">Sample Data 2</div>
-                <div class="data-item">Sample Data 3</div>
-                <div class="data-item">Sample Data 4</div>
-            </div>
-            <div class="data-column">
-                <h4>Yet to Invoice</h4>
-                <div class="data-item">Info Item A</div>
-                <div class="data-item">Info Item B</div>
-                <div class="data-item">Info Item C</div>
-                <div class="data-item">Info Item D</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Panel Toggle Button -->
-    <button id="panelToggleBtn" class="panel-toggle-btn" onclick="toggleRightPanel()">
-        <i class="fas fa-chevron-left"></i>
-    </button>
-
     <script>
 
         function fadeAndNavigate(url) {
@@ -1459,12 +1434,16 @@
                     service: serviceName 
                 })
             })
-            .then(response => {
-                if (response.ok) {
-                    alert(`${customerName} logged as invoiced.`);
-                } else {
-                    alert("Failed to log.");
+            .then(response => response.json())  
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else if (data.error) {
+                    alert(`Error: ${data.error}`);
                 }
+            })
+            .catch(error => {
+                alert(`Unexpected error: ${error}`);
             });
         }
 
@@ -1498,73 +1477,6 @@
                     type2: { customers: [], total_price: 0 }
                 });
             });
-        }
-
-        // Function to update the right panel with data
-        function updateRightPanel(data) {
-            const panel = document.getElementById('rightPanel');
-
-            panel.innerHTML = `
-                <h3>Customer Overview</h3>
-                <div class="data-columns">
-                    <div class="data-column">
-                        <h4>Invoiced Customers</h4>
-                        <div class="customer-list-panel">
-                            ${data.invoiced.map(customer => 
-                                `<div class="data-item customer-item">${customer}</div>`
-                            ).join('')}
-                        </div>
-                    </div>
-                    <div class="data-column">
-                        <h4>Uninvoiced Customers</h4>
-                        <div class="customer-list-panel">
-                            ${data.uninvoiced.map(customer => 
-                                `<div class="data-item customer-item">${customer}</div>`
-                            ).join('')}
-                        </div>
-                    </div>
-                </div>
-                <div class="summary-section">
-                    <div class="summary-item">
-                        <span class="summary-label">Invoiced Count:</span>
-                        <span class="summary-value">${data.invoiced.length}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Uninvoiced Count:</span>
-                        <span class="summary-value">${data.uninvoiced.length}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Invoiced Total:</span>
-                        <span class="summary-value">₹${data.invoiced_total.toFixed(2)}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Uninvoiced Total:</span>
-                        <span class="summary-value">₹${data.uninvoiced_total.toFixed(2)}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Modified toggle function to load data when opening
-        function toggleRightPanel() {
-            const panel = document.getElementById('rightPanel');
-            const btn = document.getElementById('panelToggleBtn');
-            
-            panel.classList.toggle('open');
-            btn.classList.toggle('open');
-            
-            // Load data when opening panel
-            if (panel.classList.contains('open')) {
-                loadCustomerData();
-            }
-            
-            // Change icon based on state
-            const icon = btn.querySelector('i');
-            if (panel.classList.contains('open')) {
-                icon.className = 'fas fa-chevron-right';
-            } else {
-                icon.className = 'fas fa-chevron-left';
-            }
         }
 
         document.getElementById('popupOverlay').addEventListener('click', function(e) {

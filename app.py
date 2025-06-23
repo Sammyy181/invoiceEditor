@@ -536,15 +536,17 @@ def log_invoiced():
     customer = data.get('customer_name')
     
     try:
-        log_customer(service, customer)
-        return jsonify({'message': 'Customer logged as invoiced successfully.'}), 200
+        log = log_customer(service, customer)
+        if log:
+            return jsonify({'message': 'Customer logged as invoiced successfully.'}), 200
+        else:
+            return jsonify({'message': 'Customer logged as uninvoiced successfully.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     import socket
     import errno
-    
     debug_mode = "--debug" in sys.argv
     port = 7001
     
