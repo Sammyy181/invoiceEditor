@@ -163,6 +163,183 @@
             margin-top: 20px;
         }
 
+        .monthly-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .month-column {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .month-column h3 {
+            text-align: center;
+            color: #0891B2;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .invoice-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .invoice-type {
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .invoice-type.invoiced {
+            background: #F0FDF4;
+            border-left-color: #10B981;
+        }
+
+        .invoice-type.uninvoiced {
+            background: #FEF3C7;
+            border-left-color: #F59E0B;
+        }
+
+        .invoice-type h4 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .invoice-type.invoiced h4 {
+            color: #059669;
+        }
+
+        .invoice-type.uninvoiced h4 {
+            color: #D97706;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .metric .label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .metric .value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .grand-total {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-top: 4px solid #0891B2;
+        }
+
+        .grand-total h3 {
+            text-align: center;
+            color: #0891B2;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .total-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .total-section {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .total-section.invoiced {
+            background: #ECFDF5;
+            border: 2px solid #10B981;
+        }
+
+        .total-section.uninvoiced {
+            background: #FFFBEB;
+            border: 2px solid #F59E0B;
+        }
+
+        .total-section.grand {
+            background: #F0F9FF;
+            border: 2px solid #0891B2;
+        }
+
+        .total-section h4 {
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .total-section.invoiced h4 {
+            color: #059669;
+        }
+
+        .total-section.uninvoiced h4 {
+            color: #D97706;
+        }
+
+        .total-section.grand h4 {
+            color: #0891B2;
+        }
+
+        .total-metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total-metric .label {
+            font-size: 0.95em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .total-metric .value {
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .total-section.invoiced .total-metric .value {
+            color: #059669;
+        }
+
+        .total-section.uninvoiced .total-metric .value {
+            color: #D97706;
+        }
+
+        .total-section.grand .total-metric .value {
+            color: #0891B2;
+        }
+
+        @media (max-width: 768px) {
+            .monthly-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .total-grid {
+                grid-template-columns: 1fr;
+            }
+        } repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
         .data-card {
             background: white;
             padding: 20px;
@@ -185,7 +362,7 @@
         .data-card .value {
             font-size: 2em;
             font-weight: bold;
-            color: #4facfe;
+            color: #0891B2;
         }
 
         .no-data {
@@ -288,158 +465,206 @@
         const serviceData = {
             'web-hosting': {
                 'Q1': {
-                    revenue: '$245K',
-                    customers: '1,234',
-                    growth: '+12%',
-                    satisfaction: '4.2/5'
+                    months: ['January', 'February', 'March'],
+                    data: [
+                        { invoiced: { customers: 412, netPrice: 45280 }, uninvoiced: { customers: 78, netPrice: 8920 } },
+                        { invoiced: { customers: 438, netPrice: 49170 }, uninvoiced: { customers: 65, netPrice: 7230 } },
+                        { invoiced: { customers: 467, netPrice: 52410 }, uninvoiced: { customers: 89, netPrice: 9840 } }
+                    ]
                 },
                 'Q2': {
-                    revenue: '$278K',
-                    customers: '1,456',
-                    growth: '+15%',
-                    satisfaction: '4.3/5'
+                    months: ['April', 'May', 'June'],
+                    data: [
+                        { invoiced: { customers: 478, netPrice: 53680 }, uninvoiced: { customers: 92, netPrice: 10120 } },
+                        { invoiced: { customers: 501, netPrice: 56230 }, uninvoiced: { customers: 67, netPrice: 7450 } },
+                        { invoiced: { customers: 523, netPrice: 58970 }, uninvoiced: { customers: 73, netPrice: 8190 } }
+                    ]
                 },
                 'Q3': {
-                    revenue: '$312K',
-                    customers: '1,678',
-                    growth: '+18%',
-                    satisfaction: '4.4/5'
+                    months: ['July', 'August', 'September'],
+                    data: [
+                        { invoiced: { customers: 545, netPrice: 61450 }, uninvoiced: { customers: 81, netPrice: 9010 } },
+                        { invoiced: { customers: 567, netPrice: 64120 }, uninvoiced: { customers: 76, netPrice: 8470 } },
+                        { invoiced: { customers: 589, netPrice: 66780 }, uninvoiced: { customers: 84, netPrice: 9360 } }
+                    ]
                 },
                 'Q4': {
-                    revenue: '$389K',
-                    customers: '1,892',
-                    growth: '+22%',
-                    satisfaction: '4.5/5'
+                    months: ['October', 'November', 'December'],
+                    data: [
+                        { invoiced: { customers: 612, netPrice: 69420 }, uninvoiced: { customers: 88, netPrice: 9830 } },
+                        { invoiced: { customers: 634, netPrice: 72150 }, uninvoiced: { customers: 71, netPrice: 7940 } },
+                        { invoiced: { customers: 658, netPrice: 75380 }, uninvoiced: { customers: 95, netPrice: 10570 } }
+                    ]
                 }
             },
             'cloud-storage': {
                 'Q1': {
-                    revenue: '$156K',
-                    customers: '892',
-                    growth: '+8%',
-                    satisfaction: '4.1/5'
+                    months: ['January', 'February', 'March'],
+                    data: [
+                        { invoiced: { customers: 289, netPrice: 28450 }, uninvoiced: { customers: 43, netPrice: 4230 } },
+                        { invoiced: { customers: 301, netPrice: 29870 }, uninvoiced: { customers: 38, netPrice: 3780 } },
+                        { invoiced: { customers: 315, netPrice: 31290 }, uninvoiced: { customers: 47, netPrice: 4610 } }
+                    ]
                 },
                 'Q2': {
-                    revenue: '$189K',
-                    customers: '1,045',
-                    growth: '+11%',
-                    satisfaction: '4.2/5'
+                    months: ['April', 'May', 'June'],
+                    data: [
+                        { invoiced: { customers: 328, netPrice: 32680 }, uninvoiced: { customers: 52, netPrice: 5120 } },
+                        { invoiced: { customers: 342, netPrice: 34120 }, uninvoiced: { customers: 39, netPrice: 3890 } },
+                        { invoiced: { customers: 356, netPrice: 35670 }, uninvoiced: { customers: 44, netPrice: 4360 } }
+                    ]
                 },
                 'Q3': {
-                    revenue: '$234K',
-                    customers: '1,267',
-                    growth: '+14%',
-                    satisfaction: '4.3/5'
+                    months: ['July', 'August', 'September'],
+                    data: [
+                        { invoiced: { customers: 371, netPrice: 37240 }, uninvoiced: { customers: 48, netPrice: 4750 } },
+                        { invoiced: { customers: 385, netPrice: 38790 }, uninvoiced: { customers: 41, netPrice: 4070 } },
+                        { invoiced: { customers: 399, netPrice: 40450 }, uninvoiced: { customers: 53, netPrice: 5230 } }
+                    ]
                 },
                 'Q4': {
-                    revenue: '$278K',
-                    customers: '1,456',
-                    growth: '+17%',
-                    satisfaction: '4.4/5'
+                    months: ['October', 'November', 'December'],
+                    data: [
+                        { invoiced: { customers: 414, netPrice: 42180 }, uninvoiced: { customers: 56, netPrice: 5540 } },
+                        { invoiced: { customers: 428, netPrice: 43920 }, uninvoiced: { customers: 43, netPrice: 4250 } },
+                        { invoiced: { customers: 443, netPrice: 45780 }, uninvoiced: { customers: 59, netPrice: 5830 } }
+                    ]
                 }
             },
             'email-service': {
                 'Q1': {
-                    revenue: '$89K',
-                    customers: '2,345',
-                    growth: '+5%',
-                    satisfaction: '4.0/5'
+                    months: ['January', 'February', 'March'],
+                    data: [
+                        { invoiced: { customers: 723, netPrice: 21690 }, uninvoiced: { customers: 112, netPrice: 3360 } },
+                        { invoiced: { customers: 756, netPrice: 22680 }, uninvoiced: { customers: 98, netPrice: 2940 } },
+                        { invoiced: { customers: 789, netPrice: 23670 }, uninvoiced: { customers: 125, netPrice: 3750 } }
+                    ]
                 },
                 'Q2': {
-                    revenue: '$98K',
-                    customers: '2,567',
-                    growth: '+7%',
-                    satisfaction: '4.1/5'
+                    months: ['April', 'May', 'June'],
+                    data: [
+                        { invoiced: { customers: 812, netPrice: 24360 }, uninvoiced: { customers: 134, netPrice: 4020 } },
+                        { invoiced: { customers: 835, netPrice: 25050 }, uninvoiced: { customers: 107, netPrice: 3210 } },
+                        { invoiced: { customers: 858, netPrice: 25740 }, uninvoiced: { customers: 118, netPrice: 3540 } }
+                    ]
                 },
                 'Q3': {
-                    revenue: '$112K',
-                    customers: '2,789',
-                    growth: '+9%',
-                    satisfaction: '4.2/5'
+                    months: ['July', 'August', 'September'],
+                    data: [
+                        { invoiced: { customers: 881, netPrice: 26430 }, uninvoiced: { customers: 128, netPrice: 3840 } },
+                        { invoiced: { customers: 904, netPrice: 27120 }, uninvoiced: { customers: 111, netPrice: 3330 } },
+                        { invoiced: { customers: 927, netPrice: 27810 }, uninvoiced: { customers: 139, netPrice: 4170 } }
+                    ]
                 },
                 'Q4': {
-                    revenue: '$134K',
-                    customers: '3,012',
-                    growth: '+12%',
-                    satisfaction: '4.3/5'
+                    months: ['October', 'November', 'December'],
+                    data: [
+                        { invoiced: { customers: 950, netPrice: 28500 }, uninvoiced: { customers: 145, netPrice: 4350 } },
+                        { invoiced: { customers: 973, netPrice: 29190 }, uninvoiced: { customers: 122, netPrice: 3660 } },
+                        { invoiced: { customers: 996, netPrice: 29880 }, uninvoiced: { customers: 156, netPrice: 4680 } }
+                    ]
                 }
             },
             'cdn': {
                 'Q1': {
-                    revenue: '$67K',
-                    customers: '456',
-                    growth: '+3%',
-                    satisfaction: '4.4/5'
+                    months: ['January', 'February', 'March'],
+                    data: [
+                        { invoiced: { customers: 145, netPrice: 18270 }, uninvoiced: { customers: 23, netPrice: 2890 } },
+                        { invoiced: { customers: 152, netPrice: 19240 }, uninvoiced: { customers: 19, netPrice: 2380 } },
+                        { invoiced: { customers: 159, netPrice: 20110 }, uninvoiced: { customers: 26, netPrice: 3290 } }
+                    ]
                 },
                 'Q2': {
-                    revenue: '$78K',
-                    customers: '523',
-                    growth: '+6%',
-                    satisfaction: '4.5/5'
+                    months: ['April', 'May', 'June'],
+                    data: [
+                        { invoiced: { customers: 167, netPrice: 21240 }, uninvoiced: { customers: 29, netPrice: 3670 } },
+                        { invoiced: { customers: 174, netPrice: 22150 }, uninvoiced: { customers: 22, netPrice: 2780 } },
+                        { invoiced: { customers: 181, netPrice: 23170 }, uninvoiced: { customers: 25, netPrice: 3150 } }
+                    ]
                 },
                 'Q3': {
-                    revenue: '$89K',
-                    customers: '612',
-                    growth: '+9%',
-                    satisfaction: '4.6/5'
+                    months: ['July', 'August', 'September'],
+                    data: [
+                        { invoiced: { customers: 189, netPrice: 24280 }, uninvoiced: { customers: 27, netPrice: 3430 } },
+                        { invoiced: { customers: 196, netPrice: 25340 }, uninvoiced: { customers: 21, netPrice: 2690 } },
+                        { invoiced: { customers: 203, netPrice: 26510 }, uninvoiced: { customers: 30, netPrice: 3810 } }
+                    ]
                 },
                 'Q4': {
-                    revenue: '$105K',
-                    customers: '723',
-                    growth: '+13%',
-                    satisfaction: '4.7/5'
+                    months: ['October', 'November', 'December'],
+                    data: [
+                        { invoiced: { customers: 211, netPrice: 27620 }, uninvoiced: { customers: 32, netPrice: 4190 } },
+                        { invoiced: { customers: 218, netPrice: 28780 }, uninvoiced: { customers: 24, netPrice: 3180 } },
+                        { invoiced: { customers: 225, netPrice: 29950 }, uninvoiced: { customers: 35, netPrice: 4590 } }
+                    ]
                 }
             },
             'database': {
                 'Q1': {
-                    revenue: '$178K',
-                    customers: '567',
-                    growth: '+10%',
-                    satisfaction: '4.3/5'
+                    months: ['January', 'February', 'March'],
+                    data: [
+                        { invoiced: { customers: 178, netPrice: 53420 }, uninvoiced: { customers: 28, netPrice: 8460 } },
+                        { invoiced: { customers: 186, netPrice: 55940 }, uninvoiced: { customers: 23, netPrice: 6920 } },
+                        { invoiced: { customers: 194, netPrice: 58340 }, uninvoiced: { customers: 31, netPrice: 9370 } }
+                    ]
                 },
                 'Q2': {
-                    revenue: '$201K',
-                    customers: '634',
-                    growth: '+13%',
-                    satisfaction: '4.4/5'
+                    months: ['April', 'May', 'June'],
+                    data: [
+                        { invoiced: { customers: 203, netPrice: 61120 }, uninvoiced: { customers: 34, netPrice: 10180 } },
+                        { invoiced: { customers: 211, netPrice: 63570 }, uninvoiced: { customers: 26, netPrice: 7840 } },
+                        { invoiced: { customers: 219, netPrice: 66190 }, uninvoiced: { customers: 29, netPrice: 8720 } }
+                    ]
                 },
                 'Q3': {
-                    revenue: '$234K',
-                    customers: '712',
-                    growth: '+16%',
-                    satisfaction: '4.5/5'
+                    months: ['July', 'August', 'September'],
+                    data: [
+                        { invoiced: { customers: 228, netPrice: 68940 }, uninvoiced: { customers: 32, netPrice: 9580 } },
+                        { invoiced: { customers: 236, netPrice: 71520 }, uninvoiced: { customers: 27, netPrice: 8190 } },
+                        { invoiced: { customers: 244, netPrice: 74280 }, uninvoiced: { customers: 35, netPrice: 10470 } }
+                    ]
                 },
                 'Q4': {
-                    revenue: '$267K',
-                    customers: '798',
-                    growth: '+19%',
-                    satisfaction: '4.6/5'
+                    months: ['October', 'November', 'December'],
+                    data: [
+                        { invoiced: { customers: 253, netPrice: 77150 }, uninvoiced: { customers: 38, netPrice: 11250 } },
+                        { invoiced: { customers: 261, netPrice: 79890 }, uninvoiced: { customers: 30, netPrice: 9070 } },
+                        { invoiced: { customers: 269, netPrice: 82840 }, uninvoiced: { customers: 41, netPrice: 12340 } }
+                    ]
                 }
             },
             'analytics': {
                 'Q1': {
-                    revenue: '$123K',
-                    customers: '234',
-                    growth: '+15%',
-                    satisfaction: '4.2/5'
+                    months: ['January', 'February', 'March'],
+                    data: [
+                        { invoiced: { customers: 67, netPrice: 35150 }, uninvoiced: { customers: 12, netPrice: 6120 } },
+                        { invoiced: { customers: 71, netPrice: 37290 }, uninvoiced: { customers: 9, netPrice: 4650 } },
+                        { invoiced: { customers: 75, netPrice: 39570 }, uninvoiced: { customers: 14, netPrice: 7340 } }
+                    ]
                 },
                 'Q2': {
-                    revenue: '$145K',
-                    customers: '278',
-                    growth: '+18%',
-                    satisfaction: '4.3/5'
+                    months: ['April', 'May', 'June'],
+                    data: [
+                        { invoiced: { customers: 79, netPrice: 41820 }, uninvoiced: { customers: 16, netPrice: 8290 } },
+                        { invoiced: { customers: 83, netPrice: 44150 }, uninvoiced: { customers: 11, netPrice: 5670 } },
+                        { invoiced: { customers: 87, netPrice: 46590 }, uninvoiced: { customers: 13, netPrice: 6920 } }
+                    ]
                 },
                 'Q3': {
-                    revenue: '$178K',
-                    customers: '334',
-                    growth: '+22%',
-                    satisfaction: '4.4/5'
+                    months: ['July', 'August', 'September'],
+                    data: [
+                        { invoiced: { customers: 92, netPrice: 49220 }, uninvoiced: { customers: 15, netPrice: 7850 } },
+                        { invoiced: { customers: 96, netPrice: 51740 }, uninvoiced: { customers: 12, netPrice: 6340 } },
+                        { invoiced: { customers: 100, netPrice: 54380 }, uninvoiced: { customers: 17, netPrice: 8930 } }
+                    ]
                 },
                 'Q4': {
-                    revenue: '$212K',
-                    customers: '389',
-                    growth: '+25%',
-                    satisfaction: '4.5/5'
+                    months: ['October', 'November', 'December'],
+                    data: [
+                        { invoiced: { customers: 105, netPrice: 57190 }, uninvoiced: { customers: 19, netPrice: 9780 } },
+                        { invoiced: { customers: 109, netPrice: 59840 }, uninvoiced: { customers: 14, netPrice: 7420 } },
+                        { invoiced: { customers: 113, netPrice: 62670 }, uninvoiced: { customers: 21, netPrice: 10830 } }
+                    ]
                 }
             }
         };
@@ -473,28 +698,98 @@
                 return;
             }
 
-            const data = serviceData[currentService][currentQuarter];
+            const quarterData = serviceData[currentService][currentQuarter];
+            
+            // Calculate totals
+            let totalInvoicedCustomers = 0;
+            let totalInvoicedPrice = 0;
+            let totalUninvoicedCustomers = 0;
+            let totalUninvoicedPrice = 0;
+            
+            quarterData.data.forEach(month => {
+                totalInvoicedCustomers += month.invoiced.customers;
+                totalInvoicedPrice += month.invoiced.netPrice;
+                totalUninvoicedCustomers += month.uninvoiced.customers;
+                totalUninvoicedPrice += month.uninvoiced.netPrice;
+            });
+            
+            let monthlyColumns = '';
+            quarterData.months.forEach((month, index) => {
+                const monthData = quarterData.data[index];
+                monthlyColumns += `
+                    <div class="month-column">
+                        <h3>${month}</h3>
+                        <div class="invoice-section">
+                            <div class="invoice-type invoiced">
+                                <h4>Invoiced</h4>
+                                <div class="metric">
+                                    <span class="label">Customers:</span>
+                                    <span class="value">${monthData.invoiced.customers.toLocaleString()}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="label">Net Price:</span>
+                                    <span class="value">${monthData.invoiced.netPrice.toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div class="invoice-type uninvoiced">
+                                <h4>Uninvoiced</h4>
+                                <div class="metric">
+                                    <span class="label">Customers:</span>
+                                    <span class="value">${monthData.uninvoiced.customers.toLocaleString()}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="label">Net Price:</span>
+                                    <span class="value">${monthData.uninvoiced.netPrice.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
             
             dataContent.innerHTML = `
-                <h3 style="text-align: center; margin-bottom: 20px; color: #333;">
+                <h3 style="text-align: center; margin-bottom: 30px; color: #333; font-size: 1.5em;">
                     ${getServiceName(currentService)} - ${currentQuarter} 2024
                 </h3>
-                <div class="data-grid">
-                    <div class="data-card">
-                        <h3>Revenue</h3>
-                        <div class="value">${data.revenue}</div>
-                    </div>
-                    <div class="data-card">
-                        <h3>Customers</h3>
-                        <div class="value">${data.customers}</div>
-                    </div>
-                    <div class="data-card">
-                        <h3>Growth</h3>
-                        <div class="value">${data.growth}</div>
-                    </div>
-                    <div class="data-card">
-                        <h3>Satisfaction</h3>
-                        <div class="value">${data.satisfaction}</div>
+                <div class="monthly-grid">
+                    ${monthlyColumns}
+                </div>
+                <div class="grand-total">
+                    <h3>Quarter Total</h3>
+                    <div class="total-grid">
+                        <div class="total-section invoiced">
+                            <h4>Total Invoiced</h4>
+                            <div class="total-metric">
+                                <span class="label">Customers:</span>
+                                <span class="value">${totalInvoicedCustomers.toLocaleString()}</span>
+                            </div>
+                            <div class="total-metric">
+                                <span class="label">Net Price:</span>
+                                <span class="value">${totalInvoicedPrice.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="total-section uninvoiced">
+                            <h4>Total Uninvoiced</h4>
+                            <div class="total-metric">
+                                <span class="label">Customers:</span>
+                                <span class="value">${totalUninvoicedCustomers.toLocaleString()}</span>
+                            </div>
+                            <div class="total-metric">
+                                <span class="label">Net Price:</span>
+                                <span class="value">${totalUninvoicedPrice.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="total-section grand">
+                            <h4>Grand Total</h4>
+                            <div class="total-metric">
+                                <span class="label">All Customers:</span>
+                                <span class="value">${(totalInvoicedCustomers + totalUninvoicedCustomers).toLocaleString()}</span>
+                            </div>
+                            <div class="total-metric">
+                                <span class="label">Total Revenue:</span>
+                                <span class="value">${(totalInvoicedPrice + totalUninvoicedPrice).toLocaleString()}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
