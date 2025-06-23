@@ -126,7 +126,13 @@ def add_service():
 def reports():
     services = get_services()
     invoiced_data = get_all_invoiced()
-    return render_template('reports.html', services=services, invoiced_data=invoiced_data)
+    service_list = {}
+    
+    for service in services:
+        service_list[service] = service
+    
+    print(f"Service list: {service_list}")
+    return render_template('reports.html', services=services, invoiced_data=invoiced_data, service_list=service_list)
 
 @app.route('/select_feature', methods=['GET', 'POST'])
 def select_feature():
