@@ -159,6 +159,12 @@ def select_customer():
         tax_config = {'cgst': 0.0, 'sgst': 0.0}
 
     if request.method == 'POST':
+        if action == 'delete':
+            print(f"Deleting customer: {selected_customer} from service: {service}")
+            delete_customer(service, selected_customer)
+            flash("Customer Deleted Successfully!")
+            return redirect(url_for('select_customer'))
+        
         if action == 'add_new':
             try:
                 columns_config = load_service_columns(service)
@@ -308,6 +314,8 @@ def get_invoice_data():
         
         df = your_invoice_function(action, service) 
         df.drop(['Month'], axis=1, inplace=True, errors='ignore')
+        df = df.iloc[:-5]
+        #print(df)
         
         net_total = df['Net Price'].sum()
         
@@ -560,16 +568,41 @@ def update_tax():
     flash('Tax rates updated successfully.', 'success')
     return redirect(url_for('select_customer'))
 
+@app.route('/get_invoiced_data', methods=['POST'])
+def get_invoice():
+    try:
+        data = request.get_json()
+        service = data.get('service')
+        
+        result = get_invoiced(service)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/shutdown', methods=['POST'])
 def shutdown():
     print("Shutdown signal received from browser.")
     threading.Thread(target=lambda: os._exit(0)).start()  
     return 'Server shutting down...'
 
+@app.route('/log_invoiced', methods=['POST'])
+def log_invoiced():
+    data = request.get_json()
+    service = data.get('service')
+    customer = data.get('customer_name')
+    
+    try:
+        log = log_customer(service, customer)
+        if log:
+            return jsonify({'message': 'Customer logged as invoiced successfully.'}), 200
+        else:
+            return jsonify({'message': 'Customer logged as uninvoiced successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     import socket
     import errno
-    
     debug_mode = "--debug" in sys.argv
     port = 7001
     

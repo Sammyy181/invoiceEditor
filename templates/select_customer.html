@@ -818,6 +818,262 @@
             overflow-y: auto;
         }
 
+        .customer-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 6px;
+            border-radius: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .customer-entry:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .customer-name-btn {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: left;
+            background: linear-gradient(135deg, #f0f4ff, #e6ecff);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .customer-name-btn:hover {
+            background: linear-gradient(135deg, #e0eaff, #d4deff);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #ffffff, #f5f8ff);
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a4a4a;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+
+        .icon-btn:hover {
+            background: linear-gradient(135deg, #e0eaff, #cdd9ff);
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .customer-list-panel {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .customer-list-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .customer-list-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .customer-list-panel::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 2px;
+        }
+
+        .customer-item {
+            font-size: 13px;
+            padding: 6px 10px;
+            margin-bottom: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .customer-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .summary-section {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 14px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .right-panel {
+            position: fixed;
+            right: -400px; /* Hidden by default */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 380px;
+            height: 60vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px 0 0 20px;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-right: none;
+            padding: 32px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+        }
+
+        .right-panel.open {
+            right: 0;
+        }
+
+        .right-panel h3 {
+            margin: 0 0 20px 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: #2d3748;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .data-columns {
+            display: flex;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .data-column {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .data-column h4 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a5568;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .data-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2d3748;
+            border-left: 3px solid #667eea;
+        }
+
+        .panel-toggle-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel-toggle-btn:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        .panel-toggle-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .panel-toggle-btn.open i {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
@@ -855,14 +1111,30 @@
     <div class="page-wrapper">
         <div class="container">
             <form method="POST" id="customerForm">
+                <input type="hidden" name="customer" id="customerToDelete" value="">
                 <h2>Select customer:</h2>
 
                 <div class="customer-list">
+                     {% for c in customers %}
+                    <div class="customer-entry">
+                        <button type="submit" name="customer" value="{{ c }}" class="customer-name-btn">
+                            {{ c }}
+                        </button>
 
-                    {% for c in customers %}
-                    <button type="submit" name="customer" value="{{ c }}" class="customer-btn">
-                        {{ c }}
-                    </button>
+                        <div class="tooltip-container">
+                            <button type="button" onclick="handleCustomerAction('{{ c }}')" class="icon-btn">
+                                ✅
+                            </button>
+                            <span class="tooltip-text">Log as Invoiced</span>
+                        </div>
+
+                        <div class="tooltip-container">
+                            <button type="submit" name="action" value="delete" class="icon-btn"
+                                    onclick="return confirmAndSetCustomer('{{ c }}')" title="Delete Customer">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
 
@@ -1149,6 +1421,64 @@
             }
         }
 
+        function handleCustomerAction(customerName){
+            const serviceName = "{{ service }}";
+
+            fetch('/log_invoiced', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    customer_name: customerName, 
+                    service: serviceName 
+                })
+            })
+            .then(response => response.json())  
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else if (data.error) {
+                    alert(`Error: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                alert(`Unexpected error: ${error}`);
+            });
+        }
+
+        function confirmAndSetCustomer(customerName) {
+            if (confirm('Delete ' + customerName + '?')) {
+                document.getElementById('customerToDelete').value = customerName;
+                return true;  // proceed with form submit
+            }
+            return false; // cancel submit
+        }
+
+        // Function to load customer data from Python backend
+        function loadCustomerData() {
+            fetch('/get_invoiced_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    service: "{{ service }}"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateRightPanel(data);
+            })
+            .catch(error => {
+                console.error('Error loading customer data:', error);
+                updateRightPanel({
+                    type1: { customers: [], total_price: 0 },
+                    type2: { customers: [], total_price: 0 }
+                });
+            });
+        }
+
         document.getElementById('popupOverlay').addEventListener('click', function(e) {
             if (e.target === this) {
                 hideAddCustomerPopup();
@@ -1182,7 +1512,5 @@
             </div>
         {% endif %}
     {% endwith %}
-
-
 </body>
 </html>
