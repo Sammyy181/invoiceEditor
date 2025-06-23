@@ -430,12 +430,6 @@
                         {% for s in services %}
                             <option value="{{ s }}">{{ s.replace('_', ' ').title() }}</option>
                         {% endfor %} 
-                        <option value="web-hosting">Web Hosting</option>
-                        <option value="cloud-storage">Cloud Storage</option>
-                        <option value="email-service">Email Service</option>
-                        <option value="cdn">Content Delivery Network</option>
-                        <option value="database">Database Service</option>
-                        <option value="analytics">Analytics Platform</option>
                     </select>
                 </div>
             </div>
@@ -465,7 +459,7 @@
 
     <script>
         // Sample data structure
-        const serviceData = {
+        /* const serviceData = {
             'web-hosting': {
                 'Q1': {
                     months: ['January', 'February', 'March'],
@@ -670,10 +664,11 @@
                     ]
                 }
             }
-        }; 
+        }; */
 
-        //const serviceData = {{ invoiced_data | tojson }};
-        //console.log("Invoiced Data:", invoicedData);
+        const serviceData = {{ invoiced_data | tojson }};
+        console.log("Invoiced Data:", serviceData);
+        const serviceNames = {{ service_list | tojson }};
         let currentService = '';
         let currentQuarter = 'Q4';
 
@@ -801,15 +796,7 @@
         }
 
         function getServiceName(serviceKey) {
-            const names = {
-                'web-hosting': 'Web Hosting',
-                'cloud-storage': 'Cloud Storage',
-                'email-service': 'Email Service',
-                'cdn': 'Content Delivery Network',
-                'database': 'Database Service',
-                'analytics': 'Analytics Platform'
-            };
-            return names[serviceKey] || serviceKey;
+            return serviceNames[serviceKey] || serviceKey;
         }
 
         function fadeAndNavigate(url) {
