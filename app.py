@@ -11,6 +11,7 @@ import sys
 from functools import wraps 
 from flask import abort
 
+
 month_name = datetime.now().strftime("%B")
 
 app = Flask(__name__)
@@ -600,6 +601,17 @@ def log_invoiced():
             return jsonify({'message': 'Customer logged as uninvoiced successfully.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/chatbot', methods=['POST'])
+def chatbot():
+    data = request.get_json()
+    user_message = data.get("message", "")
+
+    # Placeholder logic – replace with your assistant's response logic
+    response = "response"  # your function
+
+    return jsonify({"reply": response})
+
 
 if __name__ == '__main__':
     import socket
