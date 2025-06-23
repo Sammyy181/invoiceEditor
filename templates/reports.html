@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Quarter Dashboard</title>
+    <title>Service Report</title>
     <style>
         * {
             margin: 0;
@@ -418,7 +418,7 @@
 <body>
     <div class="dashboard">
         <div class="header">
-            <h1>Service Analytics Dashboard</h1>
+            <h1>Service Analytics</h1>
         </div>
         
         <div class="content">
@@ -749,7 +749,7 @@
             
             dataContent.innerHTML = `
                 <h3 style="text-align: center; margin-bottom: 30px; color: #333; font-size: 1.5em;">
-                    ${getServiceName(currentService)} - ${currentQuarter} 2024
+                    ${getServiceName(currentService)} - ${currentQuarter} 2025
                 </h3>
                 <div class="monthly-grid">
                     ${monthlyColumns}
@@ -765,7 +765,7 @@
                             </div>
                             <div class="total-metric">
                                 <span class="label">Net Price:</span>
-                                <span class="value">${totalInvoicedPrice.toLocaleString()}</span>
+                                <span class="value">₹ ${totalInvoicedPrice.toLocaleString()}</span>
                             </div>
                         </div>
                         <div class="total-section uninvoiced">
@@ -776,7 +776,7 @@
                             </div>
                             <div class="total-metric">
                                 <span class="label">Net Price:</span>
-                                <span class="value">${totalUninvoicedPrice.toLocaleString()}</span>
+                                <span class="value">₹ ${totalUninvoicedPrice.toLocaleString()}</span>
                             </div>
                         </div>
                         <div class="total-section grand">
@@ -787,7 +787,7 @@
                             </div>
                             <div class="total-metric">
                                 <span class="label">Total Revenue:</span>
-                                <span class="value">${(totalInvoicedPrice + totalUninvoicedPrice).toLocaleString()}</span>
+                                <span class="value">₹ ${(totalInvoicedPrice + totalUninvoicedPrice).toLocaleString()}</span>
                             </div>
                         </div>
                     </div>
