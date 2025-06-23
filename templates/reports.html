@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Quarter Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            opacity: 0;                     
+            animation: fadeIn 0.3s ease-in
+                        forwards;  
+            transition: opacity 0.3s ease-out;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .content {
+            display: flex;
+            min-height: 500px;
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 40px;
+            background: linear-gradient(135deg, #4300FF 0%, #00ffde 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .right-panel {
+            flex: 2;
+            padding: 40px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .left-panel .panel-title {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .right-panel .panel-title {
+            color: #333;
+        }
+
+        .dropdown-container {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 15px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+        }
+
+        select:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.5);
+        }
+
+        .quarter-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .quarter-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .quarter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .quarter-btn.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .data-display {
+            flex: 1;
+            background: linear-gradient(135deg, #4e71ff 0%, #8dd8ff 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .data-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .data-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .data-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .data-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 50px;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #0891B2 0%, #1F2937 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .quarter-selector {
+                flex-wrap: wrap;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>Service Analytics Dashboard</h1>
+        </div>
+        
+        <div class="content">
+            <div class="left-panel">
+                <h2 class="panel-title">Select Service</h2>
+                <div class="dropdown-container">
+                    <select id="serviceSelect">
+                        <option value="">Choose a service...</option>
+                        <option value="web-hosting">Web Hosting</option>
+                        <option value="cloud-storage">Cloud Storage</option>
+                        <option value="email-service">Email Service</option>
+                        <option value="cdn">Content Delivery Network</option>
+                        <option value="database">Database Service</option>
+                        <option value="analytics">Analytics Platform</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <h2 class="panel-title">Financial Quarter Data</h2>
+                
+                <div class="quarter-selector">
+                    <button class="quarter-btn" data-quarter="Q1">Q1 2024</button>
+                    <button class="quarter-btn" data-quarter="Q2">Q2 2024</button>
+                    <button class="quarter-btn" data-quarter="Q3">Q3 2024</button>
+                    <button class="quarter-btn active" data-quarter="Q4">Q4 2024</button>
+                </div>
+                
+                <div class="data-display">
+                    <div id="dataContent">
+                        <div class="no-data">Select a service to view quarterly data</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-button" onclick="fadeAndNavigate('{{ url_for('select_service') }}');">
+        <i class="fa-solid fa-house"></i> Home Page
+    </button>
+
+    <script>
+        // Sample data structure
+        const serviceData = {
+            'web-hosting': {
+                'Q1': {
+                    revenue: '$245K',
+                    customers: '1,234',
+                    growth: '+12%',
+                    satisfaction: '4.2/5'
+                },
+                'Q2': {
+                    revenue: '$278K',
+                    customers: '1,456',
+                    growth: '+15%',
+                    satisfaction: '4.3/5'
+                },
+                'Q3': {
+                    revenue: '$312K',
+                    customers: '1,678',
+                    growth: '+18%',
+                    satisfaction: '4.4/5'
+                },
+                'Q4': {
+                    revenue: '$389K',
+                    customers: '1,892',
+                    growth: '+22%',
+                    satisfaction: '4.5/5'
+                }
+            },
+            'cloud-storage': {
+                'Q1': {
+                    revenue: '$156K',
+                    customers: '892',
+                    growth: '+8%',
+                    satisfaction: '4.1/5'
+                },
+                'Q2': {
+                    revenue: '$189K',
+                    customers: '1,045',
+                    growth: '+11%',
+                    satisfaction: '4.2/5'
+                },
+                'Q3': {
+                    revenue: '$234K',
+                    customers: '1,267',
+                    growth: '+14%',
+                    satisfaction: '4.3/5'
+                },
+                'Q4': {
+                    revenue: '$278K',
+                    customers: '1,456',
+                    growth: '+17%',
+                    satisfaction: '4.4/5'
+                }
+            },
+            'email-service': {
+                'Q1': {
+                    revenue: '$89K',
+                    customers: '2,345',
+                    growth: '+5%',
+                    satisfaction: '4.0/5'
+                },
+                'Q2': {
+                    revenue: '$98K',
+                    customers: '2,567',
+                    growth: '+7%',
+                    satisfaction: '4.1/5'
+                },
+                'Q3': {
+                    revenue: '$112K',
+                    customers: '2,789',
+                    growth: '+9%',
+                    satisfaction: '4.2/5'
+                },
+                'Q4': {
+                    revenue: '$134K',
+                    customers: '3,012',
+                    growth: '+12%',
+                    satisfaction: '4.3/5'
+                }
+            },
+            'cdn': {
+                'Q1': {
+                    revenue: '$67K',
+                    customers: '456',
+                    growth: '+3%',
+                    satisfaction: '4.4/5'
+                },
+                'Q2': {
+                    revenue: '$78K',
+                    customers: '523',
+                    growth: '+6%',
+                    satisfaction: '4.5/5'
+                },
+                'Q3': {
+                    revenue: '$89K',
+                    customers: '612',
+                    growth: '+9%',
+                    satisfaction: '4.6/5'
+                },
+                'Q4': {
+                    revenue: '$105K',
+                    customers: '723',
+                    growth: '+13%',
+                    satisfaction: '4.7/5'
+                }
+            },
+            'database': {
+                'Q1': {
+                    revenue: '$178K',
+                    customers: '567',
+                    growth: '+10%',
+                    satisfaction: '4.3/5'
+                },
+                'Q2': {
+                    revenue: '$201K',
+                    customers: '634',
+                    growth: '+13%',
+                    satisfaction: '4.4/5'
+                },
+                'Q3': {
+                    revenue: '$234K',
+                    customers: '712',
+                    growth: '+16%',
+                    satisfaction: '4.5/5'
+                },
+                'Q4': {
+                    revenue: '$267K',
+                    customers: '798',
+                    growth: '+19%',
+                    satisfaction: '4.6/5'
+                }
+            },
+            'analytics': {
+                'Q1': {
+                    revenue: '$123K',
+                    customers: '234',
+                    growth: '+15%',
+                    satisfaction: '4.2/5'
+                },
+                'Q2': {
+                    revenue: '$145K',
+                    customers: '278',
+                    growth: '+18%',
+                    satisfaction: '4.3/5'
+                },
+                'Q3': {
+                    revenue: '$178K',
+                    customers: '334',
+                    growth: '+22%',
+                    satisfaction: '4.4/5'
+                },
+                'Q4': {
+                    revenue: '$212K',
+                    customers: '389',
+                    growth: '+25%',
+                    satisfaction: '4.5/5'
+                }
+            }
+        };
+
+        let currentService = '';
+        let currentQuarter = 'Q4';
+
+        const serviceSelect = document.getElementById('serviceSelect');
+        const quarterButtons = document.querySelectorAll('.quarter-btn');
+        const dataContent = document.getElementById('dataContent');
+
+        // Service selection handler
+        serviceSelect.addEventListener('change', function() {
+            currentService = this.value;
+            updateDisplay();
+        });
+
+        // Quarter button handlers
+        quarterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                quarterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentQuarter = this.dataset.quarter;
+                updateDisplay();
+            });
+        });
+
+        function updateDisplay() {
+            if (!currentService) {
+                dataContent.innerHTML = '<div class="no-data">Select a service to view quarterly data</div>';
+                return;
+            }
+
+            const data = serviceData[currentService][currentQuarter];
+            
+            dataContent.innerHTML = `
+                <h3 style="text-align: center; margin-bottom: 20px; color: #333;">
+                    ${getServiceName(currentService)} - ${currentQuarter} 2024
+                </h3>
+                <div class="data-grid">
+                    <div class="data-card">
+                        <h3>Revenue</h3>
+                        <div class="value">${data.revenue}</div>
+                    </div>
+                    <div class="data-card">
+                        <h3>Customers</h3>
+                        <div class="value">${data.customers}</div>
+                    </div>
+                    <div class="data-card">
+                        <h3>Growth</h3>
+                        <div class="value">${data.growth}</div>
+                    </div>
+                    <div class="data-card">
+                        <h3>Satisfaction</h3>
+                        <div class="value">${data.satisfaction}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getServiceName(serviceKey) {
+            const names = {
+                'web-hosting': 'Web Hosting',
+                'cloud-storage': 'Cloud Storage',
+                'email-service': 'Email Service',
+                'cdn': 'Content Delivery Network',
+                'database': 'Database Service',
+                'analytics': 'Analytics Platform'
+            };
+            return names[serviceKey] || serviceKey;
+        }
+
+        function fadeAndNavigate(url) {
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                window.location.href = url;
+            }, 300);
+        }
+    </script>
+</body>
+</html>
