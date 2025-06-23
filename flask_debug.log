@@ -1,6 +1,2 @@
-127.0.0.1 - - [23/Jun/2025 11:03:30] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-127.0.0.1 - - [23/Jun/2025 11:04:00] "[31m[1mGET /select_customer HTTP/1.1[0m" 403 -
-127.0.0.1 - - [23/Jun/2025 11:04:01] "[31m[1mGET /select_customer HTTP/1.1[0m" 403 -
-127.0.0.1 - - [23/Jun/2025 11:04:23] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-127.0.0.1 - - [23/Jun/2025 11:04:24] "[31m[1mGET /select_customer HTTP/1.1[0m" 403 -
-127.0.0.1 - - [23/Jun/2025 11:04:57] "[31m[1mGET /select_customer HTTP/1.1[0m" 403 -
+Port 7001 is already in use!
+Please stop the existing process or choose a different port.

@@ -637,13 +637,13 @@ def chatbot():
         # Get JSON data from request
         data = request.get_json()
         
-        if not data or 'prompt' not in data:
+        if not data or 'message' not in data:
             return jsonify({
                 "error": "No prompt provided",
                 "status": "error"
             }), 400
         
-        prompt = data['prompt'].strip()
+        prompt = data['message'].strip()
         
         if not prompt:
             return jsonify({
@@ -651,10 +651,8 @@ def chatbot():
                 "status": "error"
             }), 400
         
-        # Log the received prompt
-        timestamp = datetime.datetime.now().isoformat()
+        timestamp = datetime.now().isoformat()
         
-        # Store the prompt with metadata
         prompt_data = {
             "prompt": prompt,
             "timestamp": timestamp
@@ -672,8 +670,11 @@ def chatbot():
         response_message = f"{response_message}"
         
         return jsonify({"reply": response_message})
-    except:
-        return "error"
+    except Exception as e:
+        return jsonify({
+            "error": str(e),
+            "status": "error"
+        }), 500
 
 
 if __name__ == '__main__':
