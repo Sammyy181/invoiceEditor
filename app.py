@@ -10,7 +10,9 @@ import threading
 import sys
 from functools import wraps 
 from flask import abort
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from src import agent
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'invoiceEditor')))
 
 month_name = datetime.now().strftime("%B")
 
@@ -602,15 +604,52 @@ def log_invoiced():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+prompts_history = []
+
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
-    data = request.get_json()
-    user_message = data.get("message", "")
+    """Handle chat messages from the frontend"""
+    try:
+        # Get JSON data from request
+        data = request.get_json()
+        
+        if not data or 'prompt' not in data:
+            return jsonify({
+                "error": "No prompt provided",
+                "status": "error"
+            }), 400
+        
+        prompt = data['prompt'].strip()
+        
+        if not prompt:
+            return jsonify({
+                "error": "Empty prompt provided",
+                "status": "error"
+            }), 400
+        
+        # Log the received prompt
+        timestamp = datetime.datetime.now().isoformat()
+        
+        # Store the prompt with metadata
+        prompt_data = {
+            "prompt": prompt,
+            "timestamp": timestamp
+        }
+        prompts_history.append(prompt_data)
+        
+        # For now, just echo back a confirmation
+        # This is where you'd integrate your AI model
+        model_output = agent.get_input(prompt_data)
+        predicted_action = model_output.get("action")
+        response_message = model_output.get("response")  # still a string
+        #response_message = f"I received your message: '{prompt}'. This is where your AI response would go!"
 
-    # Placeholder logic – replace with your assistant's response logic
-    response = "response"  # your function
 
-    return jsonify({"reply": response})
+        response_message = f"{response_message}"
+        
+        return jsonify({"reply": response_message})
+    except:
+        return "error"
 
 
 if __name__ == '__main__':
