@@ -121,6 +121,10 @@ def add_service():
     except Exception as e:
         return f"Failed to create new service: {str(e)}", 500
 
+@app.route('/reports')
+def reports():
+    return render_template('reports.html')
+
 @app.route('/select_feature', methods=['GET', 'POST'])
 def select_feature():
     service = session.get('service')
