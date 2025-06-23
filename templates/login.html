@@ -247,6 +247,38 @@
                 font-size: 1.8rem;
             }
         }
+
+        .flash-container {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .flash-success {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: #b9fbc0;
+            border: 1px solid rgba(76, 175, 80, 0.4);
+        }
+
+        .flash-error {
+            background-color: rgba(255, 77, 79, 0.2);
+            color: #ffbaba;
+            border: 1px solid rgba(255, 77, 79, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
@@ -261,8 +293,20 @@
             <h1 class="login-title">Welcome Back!</h1>
             <p class="login-subtitle">Sign in to your account</p>
         </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
 
-        <form class="login-form" id="loginForm">
+        <form class="login-form" method="POST" action="{{ url_for('login') }}">
             <div class="form-group">
                 <label for="username" class="form-label">Username</label>
                 <input 

@@ -8,10 +8,14 @@ from openpyxl import load_workbook
 from dateutil.relativedelta import relativedelta
 import threading 
 import sys
+from functools import wraps 
+from flask import abort
 
 month_name = datetime.now().strftime("%B")
 
 app = Flask(__name__)
+app.config['SESSION_PERMANENT'] = False  # session ends when browser is closed
+app.config['SESSION_TYPE'] = 'filesystem'
 app.secret_key = 'your-secret-key'
 
 TEMPLATE_FILE = 'template.xlsx'
@@ -32,13 +36,55 @@ first_sheet.title = previous_month_name
 second_sheet.title = month_name
 wb.save(TEMPLATE_FILE)
 
+# Dummy user-role mapping
+USERS = {
+    'admin': {'password': 'adminpass', 'role': 'admin'},
+    'entry': {'password': 'entrypass', 'role': 'data_entry'},
+    'editor': {'password': 'editpass', 'role': 'data_editing'},
+    'viewer': {'password': 'viewpass', 'role': 'only_viewer'}
+}
+
+def require_roles(*roles):
+    def wrapper(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            if 'role' not in session or session['role'] not in roles:
+                # ❌ Return 403 Forbidden
+                return render_template('403.html', role=session.get('role')), 403
+            return f(*args, **kwargs)
+        return decorated
+    return wrapper
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        uname = request.form.get('username', '').strip()
+        pwd = request.form.get('password', '').strip()
+
+        user = USERS.get(uname)
+
+        if user is None:
+            flash('❌ Username does not exist.', 'error')
+            return redirect(url_for('login'))
+
+        if user['password'] != pwd:
+            flash('❌ Incorrect password.', 'error')
+            return redirect(url_for('login'))
+
+        # Successful login
+        session['user'] = uname
+        session['role'] = user['role']
+        flash(f'✅ Logged in as {uname} ({user["role"]})', 'success')
+        return redirect(url_for('select_service'))
+
+    return render_template('login.html')
+
+
 @app.route('/')
 def home():
-    return redirect(url_for('select_service'))
+    session.clear()  # 🔐 Force logout every time the root URL is visited
+    return redirect(url_for('login'))
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
 
 @app.route('/select_service', methods=['GET', 'POST'])
 def select_service():
@@ -49,6 +95,7 @@ def select_service():
     return render_template('select_service.html', services=services)
 
 @app.route('/add_service', methods=['POST'])
+@require_roles('admin', 'data_entry', 'data_editing')
 def add_service():
     service_name = request.form.get('service_name', '').strip()
     
@@ -79,22 +126,28 @@ def select_feature():
     service = session.get('service')
     if not service:
         return redirect(url_for('select_service'))
-    
+
     if request.method == 'POST':
         feature = request.form['feature']
-        
+        role = session.get('role')
+
         if feature == 'update_preferences':
+            if role == 'only_viewer':
+                flash("View-only users cannot update preferences.", "error")
+                return redirect(url_for('select_feature'))
             return redirect(url_for('select_customer'))
+        
         elif feature == 'view_invoice':
             return render_template('coming_soon.html', feature='View Last Generated Invoice')
         elif feature == 'generate_invoice':
             return render_template('coming_soon.html', feature='Generate New Invoice')
         elif feature == 'manage_customer':
             return render_template('coming_soon.html', feature='Add or Delete Customer')
-    
+
     return render_template('select_feature.html', service=service)
 
 @app.route('/select_customer', methods=['GET', 'POST'])
+@require_roles('admin', 'data_editing')
 def select_customer():
     service = session.get('service')
     action = request.form.get('action')
@@ -178,6 +231,7 @@ def select_customer():
     return render_template('select_customer.html', customers=customers, service=service, show_popup=False, tax_config=tax_config)
 
 @app.route('/add_customer', methods=['POST'])
+@require_roles('admin', 'data_entry', 'data_editing')
 def add_customer():
     service = session.get('service')
     
@@ -216,6 +270,7 @@ def get_dropdown_options():
 
 
 @app.route('/update_customer', methods=['POST'])
+@require_roles('admin', 'data_editing')
 def update_customer():
     service = session.get('service')
     customer = session.get('customer')
@@ -312,6 +367,7 @@ def download_invoice_excel():
         return jsonify({'error': str(e)}), 500
             
 @app.route('/admin')
+@require_roles('admin')
 def admin():
     services = get_services()
     return render_template('admin.html', services=services)
