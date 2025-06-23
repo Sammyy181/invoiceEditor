@@ -321,10 +321,10 @@ def your_invoice_function(action, service):
     
     if action == 'view':
         df = pd.read_excel(path, sheet_name=previous_month)
-        df = df.iloc[:-5]  # Exclude last 5 rows which are summary rows
+        df = df.iloc[:-5]  
     else:  
         df = pd.read_excel(path, sheet_name=current_month)  
-        df = df.iloc[:-5]  # Exclude last 5 rows which are summary rows
+        df = df.iloc[:-5]  
     df = df.where(pd.notnull(df), 'N/A')  
     return df
 
@@ -343,6 +343,16 @@ def copy_previous_data(service):
     if current_month in all_sheets:
         df = all_sheets[current_month].copy()
         copied = all_sheets[previous_month].copy()
+        last_columns = df.columns[-2:]
+        last_columns_copied = copied.columns[-2:]
+        normalized = [col.strip().lower() for col in last_columns]
+        normalized_copied = [col.strip().lower() for col in last_columns_copied]
+        
+        if "grand total" in normalized:
+            df = df.iloc[:-5] # Exclude last 5 rows which are summary rows
+        if "grand total" in normalized_copied:
+            copied = copied.iloc[:-5]
+        
         copied[COLUMN_MAP['month']] = current_month
 
         copied[COLUMN_MAP['period']] = pd.to_numeric(copied[COLUMN_MAP['period']], errors='coerce')
@@ -363,6 +373,11 @@ def copy_previous_data(service):
 
     elif previous_month in all_sheets:
         df = all_sheets[previous_month].copy()
+        last_columns = df.columns[-2:]
+        normalized = [col.strip().lower() for col in last_columns]
+        if "grand total" in normalized:
+            df = df.iloc[:-5]  # Exclude last 5 rows which are summary rows
+        
         df[COLUMN_MAP['month']] = current_month
 
         df[COLUMN_MAP['period']] = pd.to_numeric(df[COLUMN_MAP['period']], errors='coerce')
@@ -380,6 +395,28 @@ def copy_previous_data(service):
             df[COLUMN_MAP['unit_price']] / 100
         ).round(2)
     
+    blank_row = pd.DataFrame([[None]*len(df.columns)], columns=df.columns)
+    total = df[COLUMN_MAP['net_price']].sum()
+    try:
+        with open(TAX_CONFIG_FILE, 'r') as f:
+            tax_data = json.load(f)
+            cgst = round(total * tax_data[service]['cgst'], 2)
+            sgst = round(total * tax_data[service]['sgst'], 2)
+    except (FileNotFoundError, KeyError):
+        cgst = round(total * 0.09, 2)
+        sgst = round(total * 0.09, 2)
+    
+    grand_total = round(total + cgst + sgst, 2)
+    
+    summary_cols = df.columns[-2:]
+    summary_rows = pd.DataFrame([
+        {summary_cols[0]: "Net Price", summary_cols[1]: total},
+        {summary_cols[0]: "CGST", summary_cols[1]: cgst},
+        {summary_cols[0]: "SGST", summary_cols[1]: sgst},
+        {summary_cols[0]: "Grand Total", summary_cols[1]: grand_total}
+    ])
+    
+    df = pd.concat([df, blank_row, summary_rows], ignore_index=True)
     all_sheets[current_month] = df
     
     with pd.ExcelWriter(path, engine='openpyxl', mode='w') as writer:
