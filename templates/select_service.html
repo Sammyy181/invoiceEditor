@@ -1111,7 +1111,9 @@
     </form>
 
     <div class="add-service-container">
-      <button id="add-service-button" class="add-service-button" onclick="openAddServicePopup()">+ Add New Service</button>
+      <button id="add-service-button" class="add-service-button" onclick="openAddServicePopup()">
+        + Add New Service
+      </button>
     </div>
   </div>
 
@@ -1124,11 +1126,15 @@
 
   <div class="admin-link-container">
       <a href="#" onclick="fadeAndNavigate('{{ url_for('admin') }}'); return false;" class="admin-link">
-          <i class="fas fa-cog"></i> Admin Panel
+          <i class="fa-solid fa-user-tie"></i> Admin Panel
       </a>
 
       <a href="#" onclick="fadeAndNavigate('{{ url_for('login') }}'); return false;" class="admin-link" style="margin-left: 15px;">
         <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+
+      <a href="#" onclick="fadeAndNavigate('{{ url_for('reports') }}')" class="admin-link" style="margin-left: 15px;">
+        <i class="fa-solid fa-file-invoice"></i> Reports
       </a>
   </div>
 
