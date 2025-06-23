@@ -9,6 +9,8 @@ from dateutil.relativedelta import relativedelta
 import threading 
 import sys
 from functools import wraps 
+from io import BytesIO
+
 from flask import abort
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src import agent
@@ -135,6 +137,28 @@ def reports():
     
     print(f"Service list: {service_list}")
     return render_template('reports.html', services=services, invoiced_data=invoiced_data, service_list=service_list)
+
+@app.route('/download_report')
+def download_report():
+    service = request.args.get('service')
+    quarter = request.args.get('quarter')
+    if service == None or quarter == None:
+        flash("Please select a service and a quarter.", "error")
+        return redirect(url_for('reports'))
+    
+    data = get_quarter_data(service, quarter)
+    
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        data.to_excel(writer, index=False, sheet_name=quarter)
+    output.seek(0)
+
+    filename = f'{service}_{quarter}_report.xlsx'
+    return send_file(output,
+                     download_name=filename,
+                     as_attachment=True,
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    
 
 @app.route('/select_feature', methods=['GET', 'POST'])
 def select_feature():

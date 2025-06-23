@@ -589,4 +589,64 @@ def get_all_invoiced():
             'Q4': Q4
         }
     
-    return all_invoiced            
+    return all_invoiced 
+
+def get_months(quarter):
+    if quarter == 'Q1':
+        return ['January', 'February', 'March']
+    elif quarter == 'Q2':
+        return ['April', 'May', 'June']
+    elif quarter == 'Q3':
+        return ['July', 'August', 'September']
+    elif quarter == 'Q4':
+        return ['October', 'November', 'December']
+    else:
+        raise ValueError(f"Invalid quarter: {quarter}")     
+
+def get_quarter_data(service, quarter):
+    path = f'data/{service}.xlsx'
+    COLUMN_MAP = load_column_map(service)
+    months = get_months(quarter)
+    quarter_data = []
+    
+    for month in months:
+        try:
+            quarter_data.append(get_invoiced(service, month))
+        except Exception as e:
+            print(f"Error getting data for {service} in {month}: {e}")
+            quarter_data.append({
+                'invoiced': {
+                    'customers': 0,
+                    'netPrice': 0
+                },
+                'uninvoiced': {
+                    'customers': 0,
+                    'netPrice': 0
+                }
+            })
+    
+    records = []
+    for i in range(len(months)):
+        month = months[i]
+        data = quarter_data[i]
+        records.append({
+            'Month': month,
+            'Invoiced Customers': data['invoiced']['customers'],
+            'Invoiced Net Price': data['invoiced']['netPrice'],
+            'Uninvoiced Customers': data['uninvoiced']['customers'],
+            'Uninvoiced Net Price': data['uninvoiced']['netPrice']
+        })
+    
+    df = pd.DataFrame(records)
+
+    total_row = {
+        'Month': 'Total',
+        'Invoiced Customers': df['Invoiced Customers'].sum(),
+        'Invoiced Net Price': df['Invoiced Net Price'].sum(),
+        'Uninvoiced Customers': df['Uninvoiced Customers'].sum(),
+        'Uninvoiced Net Price': df['Uninvoiced Net Price'].sum()
+    }
+
+    df.loc[len(df)] = total_row
+    return df
+          

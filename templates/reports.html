@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Service Report</title>
     <style>
         * {
@@ -372,14 +373,19 @@
             margin-top: 50px;
         }
 
-        .back-button {
+        .button-row {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .back-button,
+        .download-button {
             padding: 12px 30px;
-            background: linear-gradient(135deg, #0891B2 0%, #1F2937 100%);
-            color: white;
             border: none;
             border-radius: 25px;
             font-size: 16px;
@@ -387,11 +393,20 @@
             cursor: pointer;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
-            z-index: 1000;
+            color: white;
         }
 
-        .back-button:hover {
-            transform: translateX(-50%) translateY(-3px);
+        .back-button {
+            background: linear-gradient(135deg, #0891B2 0%, #1F2937 100%);
+        }
+
+        .download-button {
+            background: linear-gradient(135deg, #10B981 0%, #1F2937 100%);
+        }
+
+        .back-button:hover,
+        .download-button:hover {
+            transform: translateY(-3px);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
 
@@ -453,219 +468,17 @@
         </div>
     </div>
 
-    <button class="back-button" onclick="fadeAndNavigate('{{ url_for('select_service') }}');">
-        <i class="fa-solid fa-house"></i> Home Page
-    </button>
+    <div class="button-row">
+        <button class="back-button" onclick="fadeAndNavigate('{{ url_for('select_service') }}');">
+            <i class="fa-solid fa-house"></i> Home Page
+        </button>
+
+        <button class="download-button" onclick="downloadReport()">
+            <i class="fa-solid fa-download"></i> Download Report
+        </button>
+    </div>
 
     <script>
-        // Sample data structure
-        /* const serviceData = {
-            'web-hosting': {
-                'Q1': {
-                    months: ['January', 'February', 'March'],
-                    data: [
-                        { invoiced: { customers: 412, netPrice: 45280 }, uninvoiced: { customers: 78, netPrice: 8920 } },
-                        { invoiced: { customers: 438, netPrice: 49170 }, uninvoiced: { customers: 65, netPrice: 7230 } },
-                        { invoiced: { customers: 467, netPrice: 52410 }, uninvoiced: { customers: 89, netPrice: 9840 } }
-                    ]
-                },
-                'Q2': {
-                    months: ['April', 'May', 'June'],
-                    data: [
-                        { invoiced: { customers: 478, netPrice: 53680 }, uninvoiced: { customers: 92, netPrice: 10120 } },
-                        { invoiced: { customers: 501, netPrice: 56230 }, uninvoiced: { customers: 67, netPrice: 7450 } },
-                        { invoiced: { customers: 523, netPrice: 58970 }, uninvoiced: { customers: 73, netPrice: 8190 } }
-                    ]
-                },
-                'Q3': {
-                    months: ['July', 'August', 'September'],
-                    data: [
-                        { invoiced: { customers: 545, netPrice: 61450 }, uninvoiced: { customers: 81, netPrice: 9010 } },
-                        { invoiced: { customers: 567, netPrice: 64120 }, uninvoiced: { customers: 76, netPrice: 8470 } },
-                        { invoiced: { customers: 589, netPrice: 66780 }, uninvoiced: { customers: 84, netPrice: 9360 } }
-                    ]
-                },
-                'Q4': {
-                    months: ['October', 'November', 'December'],
-                    data: [
-                        { invoiced: { customers: 612, netPrice: 69420 }, uninvoiced: { customers: 88, netPrice: 9830 } },
-                        { invoiced: { customers: 634, netPrice: 72150 }, uninvoiced: { customers: 71, netPrice: 7940 } },
-                        { invoiced: { customers: 658, netPrice: 75380 }, uninvoiced: { customers: 95, netPrice: 10570 } }
-                    ]
-                }
-            },
-            'cloud-storage': {
-                'Q1': {
-                    months: ['January', 'February', 'March'],
-                    data: [
-                        { invoiced: { customers: 289, netPrice: 28450 }, uninvoiced: { customers: 43, netPrice: 4230 } },
-                        { invoiced: { customers: 301, netPrice: 29870 }, uninvoiced: { customers: 38, netPrice: 3780 } },
-                        { invoiced: { customers: 315, netPrice: 31290 }, uninvoiced: { customers: 47, netPrice: 4610 } }
-                    ]
-                },
-                'Q2': {
-                    months: ['April', 'May', 'June'],
-                    data: [
-                        { invoiced: { customers: 328, netPrice: 32680 }, uninvoiced: { customers: 52, netPrice: 5120 } },
-                        { invoiced: { customers: 342, netPrice: 34120 }, uninvoiced: { customers: 39, netPrice: 3890 } },
-                        { invoiced: { customers: 356, netPrice: 35670 }, uninvoiced: { customers: 44, netPrice: 4360 } }
-                    ]
-                },
-                'Q3': {
-                    months: ['July', 'August', 'September'],
-                    data: [
-                        { invoiced: { customers: 371, netPrice: 37240 }, uninvoiced: { customers: 48, netPrice: 4750 } },
-                        { invoiced: { customers: 385, netPrice: 38790 }, uninvoiced: { customers: 41, netPrice: 4070 } },
-                        { invoiced: { customers: 399, netPrice: 40450 }, uninvoiced: { customers: 53, netPrice: 5230 } }
-                    ]
-                },
-                'Q4': {
-                    months: ['October', 'November', 'December'],
-                    data: [
-                        { invoiced: { customers: 414, netPrice: 42180 }, uninvoiced: { customers: 56, netPrice: 5540 } },
-                        { invoiced: { customers: 428, netPrice: 43920 }, uninvoiced: { customers: 43, netPrice: 4250 } },
-                        { invoiced: { customers: 443, netPrice: 45780 }, uninvoiced: { customers: 59, netPrice: 5830 } }
-                    ]
-                }
-            },
-            'email-service': {
-                'Q1': {
-                    months: ['January', 'February', 'March'],
-                    data: [
-                        { invoiced: { customers: 723, netPrice: 21690 }, uninvoiced: { customers: 112, netPrice: 3360 } },
-                        { invoiced: { customers: 756, netPrice: 22680 }, uninvoiced: { customers: 98, netPrice: 2940 } },
-                        { invoiced: { customers: 789, netPrice: 23670 }, uninvoiced: { customers: 125, netPrice: 3750 } }
-                    ]
-                },
-                'Q2': {
-                    months: ['April', 'May', 'June'],
-                    data: [
-                        { invoiced: { customers: 812, netPrice: 24360 }, uninvoiced: { customers: 134, netPrice: 4020 } },
-                        { invoiced: { customers: 835, netPrice: 25050 }, uninvoiced: { customers: 107, netPrice: 3210 } },
-                        { invoiced: { customers: 858, netPrice: 25740 }, uninvoiced: { customers: 118, netPrice: 3540 } }
-                    ]
-                },
-                'Q3': {
-                    months: ['July', 'August', 'September'],
-                    data: [
-                        { invoiced: { customers: 881, netPrice: 26430 }, uninvoiced: { customers: 128, netPrice: 3840 } },
-                        { invoiced: { customers: 904, netPrice: 27120 }, uninvoiced: { customers: 111, netPrice: 3330 } },
-                        { invoiced: { customers: 927, netPrice: 27810 }, uninvoiced: { customers: 139, netPrice: 4170 } }
-                    ]
-                },
-                'Q4': {
-                    months: ['October', 'November', 'December'],
-                    data: [
-                        { invoiced: { customers: 950, netPrice: 28500 }, uninvoiced: { customers: 145, netPrice: 4350 } },
-                        { invoiced: { customers: 973, netPrice: 29190 }, uninvoiced: { customers: 122, netPrice: 3660 } },
-                        { invoiced: { customers: 996, netPrice: 29880 }, uninvoiced: { customers: 156, netPrice: 4680 } }
-                    ]
-                }
-            },
-            'cdn': {
-                'Q1': {
-                    months: ['January', 'February', 'March'],
-                    data: [
-                        { invoiced: { customers: 145, netPrice: 18270 }, uninvoiced: { customers: 23, netPrice: 2890 } },
-                        { invoiced: { customers: 152, netPrice: 19240 }, uninvoiced: { customers: 19, netPrice: 2380 } },
-                        { invoiced: { customers: 159, netPrice: 20110 }, uninvoiced: { customers: 26, netPrice: 3290 } }
-                    ]
-                },
-                'Q2': {
-                    months: ['April', 'May', 'June'],
-                    data: [
-                        { invoiced: { customers: 167, netPrice: 21240 }, uninvoiced: { customers: 29, netPrice: 3670 } },
-                        { invoiced: { customers: 174, netPrice: 22150 }, uninvoiced: { customers: 22, netPrice: 2780 } },
-                        { invoiced: { customers: 181, netPrice: 23170 }, uninvoiced: { customers: 25, netPrice: 3150 } }
-                    ]
-                },
-                'Q3': {
-                    months: ['July', 'August', 'September'],
-                    data: [
-                        { invoiced: { customers: 189, netPrice: 24280 }, uninvoiced: { customers: 27, netPrice: 3430 } },
-                        { invoiced: { customers: 196, netPrice: 25340 }, uninvoiced: { customers: 21, netPrice: 2690 } },
-                        { invoiced: { customers: 203, netPrice: 26510 }, uninvoiced: { customers: 30, netPrice: 3810 } }
-                    ]
-                },
-                'Q4': {
-                    months: ['October', 'November', 'December'],
-                    data: [
-                        { invoiced: { customers: 211, netPrice: 27620 }, uninvoiced: { customers: 32, netPrice: 4190 } },
-                        { invoiced: { customers: 218, netPrice: 28780 }, uninvoiced: { customers: 24, netPrice: 3180 } },
-                        { invoiced: { customers: 225, netPrice: 29950 }, uninvoiced: { customers: 35, netPrice: 4590 } }
-                    ]
-                }
-            },
-            'database': {
-                'Q1': {
-                    months: ['January', 'February', 'March'],
-                    data: [
-                        { invoiced: { customers: 178, netPrice: 53420 }, uninvoiced: { customers: 28, netPrice: 8460 } },
-                        { invoiced: { customers: 186, netPrice: 55940 }, uninvoiced: { customers: 23, netPrice: 6920 } },
-                        { invoiced: { customers: 194, netPrice: 58340 }, uninvoiced: { customers: 31, netPrice: 9370 } }
-                    ]
-                },
-                'Q2': {
-                    months: ['April', 'May', 'June'],
-                    data: [
-                        { invoiced: { customers: 203, netPrice: 61120 }, uninvoiced: { customers: 34, netPrice: 10180 } },
-                        { invoiced: { customers: 211, netPrice: 63570 }, uninvoiced: { customers: 26, netPrice: 7840 } },
-                        { invoiced: { customers: 219, netPrice: 66190 }, uninvoiced: { customers: 29, netPrice: 8720 } }
-                    ]
-                },
-                'Q3': {
-                    months: ['July', 'August', 'September'],
-                    data: [
-                        { invoiced: { customers: 228, netPrice: 68940 }, uninvoiced: { customers: 32, netPrice: 9580 } },
-                        { invoiced: { customers: 236, netPrice: 71520 }, uninvoiced: { customers: 27, netPrice: 8190 } },
-                        { invoiced: { customers: 244, netPrice: 74280 }, uninvoiced: { customers: 35, netPrice: 10470 } }
-                    ]
-                },
-                'Q4': {
-                    months: ['October', 'November', 'December'],
-                    data: [
-                        { invoiced: { customers: 253, netPrice: 77150 }, uninvoiced: { customers: 38, netPrice: 11250 } },
-                        { invoiced: { customers: 261, netPrice: 79890 }, uninvoiced: { customers: 30, netPrice: 9070 } },
-                        { invoiced: { customers: 269, netPrice: 82840 }, uninvoiced: { customers: 41, netPrice: 12340 } }
-                    ]
-                }
-            },
-            'analytics': {
-                'Q1': {
-                    months: ['January', 'February', 'March'],
-                    data: [
-                        { invoiced: { customers: 67, netPrice: 35150 }, uninvoiced: { customers: 12, netPrice: 6120 } },
-                        { invoiced: { customers: 71, netPrice: 37290 }, uninvoiced: { customers: 9, netPrice: 4650 } },
-                        { invoiced: { customers: 75, netPrice: 39570 }, uninvoiced: { customers: 14, netPrice: 7340 } }
-                    ]
-                },
-                'Q2': {
-                    months: ['April', 'May', 'June'],
-                    data: [
-                        { invoiced: { customers: 79, netPrice: 41820 }, uninvoiced: { customers: 16, netPrice: 8290 } },
-                        { invoiced: { customers: 83, netPrice: 44150 }, uninvoiced: { customers: 11, netPrice: 5670 } },
-                        { invoiced: { customers: 87, netPrice: 46590 }, uninvoiced: { customers: 13, netPrice: 6920 } }
-                    ]
-                },
-                'Q3': {
-                    months: ['July', 'August', 'September'],
-                    data: [
-                        { invoiced: { customers: 92, netPrice: 49220 }, uninvoiced: { customers: 15, netPrice: 7850 } },
-                        { invoiced: { customers: 96, netPrice: 51740 }, uninvoiced: { customers: 12, netPrice: 6340 } },
-                        { invoiced: { customers: 100, netPrice: 54380 }, uninvoiced: { customers: 17, netPrice: 8930 } }
-                    ]
-                },
-                'Q4': {
-                    months: ['October', 'November', 'December'],
-                    data: [
-                        { invoiced: { customers: 105, netPrice: 57190 }, uninvoiced: { customers: 19, netPrice: 9780 } },
-                        { invoiced: { customers: 109, netPrice: 59840 }, uninvoiced: { customers: 14, netPrice: 7420 } },
-                        { invoiced: { customers: 113, netPrice: 62670 }, uninvoiced: { customers: 21, netPrice: 10830 } }
-                    ]
-                }
-            }
-        }; */
-
         const serviceData = {{ invoiced_data | tojson }};
         console.log("Invoiced Data:", serviceData);
         const serviceNames = {{ service_list | tojson }};
@@ -797,6 +610,18 @@
 
         function getServiceName(serviceKey) {
             return serviceNames[serviceKey] || serviceKey;
+        }
+
+        function downloadReport(){
+            const service = serviceSelect.value;
+            if (!service) {
+                alert('Please select a service to download the report.');
+                return;
+            }
+            const activeQuarterBtn = document.querySelector('.quarter-btn.active');
+            const quarter = activeQuarterBtn ? activeQuarterBtn.dataset.quarter : 'Q4';
+            const url = `/download_report?service=${encodeURIComponent(service)}&quarter=${encodeURIComponent(quarter)}`;
+            window.location.href = url;
         }
 
         function fadeAndNavigate(url) {
