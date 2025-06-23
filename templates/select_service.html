@@ -1043,6 +1043,35 @@
         transform: translateY(-2px);
         box-shadow: 0 10px 20px rgba(46, 49, 146, 0.3);
     }
+
+    #chatbot-wrapper {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    #chatbot-frame {
+      width: 400px;
+      height: 500px;
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      display: none;
+    }
+
+    #chatbot-toggle {
+      background: #6c5ce7;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
   </style>
 </head>
 <body>
@@ -1087,6 +1116,13 @@
       </button>
     </div>
   </div>
+
+  
+  <div id="chatbot-wrapper">
+    <iframe id="chatbot-frame" src="http://127.0.0.1:8000"></iframe>
+    <button id="chatbot-toggle" onclick="toggleChatbot()">💬</button>
+  </div>
+
 
   <div class="admin-link-container">
       <a href="#" onclick="fadeAndNavigate('{{ url_for('admin') }}'); return false;" class="admin-link">
@@ -1451,6 +1487,11 @@
         closeInvoicePopup();
       }
     });
+
+    function toggleChatbot() {
+      const frame = document.getElementById('chatbot-frame');
+      frame.style.display = frame.style.display === 'none' ? 'block' : 'none';
+    }
 
   </script>
 
