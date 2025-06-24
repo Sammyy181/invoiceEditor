@@ -1284,6 +1284,50 @@
     .chatbot-invoice-table th {
       background-color: #f3f4f6;
     }
+
+    .dot-typing {
+      display: inline-block;
+      width: 60px;
+      height: 20px;
+      position: relative;
+    }
+
+    .dot-typing::before,
+    .dot-typing::after,
+    .dot-typing div {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #667eea;
+      animation: dotTyping 1.4s infinite ease-in-out both;
+    }
+
+    .dot-typing::before {
+      left: 0;
+      animation-delay: -0.32s;
+    }
+
+    .dot-typing div {
+      left: 24px;
+      animation-delay: -0.16s;
+    }
+
+    .dot-typing::after {
+      left: 48px;
+    }
+
+    @keyframes dotTyping {
+      0%, 80%, 100% {
+        transform: scale(0);
+      } 
+      40% {
+        transform: scale(1);
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1727,12 +1771,18 @@
 
     function appendMessage(sender, text) {
       const msgContainer = document.getElementById("chatbot-messages");
+
       const msg = document.createElement("div");
-      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      msg.style.marginBottom = "10px";
+      msg.className = `message ${sender.toLowerCase()}`;
+
+      // Add bold sender label
+      const label = `<strong>${sender}:</strong><br>`;
+      msg.innerHTML = label + text;
+
       msgContainer.appendChild(msg);
       msgContainer.scrollTop = msgContainer.scrollHeight;
     }
+
 
     function sendChatMessage() {
       const input = document.getElementById("chatbot-input");
@@ -1742,30 +1792,37 @@
       appendMessage("You", text);
       input.value = "";
 
+      const msgContainer = document.getElementById("chatbot-messages");
+
+      // Add loading spinner
+      const loadingMsg = document.createElement("div");
+      loadingMsg.className = "message bot typing";
+      loadingMsg.innerHTML = `<div class="dot-typing"></div>`;
+      msgContainer.appendChild(loadingMsg);
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+
       fetch("/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text })
       })
-      .then(res => res.json())
-      .then(data => {
-        appendMessage("Bot", data.reply);
-      })
-      .catch(err => {
-        console.error("Error:", err);
-        appendMessage("Bot", "Sorry, there was an error.");
-      })
-      .then(data => {
-        if (data.reply) {
-          appendMessage("Bot", data.reply);
-        }
-
-        // If structured form response
-        if (data.fields) {
-          showDynamicForm(data.form_title, data.fields);
-        }
-      });
+        .then(res => res.json())
+        .then(data => {
+          loadingMsg.remove(); // Remove spinner
+          if (data.reply) {
+            appendMessage("Bot", data.reply);
+          }
+          if (data.fields) {
+            showDynamicForm(data.form_title || "Fill Details", data.fields);
+          }
+        })
+        .catch(err => {
+          loadingMsg.remove();
+          console.error("Error:", err);
+          appendMessage("Bot", "❌ Something went wrong.");
+        });
     }
+
 
   function showDynamicForm(title, fields) {
     const container = document.getElementById("chatbot-messages");
