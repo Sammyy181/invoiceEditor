@@ -355,8 +355,6 @@ def get_invoice_data():
         
         df = your_invoice_function(action, service) 
         df.drop(['Month'], axis=1, inplace=True, errors='ignore')
-        df = df.iloc[:-5]
-        #print(df)
         
         net_total = df['Net Price'].sum()
         
