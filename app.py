@@ -272,7 +272,9 @@ def select_customer():
 @app.route('/add_customer', methods=['POST'])
 @require_roles('admin', 'data_entry', 'data_editing')
 def add_customer():
-    service = session.get('service')
+    print(f"Request is {request.form}")
+    service = session.get('service') or request.form.get('service')
+    session['service'] = service
     
     name = request.form['customer_name']
     price = float(request.form['unit_price'])
@@ -283,7 +285,7 @@ def add_customer():
     other_data = {}
     
     try:
-        columns =load_service_columns(service)
+        columns = load_service_columns(service)
     except Exception as e:
         flash(f"Failed to load field configuration: {str(e)}", "error")
         return redirect(url_for('select_customer'))
