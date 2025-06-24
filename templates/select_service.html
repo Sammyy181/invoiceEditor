@@ -1267,6 +1267,23 @@
         bottom: 20px;
       }
     }
+
+    .chatbot-invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .chatbot-invoice-table th,
+    .chatbot-invoice-table td {
+      border: 1px solid #ccc;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    .chatbot-invoice-table th {
+      background-color: #f3f4f6;
+    }
   </style>
 </head>
 <body>
@@ -1737,9 +1754,70 @@
       .catch(err => {
         console.error("Error:", err);
         appendMessage("Bot", "Sorry, there was an error.");
+      })
+      .then(data => {
+        if (data.reply) {
+          appendMessage("Bot", data.reply);
+        }
+
+        // If structured form response
+        if (data.fields) {
+          showDynamicForm(data.form_title, data.fields);
+        }
       });
     }
 
+  function showDynamicForm(title, fields) {
+    const container = document.getElementById("chatbot-messages");
+
+    const form = document.createElement("form");
+    form.classList.add("chatbot-form");
+
+    const heading = document.createElement("h4");
+    heading.innerText = title;
+    form.appendChild(heading);
+
+    fields.forEach(field => {
+      const label = document.createElement("label");
+      label.innerText = field.label;
+      label.htmlFor = field.id;
+      
+      const input = document.createElement("input");
+      input.type = field.type || "text";
+      input.name = field.id;
+      input.id = field.id;
+      input.required = true;
+
+      form.appendChild(label);
+      form.appendChild(input);
+    });
+
+    const submit = document.createElement("button");
+    submit.type = "submit";
+    submit.innerText = "Add Customer";
+    form.appendChild(submit);
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(form));
+      fetch("/add_customer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        appendMessage("Bot", data.message || "✅ Customer added.");
+        form.remove(); // clean up
+      })
+      .catch(err => {
+        appendMessage("Bot", "❌ Error submitting customer.");
+      });
+    };
+
+    container.appendChild(form);
+    container.scrollTop = container.scrollHeight;
+  }
 
   </script>
 </body>
