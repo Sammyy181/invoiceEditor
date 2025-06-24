@@ -1386,9 +1386,11 @@
     </form>
 
     <div class="add-service-container">
-      <button id="add-service-button" class="add-service-button" onclick="openAddServicePopup()">
-        + Add New Service
-      </button>
+      {% if session['role'] != 'only_viewer' %}
+        <button id="add-service-button" class="add-service-button" onclick="openAddServicePopup()">
+          + Add New Service
+        </button>
+      {% endif %}
     </div>
   </div>
 
