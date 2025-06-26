@@ -313,8 +313,12 @@ def get_dropdown_options():
 @app.route('/update_customer', methods=['POST'])
 @require_roles('admin', 'data_editing')
 def update_customer():
-    service = session.get('service')
-    customer = session.get('customer')
+    service = session.get('service') or request.form.get('service')
+    customer = session.get('customer') or request.form.get('customer')
+    print(customer)
+    session['service'] = service
+    session['customer'] = customer
+    print(request.form)
 
     if not service or not customer:
         flash("Session expired or invalid. Please select a customer again.", "error")

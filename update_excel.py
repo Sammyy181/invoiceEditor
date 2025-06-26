@@ -281,6 +281,7 @@ def update_customer_info(service, customer_name, updates):
         float(df.at[idx, COLUMN_MAP['usage']]) *
         float(df.at[idx, COLUMN_MAP['unit_price']]) / 100
     ), 2)
+    df.at[idx, 'invoiced'] = 0
     
     blank_row = pd.DataFrame([[None]*len(df.columns)], columns=df.columns)
     total = df[COLUMN_MAP['net_price']].sum()
