@@ -476,6 +476,10 @@
         <button class="download-button" onclick="downloadReport()">
             <i class="fa-solid fa-download"></i> Download Report
         </button>
+
+        <button class="download-button" onclick="sendConfiguredMail()">
+            <i class="fa-solid fa-paper-plane"></i> Send Report Mail
+        </button>
     </div>
 
     <script>
@@ -632,6 +636,46 @@
                 window.location.href = url;
             }, 300);
         }
+
+        async function sendConfiguredMail() {
+            const service = document.getElementById('serviceSelect').value;
+            if (!service) {
+                alert('Please select a service before sending the mail.');
+                return;
+            }
+
+            const activeQuarterBtn = document.querySelector('.quarter-btn.active');
+            const quarter = activeQuarterBtn ? activeQuarterBtn.dataset.quarter : 'Q4';
+
+            // Prompt the user for their email app password
+            const emailPassword = prompt("Enter the email app password to send this report:");
+
+            if (!emailPassword) {
+                alert('Sending cancelled — no password entered.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/send-mail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ service, quarter, password: emailPassword })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message || 'Mail sent successfully!');
+                } else {
+                    alert(result.error || 'Failed to send mail.');
+                }
+            } catch (error) {
+                console.error('Mail sending failed:', error);
+                alert('Network error occurred while sending mail.');
+            }
+        }
+
     </script>
 </body>
 </html>

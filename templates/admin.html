@@ -476,6 +476,7 @@
             <button class="tab-button" onclick="showTab('custom-columns')">Custom Columns</button>
             <button class="tab-button" onclick="showTab('fixed-columns')">Fixed Columns</button>
             <button class="tab-button" onclick="showTab('new-feature')">Categories</button>
+            <button class="tab-button" onclick="showTab('mail-config')">Mail Configuration</button>
         </div>
     </div>
 
@@ -594,6 +595,39 @@
         </div>
     </div>
 
+    <div id="mail-config" class="tab-content">
+        <div class="grid-layout">
+            <div class="container">
+                <h1 class="form-title">Mail Configuration</h1>
+
+                <h3 style="color: #2e3192;">Report Mails</h3>
+                <div class="form-group">
+                    <label for="reportSender">Sender Email</label>
+                    <input type="text" id="reportSender" placeholder="Enter report sender email">
+                </div>
+                <div class="form-group">
+                    <label for="reportRecipient">Recipient Email</label>
+                    <input type="text" id="reportRecipient" placeholder="Enter report recipient email">
+                </div>
+
+                <h3 style="color: #2e3192; margin-top: 30px;">Invoice Mails</h3>
+                <div class="form-group">
+                    <label for="invoiceSender">Sender Email</label>
+                    <input type="text" id="invoiceSender" placeholder="Enter invoice sender email">
+                </div>
+                <div class="form-group">
+                    <label for="invoiceRecipient">Recipient Email</label>
+                    <input type="text" id="invoiceRecipient" placeholder="Enter invoice recipient email">
+                </div>
+
+                <div class="form-actions">
+                    <button class="save-button" onclick="saveMailConfig()">Save</button>
+                    <button class="cancel-button" onclick="loadMailConfig()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="back-button-container">
         <a href="#" onclick="fadeAndNavigate('/select_service'); return false;">
             Go Back
@@ -606,6 +640,7 @@
         let categories = [];
         let selectedService = '';
         let editingId = null;
+
 
         function showTab(tabName) {
             const tabContents = document.querySelectorAll('.tab-content');
@@ -1008,6 +1043,57 @@
                 alert('Network error occurred');
             }
         }
+
+        async function loadMailConfig() {
+            try {
+                const response = await fetch('/api/mail-config');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('reportSender').value = data.report_sender || '';
+                    document.getElementById('reportRecipient').value = data.report_recipient || '';
+                    document.getElementById('invoiceSender').value = data.invoice_sender || '';
+                    document.getElementById('invoiceRecipient').value = data.invoice_recipient || '';
+                }
+            } catch (error) {
+                console.error('Failed to load mail config:', error);
+            }
+        }
+
+        async function saveMailConfig() {
+            const config = {
+                report_sender: document.getElementById('reportSender').value.trim(),
+                report_recipient: document.getElementById('reportRecipient').value.trim(),
+                invoice_sender: document.getElementById('invoiceSender').value.trim(),
+                invoice_recipient: document.getElementById('invoiceRecipient').value.trim(),
+            };
+
+            if (!config.report_sender || !config.report_recipient || !config.invoice_sender || !config.invoice_recipient) {
+                alert('Please fill in all email fields.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/mail-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                if (response.ok) {
+                    alert('Mail configuration saved successfully!');
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Failed to save mail configuration');
+                }
+            } catch (error) {
+                console.error('Failed to save mail config:', error);
+                alert('Network error occurred');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadMailConfig();
+        });
 
     </script>
 </body>
