@@ -1541,6 +1541,7 @@
 
   <script>
     let selectedService = '';
+    let chatbotInitialized = false;
 
     function openPopup(service) {
       selectedService = service;
@@ -1866,6 +1867,19 @@
     function toggleChatbot() {
       const bot = document.getElementById("chatbot-container");
       bot.classList.toggle("hidden");
+
+      if (!chatbotInitialized && !bot.classList.contains("hidden")) {
+          appendMessage("Bot", `👋 Hey there! I'm here to make managing your services a breeze. Here's what I can help you with:<br><ul>
+            <li>➕ Add a new service</li>
+            <li>📋 List all available services</li>
+            <li>📆 View last month's or the current month's invoice</li>
+            <li>📝 Copy data from the previous month</li>
+            <li>👥 List customers in a service</li>
+            <li>✏️ Add or edit customer details</li>
+            <li>💰 Update tax rates</li>
+          </ul><br>Just type what you'd like to do, and I’ll guide you through it! 😊`);
+          chatbotInitialized = true;
+      }
     }
 
 

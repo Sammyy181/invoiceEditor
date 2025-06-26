@@ -1608,6 +1608,7 @@
     </div>
 
     <script>
+        let chatbotInitialized = false;
 
         function fadeAndNavigate(url) {
             document.body.style.transition = 'opacity 0.3s ease-out';
@@ -1783,6 +1784,11 @@
         function toggleChatbot() {
             const bot = document.getElementById("chatbot-container");
             bot.classList.toggle("hidden");
+            }
+
+            if (!chatbotInitialized && !bot.classList.contains("hidden")) {
+                appendMessage("Bot", "👋 Hi there! How can I help you today?");
+                chatbotInitialized = true;
             }
 
 
