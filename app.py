@@ -10,6 +10,10 @@ import threading
 import sys
 from functools import wraps 
 from io import BytesIO
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
+import smtplib
 
 from flask import abort
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -158,7 +162,100 @@ def download_report():
                      download_name=filename,
                      as_attachment=True,
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    
+
+def generate_report_excel_file(service, quarter):
+    data = get_quarter_data(service, quarter)  # same as in download_report
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        data.to_excel(writer, index=False, sheet_name=quarter)
+    output.seek(0)
+    return output
+
+def get_invoice_dataframe(action, service):
+    df = your_invoice_function(action, service)  # existing logic
+    df.drop(['Month'], axis=1, inplace=True, errors='ignore')
+
+    net_total = df['Net Price'].sum()
+
+    tax_config = get_service_tax(service)
+    SGST_RATE = tax_config['sgst']
+    CGST_RATE = tax_config['cgst']
+
+    sgst_amount = net_total * SGST_RATE
+    cgst_amount = net_total * CGST_RATE
+    grand_total = net_total + sgst_amount + cgst_amount
+
+    # Append summary row to df
+    summary_row = {
+        'Net Price': round(net_total, 2),
+        'SGST': round(sgst_amount, 2),
+        'CGST': round(cgst_amount, 2),
+        'Total': round(grand_total, 2)
+    }
+    df = pd.concat([df, pd.DataFrame([summary_row])], ignore_index=True)
+
+    return df
+
+@app.route('/api/send-invoice-mail', methods=['POST'])
+def send_invoice_mail():
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.application import MIMEApplication
+    from email.mime.text import MIMEText
+
+    data = request.get_json()
+    service = data.get('service')
+    invoice_type = data.get('type')  # "view" or "generate"
+    password = data.get('password')
+
+    if not service or not invoice_type or not password:
+        return jsonify(error="Missing required fields"), 400
+
+    # Load sender/recipient
+    try:
+        with open('mail_config.json', 'r') as f:
+            config = json.load(f)
+            sender = config.get('invoice_sender')
+            recipient = config.get('invoice_recipient')
+    except:
+        return jsonify(error="Mail config missing or invalid"), 500
+
+    if not sender or not recipient:
+        return jsonify(error="Sender/recipient not configured"), 500
+
+    # Create email
+    msg = MIMEMultipart()
+    msg['From'] = sender
+    msg['To'] = recipient
+    msg['Subject'] = f"Invoice for {service} – {invoice_type.title()} Month"
+
+    body = f"Dear recipient,\n\nAttached is the invoice for {service} – {invoice_type.title()}.\n\nRegards,\nInvoice Assistant"
+    msg.attach(MIMEText(body, 'plain'))
+
+    # Generate invoice Excel (reuse your logic)
+    try:
+        df = get_invoice_dataframe(invoice_type, service)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index=False, sheet_name='Invoice')
+        output.seek(0)
+
+        filename = f"{service}_{invoice_type}_invoice.xlsx"
+        attachment = MIMEApplication(output.read(), _subtype="xlsx")
+        attachment.add_header('Content-Disposition', 'attachment', filename=filename)
+        msg.attach(attachment)
+    except Exception as e:
+        return jsonify(error=f"Error generating invoice: {str(e)}"), 500
+
+
+    # Send email
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(sender, password)
+            server.sendmail(sender, recipient, msg.as_string())
+        return jsonify(message="Invoice mail sent successfully!")
+    except Exception as e:
+        return jsonify(error=f"Failed to send mail: {str(e)}"), 500
+
 
 @app.route('/select_feature', methods=['GET', 'POST'])
 def select_feature():
@@ -633,6 +730,73 @@ def log_invoiced():
         return jsonify({'error': str(e)}), 500
     
 prompts_history = []
+MAIL_CONFIG_FILE = 'mail_config.json'
+
+@app.route('/api/mail-config', methods=['GET'])
+def get_mail_config():
+    if os.path.exists(MAIL_CONFIG_FILE):
+        with open(MAIL_CONFIG_FILE, 'r') as f:
+            return jsonify(json.load(f))
+    return jsonify({
+        "report_sender": "",
+        "report_recipient": "",
+        "invoice_sender": "",
+        "invoice_recipient": ""
+    })
+
+@app.route('/api/mail-config', methods=['POST'])
+def save_mail_config():
+    data = request.get_json()
+    with open(MAIL_CONFIG_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+    return jsonify(success=True)
+
+@app.route('/api/send-mail', methods=['POST'])
+def send_configured_report_mail():
+    data = request.get_json()
+    service = data.get('service')
+    quarter = data.get('quarter')
+    password = data.get('password')
+
+    if not service or not quarter or not password:
+        return jsonify(error="Missing required fields"), 400
+
+    # Load mail config
+    with open('mail_config.json') as f:
+        config = json.load(f)
+
+    sender = config.get('report_sender')
+    recipient = config.get('report_recipient')
+
+    if not sender or not recipient:
+        return jsonify(error="Sender or recipient email not configured"), 400
+
+    # Build email
+    msg = MIMEMultipart()
+    msg['From'] = sender
+    msg['To'] = recipient
+    msg['Subject'] = f"Service Report: {service} - {quarter} 2025"
+    msg.attach(MIMEText(f"Hi,\n\nAttached is the Excel report for {service} - {quarter}.\n\nRegards,\nInvoice Assistant", 'plain'))
+
+    # ✅ Generate and attach Excel
+    try:
+        report_file = generate_report_excel_file(service, quarter)
+        filename = f"{service}_{quarter}_report.xlsx"
+        attachment = MIMEApplication(report_file.read(), _subtype="xlsx")
+        attachment.add_header('Content-Disposition', 'attachment', filename=filename)
+        msg.attach(attachment)
+    except Exception as e:
+        return jsonify(error=f"Failed to generate Excel file: {str(e)}"), 500
+
+    # Send the email
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(sender, password)
+            server.sendmail(sender, recipient, msg.as_string())
+        return jsonify(message="Mail with report sent successfully!")
+    except Exception as e:
+        return jsonify(error=f"Failed to send mail: {str(e)}"), 500
+    
 
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
