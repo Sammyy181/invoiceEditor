@@ -1,20 +1,21 @@
 @echo off
+setlocal
 
-REM Activate the virtual environment
-call venv\Scripts\activate
+set VENV_DIR=venv
 
-REM Start the Flask app in a new window
-start "" python app.py
+echo Activating virtual environment
+call %VENV_DIR%\Scripts\activate.bat
 
-REM Wait until server is reachable
-:waitloop
-curl -s --head http://127.0.0.1:7000 >nul
-if errorlevel 1 (
-    timeout /t 1 /nobreak >nul
-    goto waitloop
-)
+echo Starting Ollama server...
+start /min ollama serve
 
-REM Open browser after server is ready
-start "" "http://127.0.0.1:7000"
+echo Waiting for Ollama to initialize...
+timeout /t 5 >nul
 
-exit
+echo Starting your application...
+python app.py
+
+REM Optional: stop Ollama when done
+REM taskkill /IM ollama.exe /F
+
+pause

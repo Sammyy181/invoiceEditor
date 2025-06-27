@@ -1,21 +1,24 @@
 @echo off
-SET VENV_NAME=venv
+setlocal
 
-echo Creating virtual environment...
-python -m venv %VENV_NAME%
+set VENV_DIR=venv
 
-echo Activating virtual environment...
-call %VENV_NAME%\Scripts\activate
+echo [1/5] Creating virtual environment in %VENV_DIR%
+python -m venv %VENV_DIR%
 
-echo Installing dependencies from requirements.txt...
+echo [2/5] Activating virtual environment
+call %VENV_DIR%\Scripts\activate.bat
+
+echo [3/5] Installing Python packages
 pip install --upgrade pip
 pip install -r requirements.txt
 
-echo.
-echo ✅ Setup complete!
-echo Run your app using:
-echo.
-echo     call %VENV_NAME%\Scripts\activate
-echo     python app.py
-echo.
+echo [4/5] Installing Ollama...
+powershell -Command "Invoke-WebRequest https://ollama.com/download/OllamaSetup.exe -OutFile OllamaSetup.exe"
+start /wait OllamaSetup.exe /silent
+
+echo [5/5] Pulling Mistral model
+ollama pull mistral
+
+echo Setup complete.
 pause
