@@ -23,7 +23,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'invoice
 month_name = datetime.now().strftime("%B")
 
 app = Flask(__name__)
-app.config['SESSION_PERMANENT'] = False  # session ends when browser is closed
+app.config['SESSION_PERMANENT'] = False 
 app.config['SESSION_TYPE'] = 'filesystem'
 app.secret_key = 'your-secret-key'
 
@@ -45,7 +45,6 @@ first_sheet.title = previous_month_name
 second_sheet.title = month_name
 wb.save(TEMPLATE_FILE)
 
-# Dummy user-role mapping
 USERS = {
     'admin': {'password': 'adminpass', 'role': 'admin'},
     'entry': {'password': 'entrypass', 'role': 'data_entry'},
@@ -58,7 +57,6 @@ def require_roles(*roles):
         @wraps(f)
         def decorated(*args, **kwargs):
             if 'role' not in session or session['role'] not in roles:
-                # ❌ Return 403 Forbidden
                 return render_template('403.html', role=session.get('role')), 403
             return f(*args, **kwargs)
         return decorated
@@ -80,7 +78,6 @@ def login():
             flash('❌ Incorrect password.', 'error')
             return redirect(url_for('login'))
 
-        # Successful login
         session['user'] = uname
         session['role'] = user['role']
         flash(f'✅ Logged in as {uname} ({user["role"]})', 'success')
@@ -91,7 +88,7 @@ def login():
 
 @app.route('/')
 def home():
-    session.clear()  # 🔐 Force logout every time the root URL is visited
+    session.clear() 
     return redirect(url_for('login'))
 
 
@@ -164,7 +161,7 @@ def download_report():
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 def generate_report_excel_file(service, quarter):
-    data = get_quarter_data(service, quarter)  # same as in download_report
+    data = get_quarter_data(service, quarter) 
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         data.to_excel(writer, index=False, sheet_name=quarter)
@@ -172,7 +169,7 @@ def generate_report_excel_file(service, quarter):
     return output
 
 def get_invoice_dataframe(action, service):
-    df = your_invoice_function(action, service)  # existing logic
+    df = your_invoice_function(action, service)
     df.drop(['Month'], axis=1, inplace=True, errors='ignore')
 
     net_total = df['Net Price'].sum()
@@ -185,7 +182,6 @@ def get_invoice_dataframe(action, service):
     cgst_amount = net_total * CGST_RATE
     grand_total = net_total + sgst_amount + cgst_amount
 
-    # Append summary row to df
     summary_row = {
         'Net Price': round(net_total, 2),
         'SGST': round(sgst_amount, 2),
@@ -204,7 +200,7 @@ def send_invoice_mail():
 
     data = request.get_json()
     service = data.get('service')
-    invoice_type = data.get('type')  # "view" or "generate"
+    invoice_type = data.get('type') 
     password = data.get('password')
 
     if not service or not invoice_type or not password:
@@ -222,7 +218,6 @@ def send_invoice_mail():
     if not sender or not recipient:
         return jsonify(error="Sender/recipient not configured"), 500
 
-    # Create email
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = recipient
@@ -231,7 +226,6 @@ def send_invoice_mail():
     body = f"Dear recipient,\n\nAttached is the invoice for {service} – {invoice_type.title()}.\n\nRegards,\nInvoice Assistant"
     msg.attach(MIMEText(body, 'plain'))
 
-    # Generate invoice Excel (reuse your logic)
     try:
         df = get_invoice_dataframe(invoice_type, service)
         output = BytesIO()
@@ -246,8 +240,6 @@ def send_invoice_mail():
     except Exception as e:
         return jsonify(error=f"Error generating invoice: {str(e)}"), 500
 
-
-    # Send email
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(sender, password)
@@ -287,7 +279,7 @@ def select_feature():
 def select_customer():
     service = session.get('service')
     action = request.form.get('action')
-    selected_customer = request.form.get('customer')
+    selected_customer = request.form.get('customer_name') or request.form.get('customer')
     customers = get_customers(service)
     if service:
         tax_config = get_service_tax(service)
@@ -761,7 +753,6 @@ def send_configured_report_mail():
     if not service or not quarter or not password:
         return jsonify(error="Missing required fields"), 400
 
-    # Load mail config
     with open('mail_config.json') as f:
         config = json.load(f)
 
@@ -771,14 +762,12 @@ def send_configured_report_mail():
     if not sender or not recipient:
         return jsonify(error="Sender or recipient email not configured"), 400
 
-    # Build email
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = recipient
     msg['Subject'] = f"Service Report: {service} - {quarter} 2025"
     msg.attach(MIMEText(f"Hi,\n\nAttached is the Excel report for {service} - {quarter}.\n\nRegards,\nInvoice Assistant", 'plain'))
 
-    # ✅ Generate and attach Excel
     try:
         report_file = generate_report_excel_file(service, quarter)
         filename = f"{service}_{quarter}_report.xlsx"
@@ -788,7 +777,6 @@ def send_configured_report_mail():
     except Exception as e:
         return jsonify(error=f"Failed to generate Excel file: {str(e)}"), 500
 
-    # Send the email
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(sender, password)
@@ -800,9 +788,7 @@ def send_configured_report_mail():
 
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
-    """Handle chat messages from the frontend"""
     try:
-        # Get JSON data from request
         data = request.get_json()
         
         if not data or 'message' not in data:
@@ -827,13 +813,8 @@ def chatbot():
         }
         prompts_history.append(prompt_data)
         
-        # For now, just echo back a confirmation
-        # This is where you'd integrate your AI model
         model_output = agent.get_input(prompt_data)
-        predicted_action = model_output.get("action")
-        response_message = model_output.get("response")  # still a string
-        #response_message = f"I received your message: '{prompt}'. This is where your AI response would go!"
-
+        response_message = model_output.get("response") 
 
         response_message = f"{response_message}"
         
@@ -851,7 +832,6 @@ if __name__ == '__main__':
     debug_mode = "--debug" in sys.argv
     port = 7001
     
-    # Check if port is already in use
     def is_port_in_use(port):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
@@ -870,26 +850,23 @@ if __name__ == '__main__':
     print(f"Starting Flask app on http://127.0.0.1:{port}")
     
     try:
-        # Try the standard Flask development server first
         app.run(
             host='127.0.0.1',
             port=port,
-            debug=False,  # Always disable debug to avoid reloader issues
+            debug=False, 
             use_reloader=False,
             use_debugger=False,
             threaded=True,
             processes=1
         )
     except OSError as e:
-        if e.errno == 9 or getattr(e, 'winerror', None) == 10038:  # Bad file descriptor
+        if e.errno == 9 or getattr(e, 'winerror', None) == 10038: 
             print("File descriptor error detected - using alternative server method...")
             
-            # Fallback: Use Werkzeug server directly
             from werkzeug.serving import make_server, WSGIRequestHandler
             
             class QuietHandler(WSGIRequestHandler):
                 def log_request(self, code='-', size='-'):
-                    # Only log errors, not every request
                     if str(code).startswith('4') or str(code).startswith('5'):
                         super().log_request(code, size)
             
@@ -907,7 +884,6 @@ if __name__ == '__main__':
             except Exception as fallback_error:
                 print(f"Fallback method also failed: {fallback_error}")
                 
-                # Last resort: Basic threading approach
                 import threading
                 import time
                 from werkzeug.serving import run_simple
@@ -936,5 +912,4 @@ if __name__ == '__main__':
                     print("\nShutting down...")
                     sys.exit(0)
         else:
-            # Re-raise other OSErrors
             raise

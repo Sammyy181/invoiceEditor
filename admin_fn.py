@@ -24,9 +24,8 @@ def load_service_titles(service):
 def save_service_columns(service, columns):
     config_file = f'columns/{service}.json'
     
-    if os.path.exists(config_file):
-        with open(config_file, 'w') as f:
-            json.dump(columns, f, indent = 2)
+    with open(config_file, 'w') as f:
+        json.dump(columns, f, indent = 2)
             
 def save_service_titles(service, titles):
     title_file = f'titles/{service}.json'

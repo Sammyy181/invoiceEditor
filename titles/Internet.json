@@ -16,12 +16,12 @@
     },
     {
         "id": "fixed_4",
-        "title": "Utilisation (%)",
+        "title": "Usage (%)",
         "type": "integer"
     },
     {
         "id": "fixed_5",
-        "title": "Consumption (%)",
+        "title": "Consumption Duration",
         "type": "decimal"
     },
     {
@@ -40,7 +40,7 @@
         "type": "text"
     },
     {
-        "id" : "fixed_9",
+        "id": "fixed_9",
         "title": "Invoiced",
         "type": "boolean"
     }

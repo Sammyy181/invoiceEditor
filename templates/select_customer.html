@@ -1390,30 +1390,11 @@
         </div>
         </div>
     </div>
-
-    <!-- Chatbot Toggle Button -->
-    <div id="chatbot-toggle" onclick="toggleChatbot()">
-        💬 Chat
-    </div>
-
-    <!-- Chatbot Window -->
-    <div id="chatbot-container" class="hidden">
-        <div class="chatbot-header">
-        Assistant
-        <span onclick="toggleChatbot()" class="chatbot-close">&times;</span>
-        </div>
-        <div id="chatbot-messages" class="chatbot-messages"></div>
-        <div class="chatbot-input-container">
-        <input type="text" id="chatbot-input" placeholder="Ask me something..." onkeydown="handleChatKey(event)">
-        <button onclick="sendChatMessage()">➤</button>
-        </div>
-    </div>
-
     
     <div class="page-wrapper">
         <div class="container">
             <form method="POST" id="customerForm">
-                <input type="hidden" name="customer" id="customerToDelete" value="">
+                <input type="hidden" name="customer_name" id="customerToDelete" value="">
                 <h2>Select customer:</h2>
 
                 <div class="customer-list">
@@ -1753,9 +1734,9 @@
         function confirmAndSetCustomer(customerName) {
             if (confirm('Delete ' + customerName + '?')) {
                 document.getElementById('customerToDelete').value = customerName;
-                return true;  // proceed with form submit
+                return true; 
             }
-            return false; // cancel submit
+            return false; 
         }
 
         document.getElementById('popupOverlay').addEventListener('click', function(e) {
@@ -1780,130 +1761,6 @@
                 }
             }
         });
-
-        function toggleChatbot() {
-            const bot = document.getElementById("chatbot-container");
-            bot.classList.toggle("hidden");
-            }
-
-            if (!chatbotInitialized && !bot.classList.contains("hidden")) {
-                appendMessage("Bot", "👋 Hi there! How can I help you today?");
-                chatbotInitialized = true;
-            }
-
-
-            function handleChatKey(e) {
-            if (e.key === "Enter") {
-                sendChatMessage();
-            }
-            }
-
-            function appendMessage(sender, text) {
-            const msgContainer = document.getElementById("chatbot-messages");
-
-            const msg = document.createElement("div");
-            msg.className = `message ${sender.toLowerCase()}`;
-
-            // Add bold sender label
-            const label = `<strong>${sender}:</strong><br>`;
-            msg.innerHTML = label + text;
-
-            msgContainer.appendChild(msg);
-            msgContainer.scrollTop = msgContainer.scrollHeight;
-            }
-
-
-            function sendChatMessage() {
-            const input = document.getElementById("chatbot-input");
-            const text = input.value.trim();
-            if (!text) return;
-
-            appendMessage("You", text);
-            input.value = "";
-
-            const msgContainer = document.getElementById("chatbot-messages");
-
-            // Add loading spinner
-            const loadingMsg = document.createElement("div");
-            loadingMsg.className = "message bot typing";
-            loadingMsg.innerHTML = `<div class="dot-typing"></div>`;
-            msgContainer.appendChild(loadingMsg);
-            msgContainer.scrollTop = msgContainer.scrollHeight;
-
-            fetch("/chatbot", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: text })
-            })
-                .then(res => res.json())
-                .then(data => {
-                loadingMsg.remove(); // Remove spinner
-                if (data.reply) {
-                    appendMessage("Bot", data.reply);
-                }
-                if (data.fields) {
-                    showDynamicForm(data.form_title || "Fill Details", data.fields);
-                }
-                })
-                .catch(err => {
-                loadingMsg.remove();
-                console.error("Error:", err);
-                appendMessage("Bot", "❌ Something went wrong.");
-                });
-            }
-
-
-        function showDynamicForm(title, fields) {
-            const container = document.getElementById("chatbot-messages");
-
-            const form = document.createElement("form");
-            form.classList.add("chatbot-form");
-
-            const heading = document.createElement("h4");
-            heading.innerText = title;
-            form.appendChild(heading);
-
-            fields.forEach(field => {
-            const label = document.createElement("label");
-            label.innerText = field.label;
-            label.htmlFor = field.id;
-            
-            const input = document.createElement("input");
-            input.type = field.type || "text";
-            input.name = field.id;
-            input.id = field.id;
-            input.required = true;
-
-            form.appendChild(label);
-            form.appendChild(input);
-            });
-
-            const submit = document.createElement("button");
-            submit.type = "submit";
-            submit.innerText = "Add Customer";
-            form.appendChild(submit);
-
-            form.onsubmit = (e) => {
-            e.preventDefault();
-            const formData = Object.fromEntries(new FormData(form));
-            fetch("/add_customer", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            })
-            .then(res => res.json())
-            .then(data => {
-                appendMessage("Bot", data.message || "✅ Customer added.");
-                form.remove(); // clean up
-            })
-            .catch(err => {
-                appendMessage("Bot", "❌ Error submitting customer.");
-            });
-            };
-
-            container.appendChild(form);
-            container.scrollTop = container.scrollHeight;
-        }
     </script>
 
     {% with messages = get_flashed_messages() %}

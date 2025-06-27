@@ -54,7 +54,7 @@ def get_customers(service):
     
     try:
         df = pd.read_excel(filepath, sheet_name=current_month)
-        df = df.iloc[:-5]  # Exclude last 5 rows which are summary rows
+        df = df.iloc[:-5] 
     except Exception:
         df = pd.read_excel(filepath, sheet_name=previous_month)
         df = df[0:0]
@@ -350,7 +350,7 @@ def copy_previous_data(service):
         normalized_copied = [col.strip().lower() for col in last_columns_copied]
         
         if "grand total" in normalized:
-            df = df.iloc[:-5] # Exclude last 5 rows which are summary rows
+            df = df.iloc[:-5]
         if "grand total" in normalized_copied:
             copied = copied.iloc[:-5]
         
@@ -377,7 +377,7 @@ def copy_previous_data(service):
         last_columns = df.columns[-2:]
         normalized = [col.strip().lower() for col in last_columns]
         if "grand total" in normalized:
-            df = df.iloc[:-5]  # Exclude last 5 rows which are summary rows
+            df = df.iloc[:-5] 
         
         df[COLUMN_MAP['month']] = current_month
 

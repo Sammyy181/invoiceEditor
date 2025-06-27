@@ -1437,31 +1437,22 @@
     </div>
   </div>
 
-  <!-- Chatbot Toggle Button -->
   <button id="chatbot-toggle" onclick="toggleChatbot()">
     <svg class="robot-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <!-- Robot Head -->
       <rect x="6" y="4" width="12" height="10" rx="2" ry="2"/>
-      <!-- Robot Eyes -->
       <circle cx="9" cy="8" r="1"/>
       <circle cx="15" cy="8" r="1"/>
-      <!-- Robot Mouth -->
       <rect x="10" y="10" width="4" height="1" rx="0.5"/>
-      <!-- Robot Antenna -->
       <circle cx="12" cy="2" r="1"/>
       <line x1="12" y1="3" x2="12" y2="4" stroke="currentColor" stroke-width="1"/>
-      <!-- Robot Body -->
       <rect x="8" y="14" width="8" height="6" rx="1"/>
-      <!-- Robot Arms -->
       <rect x="4" y="15" width="3" height="1" rx="0.5"/>
       <rect x="17" y="15" width="3" height="1" rx="0.5"/>
-      <!-- Robot Legs -->
       <rect x="9" y="20" width="2" height="2" rx="0.5"/>
       <rect x="13" y="20" width="2" height="2" rx="0.5"/>
     </svg>
   </button>
 
-  <!-- Chatbot Window -->
   <div id="chatbot-container" class="hidden">
     <div class="chatbot-header">
       Invo
@@ -1895,7 +1886,6 @@
       const msg = document.createElement("div");
       msg.className = `message ${sender.toLowerCase()}`;
 
-      // Add bold sender label
       const label = `<strong>${sender}:</strong><br>`;
       msg.innerHTML = label + text;
 
@@ -1914,7 +1904,6 @@
 
       const msgContainer = document.getElementById("chatbot-messages");
 
-      // Add loading spinner
       const loadingMsg = document.createElement("div");
       loadingMsg.className = "message bot typing";
       loadingMsg.innerHTML = `<div class="dot-typing"></div>`;
@@ -1928,7 +1917,7 @@
       })
         .then(res => res.json())
         .then(data => {
-          loadingMsg.remove(); // Remove spinner
+          loadingMsg.remove(); 
           if (data.reply) {
             appendMessage("Bot", data.reply);
           }
@@ -1985,7 +1974,7 @@
       .then(res => res.json())
       .then(data => {
         appendMessage("Bot", data.message || "✅ Customer added.");
-        form.remove(); // clean up
+        form.remove(); 
       })
       .catch(err => {
         appendMessage("Bot", "❌ Error submitting customer.");
