@@ -3,12 +3,11 @@ import os
 from datetime import datetime
 import pandas as pd
 
-TEMPLATE_FILE = 'template.xlsx'
-
 def load_service_columns(service):
     config_file = f'columns/{service}.json'
     
     if os.path.exists(config_file):
+        print("File Found")
         with open(config_file, 'r') as f:
             return json.load(f)
     return []

@@ -39,11 +39,10 @@ previous_month_date = now - relativedelta(months=1)
 previous_month_name = previous_month_date.strftime('%B')    
 
 wb = load_workbook(TEMPLATE_FILE)
-first_sheet = wb.worksheets[0] 
-second_sheet = wb.worksheets[1]
-first_sheet.title = previous_month_name
-second_sheet.title = month_name
-wb.save(TEMPLATE_FILE)
+first_sheet = wb.worksheets[0]
+if first_sheet.title is not month_name:
+    first_sheet.title = month_name
+    wb.save(TEMPLATE_FILE)
 
 USERS = {
     'admin': {'password': 'adminpass', 'role': 'admin'},
@@ -415,9 +414,16 @@ def add_customer():
         return redirect(url_for('select_customer'))
     
     for col in columns:
+        print(f"Column - {col}")
         field_name = col['title']
-        if field_name in request.form:
-            val = request.form[field_name].strip()
+        field_name = field_name.capitalize()
+        if field_name in request.form or field_name.lower() in request.form:
+            print(f"Field name - {field_name}, Form - {request.form}")
+            try:
+                val = request.form[field_name.lower()].strip() or request.form[field_name].strip()
+            except Exception as e:
+                print(f"Error - {e}")
+                val = ''
             if val != '':
                 other_data[field_name] = val
 
