@@ -44,13 +44,6 @@ if first_sheet.title is not month_name:
     first_sheet.title = month_name
     wb.save(TEMPLATE_FILE)
 
-USERS = {
-    'admin': {'password': 'adminpass', 'role': 'admin'},
-    'entry': {'password': 'entrypass', 'role': 'data_entry'},
-    'editor': {'password': 'editpass', 'role': 'data_editing'},
-    'viewer': {'password': 'viewpass', 'role': 'only_viewer'}
-}
-
 USERS_FILE = 'users.json'
 
 def load_users():
