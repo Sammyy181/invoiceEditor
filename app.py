@@ -51,6 +51,18 @@ USERS = {
     'viewer': {'password': 'viewpass', 'role': 'only_viewer'}
 }
 
+USERS_FILE = 'users.json'
+
+def load_users():
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_users(users):
+    with open(USERS_FILE, 'w') as f:
+        json.dump(users, f, indent=4)
+
 def require_roles(*roles):
     def wrapper(f):
         @wraps(f)
@@ -67,7 +79,8 @@ def login():
         uname = request.form.get('username', '').strip()
         pwd = request.form.get('password', '').strip()
 
-        user = USERS.get(uname)
+        users = load_users()
+        user = users.get(uname)
 
         if user is None:
             flash('❌ Username does not exist.', 'error')
@@ -84,6 +97,28 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        uname = request.form['username'].strip()
+        pwd = request.form['password'].strip()
+        role = request.form['role'].strip()
+
+        if not uname or not pwd or not role:
+            flash("All fields are required.", "error")
+            return redirect(url_for('register'))
+
+        users = load_users()
+        if uname in users:
+            flash("Username already exists.", "error")
+            return redirect(url_for('register'))
+
+        users[uname] = {'password': pwd, 'role': role}
+        save_users(users)
+        flash("✅ Registration successful. You can now log in.", "success")
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
 
 @app.route('/')
 def home():
